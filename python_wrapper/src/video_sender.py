@@ -1,5 +1,7 @@
 import ctypes
 from .agora_base import *
+from src.video_frame_observer import *
+
 """
 /**
 * Video buffer types.
@@ -141,6 +143,11 @@ agora_video_frame_sender_send = agora_lib.agora_video_frame_sender_send
 agora_video_frame_sender_send.restype = AGORA_API_C_INT
 agora_video_frame_sender_send.argtypes = [AGORA_HANDLE, ctypes.POINTER(ExternalVideoFrame)]
 
+agora_local_user_register_video_frame_observer = agora_lib.agora_local_user_register_video_frame_observer
+# agora_local_user_register_video_frame_observer.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
+agora_local_user_register_video_frame_observer.argtypes = [AGORA_HANDLE, ctypes.POINTER(VideoFrameObserver2)]
+agora_local_user_register_video_frame_observer.restype = ctypes.c_int
+
 class VideoSender:
     def __init__(self, video_frame_sender, video_track, local_user) -> None:
         self.video_frame_sender = video_frame_sender
@@ -158,6 +165,13 @@ class VideoSender:
         ret = agora_local_user_unpublish_video(self.local_user, self.video_track)     
         agora_local_video_track_set_enabled(self.video_track, 0)
         return ret
+    
+    def register_video_frame_observer(self, agora_video_frame_observer2):
+        # observer_ptr = ctypes.c_void_p(ctypes.addressof(agora_video_frame_observer2))
+        observer_ptr = ctypes.byref(agora_video_frame_observer2)
+        result = agora_local_user_register_video_frame_observer(self.local_user, observer_ptr)
+        if result!= 0:
+            raise Exception("Failed to register video frame observer")
 
     def SendVideoFrame(self, external_video_frame):
         c_array = (ctypes.c_ubyte * len(external_video_frame.data)).from_buffer(external_video_frame.data)

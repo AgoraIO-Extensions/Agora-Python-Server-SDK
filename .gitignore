@@ -183,3 +183,5 @@ test_data
 python_wrapper/test_fastapi_sheng_version.py
 
 agora_sdk_mac.zip
+
+ agora_sdk_old2/

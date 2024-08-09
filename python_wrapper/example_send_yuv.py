@@ -8,6 +8,7 @@ from src.media_node_factory import *
 from src.audio_pcm_data_sender import *
 from src.audio_frame_observer import *
 from src.video_sender import *
+from src.video_frame_observer import *
 
 # conn_observer callback
 def on_connected(agora_rtc_conn, conn_info, reason):
@@ -51,7 +52,11 @@ def on_stream_message(local_user, user_id, stream_id, data, length):
     return 0
 
 def on_user_info_updated(local_user, user_id, msg, val):
-    print("on useroff:", user_id, msg, val)
+    print("on_user_info_updated:", user_id, msg, val)
+    return 0
+
+def on_frame(agora_video_frame_observer2, channel_id, remote_uid, frame):
+    print("on_frame")
     return 0
 
 class Pacer:
@@ -128,6 +133,11 @@ connection.RegisterObserver(conn_observer,localuser_observer)
 connection.Connect(token, channel_id, uid)
 
 video_sender = connection.GetVideoSender()
+video_frame_observer = VideoFrameObserver2(
+    on_frame=ON_FRAME_CALLBACK(on_frame)
+)
+video_sender.register_video_frame_observer(video_frame_observer)
+
 video_sender.Start()
 
 sendinterval = 1/30
