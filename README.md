@@ -21,25 +21,25 @@
 
 # Test Data
 - download and unzip [test_data.zip](https://share.weiyun.com/4x3Um6b8)
-- make **test_data** directory in the same directory with **python_wrapper**
+- make **test_data** directory in the same directory with **agora_service**
 
 # Linux debug & develop
 ## Prepare C version of agora rtc sdk
 - download and unzip [agora_sdk.zip](https://share.weiyun.com/1tuBWw6O)
-- make **agora_sdk** directory in the same directory with **python_wrapper**
+- make **agora_sdk** directory in the same directory with **agora_service**
 - there should be **libagora_rtc_sdk.so** and **include_c** in **agora_sdk** directory
 
 ## run example on linux
 ```
 export LD_LIBRARY_PATH=/path/to/agora_sdk
-python python_wrapper/example.py
+python examples/example_send_pcm.py {appid} {token} {channel_id} ./test_data/demo.pcm {userid}
 ```
 
 # Mac debug & develop
 ## Prepare C version of agora rtc sdk
 - download and unzip [agora_sdk_mac.zip](https://share.weiyun.com/jgvFzRI0) for mac version: please contact R&D
 - rename dir agora_sdk_mac to agora_sdk
-- make **agora_sdk** directory in the same directory with **python_wrapper** 
+- make **agora_sdk** directory in the same directory with **agora_service** 
 
 ## run example on mac
 
@@ -47,5 +47,4 @@ python python_wrapper/example.py
 - or  `export DYLD_LIBRARY_PATH=/path/to/agora_sdk`
 
 ```
-python python_wrapper/example.py {appid} {token} {channelname} {userid} {pcm sampe file path}
-```
+python examples/example_send_pcm.py {appid} {token} {channel_id} ./test_data/demo.pcm {userid}```

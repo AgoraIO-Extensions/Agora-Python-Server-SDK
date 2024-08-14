@@ -178,7 +178,7 @@ signal.signal(signal.SIGINT, signal_handler)
 
 
 # 通过传参将参数传进来
-# 例如： python python_wrapper/example.py {appid} {token} {channel_id} ./python_wrapper/demo.pcm {userid}
+# 例如： python examples/example.py {appid} {token} {channel_id} ./test_data/demo.pcm {userid}
 appid = sys.argv[1]
 token = sys.argv[2]
 channel_id = sys.argv[3]

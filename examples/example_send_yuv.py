@@ -77,7 +77,7 @@ example_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 # 通过传参将参数传进来
-# 例如： python python_wrapper/example.py {appid} {token} {channel_id} ./test_data/103_RaceHorses_416x240p30_300.yuv {userid}
+# 例如： python examples/example.py {appid} {token} {channel_id} ./test_data/103_RaceHorses_416x240p30_300.yuv {userid}
 appid = sys.argv[1]
 token = sys.argv[2]
 channel_id = sys.argv[3]

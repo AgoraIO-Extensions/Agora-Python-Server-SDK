@@ -180,7 +180,6 @@ audio_dump_*.pcm
 test_data
 
 
-python_wrapper/test_fastapi_sheng_version.py
 
 agora_sdk_mac.zip
 
