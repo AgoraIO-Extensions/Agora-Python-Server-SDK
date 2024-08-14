@@ -109,7 +109,7 @@ class AgoraService:
             return
         agora_service_release(self.service_handle)
     
-    def createRtcConnection	(self, con_config):        
+    def create_rtc_connection	(self, con_config):        
         return RTCConnection(con_config,self)
 
     def create_custom_audio_track_pcm(self, audio_pcm_data_sender):
