@@ -78,16 +78,16 @@ agora_service_set_log_file = agora_lib.agora_service_set_log_file
 agora_service_set_log_file.restype = AGORA_API_C_INT
 agora_service_set_log_file.argtypes = [AGORA_HANDLE, ctypes.c_char_p, ctypes.c_uint]
 
+agora_service_create_custom_audio_track_pcm = agora_lib.agora_service_create_custom_audio_track_pcm
+agora_service_create_custom_audio_track_pcm.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
+agora_service_create_custom_audio_track_pcm.restype = AGORA_HANDLE  
 
 class AgoraService:
     def __init__(self) -> None:
         self.service_handle = agora_service_create()
         self.inited = False
 
-    def NewConnection(self, con_config):        
-        return RTCConnection(con_config,self)
-
-    def Init(self, config: AgoraServiceConfig):        
+    def initialize(self, config: AgoraServiceConfig):       
         if self.inited == True:
             return
         config.app_id = config.appid.encode('utf-8')
@@ -104,7 +104,18 @@ class AgoraService:
             self.inited = True
         print(f'Initialization result: {result}')
         
-    def Destroy(self):                
+    def release(self):                
         if self.inited == False:
             return
         agora_service_release(self.service_handle)
+    
+    def createRtcConnection	(self, con_config):        
+        return RTCConnection(con_config,self)
+
+    def create_custom_audio_track_pcm(self, audio_pcm_data_sender):
+        result = agora_service_create_custom_audio_track_pcm(self.service_handle, audio_pcm_data_sender)
+        if not result:
+            raise Exception("Failed to create custom audio track PCM")
+        return result
+    
+
