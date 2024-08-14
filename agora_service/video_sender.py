@@ -1,6 +1,6 @@
 import ctypes
 from .agora_base import *
-from src.video_frame_observer import *
+from agora_service.video_frame_observer import *
 
 """
 /**
