@@ -10,6 +10,29 @@ class PcmAudioFrame:
         self.number_of_channels = 0
         self.sample_rate = 0
 
+#ref to: https://doc.shengwang.cn/api-ref/rtc-server-sdk/cpp/structagora_1_1rtc_1_1_encoded_audio_frame_advanced_settings.html
+class EncodedAudioFrameAdvancedSettings:
+    def __init__(self)->None:
+        self.sendEvenIfEmpty = 1 #bool value, 是否发送空音频帧,default TRUE
+        self.speech = 1 #bool, 是否是语音,default TRUE
+class EncodedAudioFrameInfo:
+    def __init__(self)->None:
+        self.advancedSettings = EncodedAudioFrameAdvancedSettings()
+        self.captureTimeMs = 0 #int64, 音频帧的 Unix 时间戳（毫秒）
+        #int, 音频帧的编码格式; ref: https://doc.shengwang.cn/api-ref/rtc-server-sdk/cpp/namespaceagora_1_1rtc#ac211c1a503d38d504c92b5f006240053
+        self.codec = 1
+        self.numberOfChannels = 2
+        self.sampleRateHz = 16000
+        #int, 对于 aac 编码格式，默认为 1024；对于 Opus 编码格式，默认为 960
+        self.samplesPerChannel = 960
+        
+
+class EncodedAudioFrame:
+    def __init__(self)->None:
+        self.data = []
+        self.size = 0
+        self.audioFrameInfo = EncodedAudioFrameInfo()
+
 
 agora_audio_pcm_data_sender_send = agora_lib.agora_audio_pcm_data_sender_send
 agora_audio_pcm_data_sender_send.restype = AGORA_API_C_INT
@@ -47,40 +70,17 @@ agora_local_audio_track_clear_buffer.argtypes = [AGORA_HANDLE]
 
 
 class AudioPcmDataSender:
-    def __init__(self, audio_pcm_data_sender, audio_track, local_user) -> None:
-        self.audio_pcm_data_sender = audio_pcm_data_sender
-        self.audio_track = audio_track
-        self.local_user = local_user
+    def __init__(self, handle) -> None:
+        self.sender_handle = handle
+       
 
-
-    def Release(self):
-        if self.audio_pcm_data_sender == None:
-            return
-        agora_local_audio_track_destroy(self.audio_pcm_data_sender)
-        agora_audio_pcm_data_sender_destroy(self.audio_track)
-
-    def Start(self):
-        agora_local_audio_track_set_enabled(self.audio_track, 1)
-        ret = agora_local_user_publish_audio(self.local_user, self.audio_track)
-        return ret
-    
-    def Stop(self):
-        ret = agora_local_user_unpublish_audio(self.local_user, self.audio_track)
-        agora_local_audio_track_set_enabled(self.audio_track, 0)
-        return ret
-
-    def SendPcmData(self, frame):
+    def SendAudioPcmData(self, frame:PcmAudioFrame):
         c_data = (ctypes.c_char * len(frame.data)).from_buffer(frame.data)
-        return agora_audio_pcm_data_sender_send(self.audio_pcm_data_sender, c_data, frame.timestamp, frame.samples_per_channel, frame.bytes_per_sample, frame.number_of_channels, frame.sample_rate)
+        return agora_audio_pcm_data_sender_send(self.sender_handle, c_data, frame.timestamp, frame.samples_per_channel, frame.bytes_per_sample, frame.number_of_channels, frame.sample_rate)
         
-    def AdjustVolume(self, volume):
-        return agora_local_audio_track_adjust_publish_volume(self.audio_track, volume)
     
-    def SetSendBufferSize(self, bufSize):
-        ret = agora_local_audio_track_set_max_buffer_audio_frame_number(self.audio_track, bufSize)
-        return ret
-
-    def ClearSendBuffer(self):
-        ret = agora_local_audio_track_clear_buffer(self.audio_track)
-        return ret
-
+class AudioEncodedFrameSender:
+    def __init__(self, handle) -> None:
+        self.sender_handle = handle
+    def sendEncodedAudioFrame(self, frame:EncodedAudioFrame):
+        return agora_audio_encoded_frame_sender_send(self.sender_handle, frame.data, frame.length, frame.type, frame.timestamp, frame.samples_per_channel, frame.bytes_per_sample, frame.number_of_channels, frame.sample_rate)

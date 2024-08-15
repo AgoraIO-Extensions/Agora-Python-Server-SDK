@@ -148,7 +148,7 @@ agora_local_user_register_video_frame_observer = agora_lib.agora_local_user_regi
 agora_local_user_register_video_frame_observer.argtypes = [AGORA_HANDLE, ctypes.POINTER(VideoFrameObserver2)]
 agora_local_user_register_video_frame_observer.restype = ctypes.c_int
 
-class VideoSender:
+class VideoFrameSender:
     def __init__(self, video_frame_sender, video_track, local_user) -> None:
         self.video_frame_sender = video_frame_sender
         self.video_track = video_track

@@ -70,6 +70,9 @@ agora_service_create_media_node_factory = agora_lib.agora_service_create_media_n
 agora_service_create_media_node_factory.restype = AGORA_HANDLE
 agora_service_create_media_node_factory.argtypes = [AGORA_HANDLE]
 
+agora_media_node_factory_destroy = agora_lib.agora_media_node_factory_destroy
+agora_media_node_factory_destroy.argtypes = [AGORA_HANDLE]
+
 agora_service_release = agora_lib.agora_service_release
 agora_service_release.restype = AGORA_API_C_INT
 agora_service_release.argtypes = [AGORA_HANDLE]
@@ -86,6 +89,7 @@ class AgoraService:
     def __init__(self) -> None:
         self.service_handle = agora_service_create()
         self.inited = False
+        self.media_node_factory = None
 
     def initialize(self, config: AgoraServiceConfig):       
         if self.inited == True:
@@ -107,15 +111,32 @@ class AgoraService:
     def release(self):                
         if self.inited == False:
             return
-        agora_service_release(self.service_handle)
+        #release node
+        if self.media_node_factory :
+            agora_media_node_factory_destroy(self.media_node_factory)
+
+        if self.service_handle:
+            agora_service_release(self.service_handle)
+       
+        self.inited = False
+        self.media_node_factory = None
+        self.service_handle = None
     
     def create_rtc_connection(self, con_config):        
         return RTCConnection(con_config,self)
 
-    def create_custom_audio_track_pcm(self, audio_pcm_data_sender):
-        result = agora_service_create_custom_audio_track_pcm(self.service_handle, audio_pcm_data_sender)
+    #createMediaNodeFactory	创建一个媒体节点工厂对象。
+    def create_media_node_factory(self):
+        return MediaNodeFactory(self.media_node_factory)
+    
+    #感觉没有理顺Track和pcm Sender之间的创建关系？？？？
+    #比如创建Track的时候，需要先创建pcm Sender
+    #createCustomAudioTrackPcm	创建一个自定义音频Track。
+    def create_custom_audio_track_pcm(self, sender: AudioPcmDataSender):
+        result = agora_service_create_custom_audio_track_pcm(self.service_handle, sender.audio_pcm_data_sender)
         if not result:
             raise Exception("Failed to create custom audio track PCM")
-        return result
+        LocalAudioTrack = LocalAudioTrack(result)
+        return LocalAudioTrack
     
 
