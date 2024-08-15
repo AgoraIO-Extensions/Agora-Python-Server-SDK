@@ -85,6 +85,11 @@ agora_service_create_custom_audio_track_pcm = agora_lib.agora_service_create_cus
 agora_service_create_custom_audio_track_pcm.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
 agora_service_create_custom_audio_track_pcm.restype = AGORA_HANDLE  
 
+agora_rtc_conn_create = agora_lib.agora_rtc_conn_create
+agora_rtc_conn_create.restype = AGORA_HANDLE
+agora_rtc_conn_create.argtypes = [AGORA_HANDLE, ctypes.POINTER(RTCConnConfig)]
+
+
 class AgoraService:
     def __init__(self) -> None:
         self.service_handle = agora_service_create()
@@ -96,14 +101,6 @@ class AgoraService:
             return
         config.app_id = config.appid.encode('utf-8')
         result = agora_service_initialize(self.service_handle, ctypes.byref(config))
-        self.media_node_factory = agora_service_create_media_node_factory(self.service_handle)        
-
-        if config.log_path:
-            log_size = 512 * 1024
-            if config.log_size > 0:
-                log_size = config.log_size            
-            agora_service_set_log_file(self.service_handle, ctypes.create_string_buffer(config.log_path.encode('utf-8')),log_size)
-
         if result == 0:
             self.inited = True
         print(f'Initialization result: {result}')
@@ -122,21 +119,48 @@ class AgoraService:
         self.media_node_factory = None
         self.service_handle = None
     
-    def create_rtc_connection(self, con_config):        
-        return RTCConnection(con_config,self)
-
     #createMediaNodeFactory	创建一个媒体节点工厂对象。
     def create_media_node_factory(self):
+        if not self.inited:
+            print("AgoraService is not initialized. Please call initialize() first.")
+            return None
+        self.media_node_factory = agora_service_create_media_node_factory(self.service_handle)
+        if not self.media_node_factory:
+            raise Exception("Failed to create media node factory")
         return MediaNodeFactory(self.media_node_factory)
     
+
+    def create_rtc_connection(self, con_config):       
+        if not self.inited:
+            print("AgoraService is not initialized. Please call initialize() first.")
+            return None
+        rtc_conn_handle = agora_rtc_conn_create(self.service_handle, ctypes.byref(con_config))
+        if not rtc_conn_handle:
+            raise Exception("Failed to create RTC connection")
+        return RTCConnection(rtc_conn_handle)
+
     #感觉没有理顺Track和pcm Sender之间的创建关系？？？？
     #比如创建Track的时候，需要先创建pcm Sender
     #createCustomAudioTrackPcm	创建一个自定义音频Track。
-    def create_custom_audio_track_pcm(self, sender: AudioPcmDataSender):
-        result = agora_service_create_custom_audio_track_pcm(self.service_handle, sender.audio_pcm_data_sender)
-        if not result:
+    def create_custom_audio_track_pcm(self, audio_pcm_data_sender):
+        if not self.inited:
+            print("AgoraService is not initialized. Please call initialize() first.")
+            return None
+        audio_track = agora_service_create_custom_audio_track_pcm(self.service_handle, audio_pcm_data_sender)
+        if not audio_track:
             raise Exception("Failed to create custom audio track PCM")
-        LocalAudioTrack = LocalAudioTrack(result)
-        return LocalAudioTrack
+        return audio_track
     
+    def set_log_file(self, log_path: str, log_size: int = 512 * 1024):
+        if not self.inited:
+            print("AgoraService is not initialized. Please call initialize() first.")
+            return -1
+        encoded_log_path = log_path.encode('utf-8')
+        result = agora_service_set_log_file(self.service_handle, ctypes.create_string_buffer(encoded_log_path), log_size)
+        if result == 0:
+            print(f"Log file set successfully: {log_path}")
+        else:
+            print(f"Failed to set log file. Error code: {result}")
+        return result
+
 

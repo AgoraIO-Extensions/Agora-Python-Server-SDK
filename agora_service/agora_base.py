@@ -20,6 +20,7 @@ elif sys.platform == 'linux':
 AGORA_HANDLE = ctypes.c_void_p
 AGORA_API_C_INT = ctypes.c_int
 AGORA_API_C_HDLL = ctypes.c_void_p
+AGORA_API_C_VOID = None
 
 class LastmileProbeOneWayResult(ctypes.Structure):
     _fields_ = [
@@ -74,6 +75,66 @@ class RTCStats(ctypes.Structure):
         ("tx_packet_loss_rate", ctypes.c_int),
         ("rx_packet_loss_rate", ctypes.c_int)
     ]    
+
+
+
+class VIDEO_STREAM_TYPE(ctypes.c_int):
+    VIDEO_STREAM_HIGH = 0
+    VIDEO_STREAM_LOW = 1
+
+class VideoSubscriptionOptions(ctypes.Structure):
+    _fields_ = [
+        ("type", ctypes.c_int),
+        ("encodedFrameOnly", ctypes.c_bool)
+    ]
+
+
+class AudioPcmDataInfo(ctypes.Structure):
+    _fields_ = [
+        ("samplesPerChannel", ctypes.c_size_t),
+        ("channelNum", ctypes.c_int16),
+        ("samplesOut", ctypes.c_size_t),
+        ("elapsedTimeMs", ctypes.c_int64),
+        ("ntpTimeMs", ctypes.c_int64)
+    ]
+
+    def __init__(self):
+        self.samplesPerChannel = 0
+        self.channelNum = 0
+        self.samplesOut = 0
+        self.elapsedTimeMs = 0
+        self.ntpTimeMs = 0
+
+
+class LocalAudioStats(ctypes.Structure):
+    _fields_ = [
+        ("numChannels", ctypes.c_int),
+        ("sentSampleRate", ctypes.c_int),
+        ("sentBitrate", ctypes.c_int),
+        ("internalCodec", ctypes.c_int),
+        ("txPacketLossRate", ctypes.c_ushort),
+        ("audioDeviceDelay", ctypes.c_int)
+    ]
+
+
+
+class AUDIO_PROFILE_TYPE(ctypes.c_int):
+    AUDIO_PROFILE_DEFAULT = 0
+    AUDIO_PROFILE_SPEECH_STANDARD = 1
+    AUDIO_PROFILE_MUSIC_STANDARD = 2
+    AUDIO_PROFILE_MUSIC_STANDARD_STEREO = 3
+    AUDIO_PROFILE_MUSIC_HIGH_QUALITY = 4
+    AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO = 5
+    AUDIO_PROFILE_IOT = 6
+    AUDIO_PROFILE_NUM = 7
+
+class AudioEncoderConfiguration(ctypes.Structure):
+    _fields_ = [
+        ("audioProfile", AUDIO_PROFILE_TYPE)
+    ]
+
+    def __init__(self):
+        self.audioProfile = AUDIO_PROFILE_TYPE.AUDIO_PROFILE_DEFAULT
 
 
 agora_service_create_custom_audio_track_pcm = agora_lib.agora_service_create_custom_audio_track_pcm
