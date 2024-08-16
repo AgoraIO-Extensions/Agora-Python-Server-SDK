@@ -51,7 +51,7 @@ ON_STREAM_MESSAGE_ERROR_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, user_id_
 ON_ENCRYPTION_ERROR_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_int)
 ON_UPLOAD_LOG_RESULT_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_char_p, ctypes.c_int, ctypes.c_int)
 
-class RTCConnObserver(ctypes.Structure):
+class RTCConnectionObserver(ctypes.Structure):
     _fields_ = [
         ("on_connected", ON_CONNECTED_CALLBACK),
         ("on_disconnected", ON_DISCONNECTED_CALLBACK),

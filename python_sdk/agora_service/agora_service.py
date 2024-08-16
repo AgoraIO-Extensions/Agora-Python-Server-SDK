@@ -13,7 +13,7 @@ from .media_node_factory import *
 from .rtc_connection import *
 from .audio_pcm_data_sender import *
 from .local_audio_track import *
-from .rtc_conn_observer import *
+from .rtc_connection_observer import *
 
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
