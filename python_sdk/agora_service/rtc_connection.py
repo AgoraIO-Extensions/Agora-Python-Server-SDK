@@ -53,7 +53,7 @@ agora_rtc_conn_disconnect.argtypes = [AGORA_HANDLE]
 
 agora_rtc_conn_register_observer = agora_lib.agora_rtc_conn_register_observer
 agora_rtc_conn_register_observer.restype = AGORA_API_C_INT
-agora_rtc_conn_register_observer.argtypes = [AGORA_HANDLE, ctypes.POINTER(RTCConnObserver)]
+agora_rtc_conn_register_observer.argtypes = [AGORA_HANDLE, ctypes.POINTER(RTCConnectionObserver)]
 #unregister
 agora_rtc_conn_unregister_observer = agora_lib.agora_rtc_conn_unregister_observer
 agora_rtc_conn_unregister_observer.restype = AGORA_API_C_INT
@@ -224,3 +224,12 @@ class RTCConnection:
             print("Failed to get Agora parameter")
             return None
         return agora_parameter
+
+
+    # 获取本地用户对象。
+    def get_local_user(self):
+        local_user_handle = agora_rtc_conn_get_local_user(self.conn_handle)
+        if not local_user_handle:
+            print("Failed to get local user")
+            return None
+        return LocalUser(local_user_handle)

@@ -7,6 +7,7 @@ from agora_service.rtc_connection import *
 from agora_service.media_node_factory import *
 from agora_service.audio_pcm_data_sender import *
 from agora_service.audio_frame_observer import *
+from agora_service.media_node_factory import *
 
 # conn_observer callback
 def on_connected(agora_rtc_conn, conn_info, reason):
@@ -109,7 +110,7 @@ config.appid = appid
 config.log_path = os.path.join(example_dir, 'agorasdk.log')
 
 agora_service = AgoraService()
-agora_service.Init(config)
+agora_service.initialize(config)
 
 #---------------2. Create Connection
 con_config = RTCConnConfig(
@@ -126,9 +127,9 @@ pcm_observer = AudioFrameObserver(
     on_get_audio_frame_position=ON_GET_AUDIO_FRAME_POSITION_CALLBACK(on_get_audio_frame_position),
 )
 con_config.pcm_observer = pcm_observer
-connection = agora_service.NewConnection(con_config)
+connection = agora_service.create_rtc_connection(con_config)
 
-conn_observer = RTCConnObserver(
+conn_observer = RTCConnectionObserver(
     on_connected=ON_CONNECTED_CALLBACK(on_connected),
     on_disconnected=ON_CONNECTED_CALLBACK(on_disconnected),
     on_user_joined=ON_USER_JOINED_CALLBACK(on_user_joined)
@@ -138,16 +139,24 @@ localuser_observer = RTCLocalUserObserver(
     on_stream_message=ON_STREAM_MESSAGE_CALLBACK(on_stream_message),
     on_user_info_updated=ON_USER_INFO_UPDATED_CALLBACK(on_user_info_updated)
 )
-connection.RegisterObserver(conn_observer,localuser_observer)
-connection.Connect(token, channel_id, uid)
+connection.register_observer(conn_observer)
+connection.connect(token, channel_id, uid)
 
 #---------------3. Create Media Sender
-audio_pcm_data_sender = connection.NewPcmSender()
-audio_pcm_data_sender.SetSendBufferSize(320*2000)# set to 1s
+# audio_pcm_data_sender = connection.NewPcmSender()
+# audio_pcm_data_sender.SetSendBufferSize(320*2000)# set to 1s
 
+media_node_factory = agora_service.create_media_node_factory()
+pcm_data_sender = media_node_factory.create_audio_pcm_data_sender()
+
+audio_track_pcm = agora_service.create_custom_audio_track_pcm(pcm_data_sender)
+
+
+local_user = connection.get_local_user()
 
 #---------------4. Send Media Stream
-audio_pcm_data_sender.Start()
+audio_track_pcm.set_enabled(1)
+local_user.publish_audio(audio_track_pcm)
 
 sendinterval = 0.1
 Pacer = Pacer(sendinterval)

@@ -30,13 +30,13 @@ agora_local_audio_track_get_state = agora_lib.agora_local_audio_track_get_state
 agora_local_audio_track_get_state.restype = ctypes.c_int
 agora_local_audio_track_get_state.argtypes = [AGORA_HANDLE]
 
-agora_local_audio_track_get_statistics = agora_lib.agora_local_audio_track_get_statistics
-agora_local_audio_track_get_statistics.restype = ctypes.POINTER(local_audio_track_stats)
-agora_local_audio_track_get_statistics.argtypes = [AGORA_HANDLE]
+# agora_local_audio_track_get_statistics = agora_lib.agora_local_audio_track_get_statistics
+# agora_local_audio_track_get_statistics.restype = ctypes.POINTER(local_audio_track_stats)
+# agora_local_audio_track_get_statistics.argtypes = [AGORA_HANDLE]
 
-agora_local_audio_track_destroy_statistics = agora_lib.agora_local_audio_track_destroy_statistics
-agora_local_audio_track_destroy_statistics.restype = None
-agora_local_audio_track_destroy_statistics.argtypes = [AGORA_HANDLE, ctypes.POINTER(local_audio_track_stats)]
+# agora_local_audio_track_destroy_statistics = agora_lib.agora_local_audio_track_destroy_statistics
+# agora_local_audio_track_destroy_statistics.restype = None
+# agora_local_audio_track_destroy_statistics.argtypes = [AGORA_HANDLE, ctypes.POINTER(local_audio_track_stats)]
 
 agora_local_audio_track_adjust_publish_volume = agora_lib.agora_local_audio_track_adjust_publish_volume
 agora_local_audio_track_adjust_publish_volume.restype = ctypes.c_int
@@ -83,17 +83,17 @@ class LocalAudioTrack:
     def get_state(self):
         return agora_local_audio_track_get_state(self.track_handle)
 
-    def get_statistics(self):
-        stats_ptr = agora_local_audio_track_get_statistics(self.track_handle)
-        if not stats_ptr:
-            print("Failed to get local audio track statistics")
-            return None
-        stats = stats_ptr.contents
-        self.destroy_statistics(stats_ptr)
-        return stats
+    # def get_statistics(self):
+    #     stats_ptr = agora_local_audio_track_get_statistics(self.track_handle)
+    #     if not stats_ptr:
+    #         print("Failed to get local audio track statistics")
+    #         return None
+    #     stats = stats_ptr.contents
+    #     self.destroy_statistics(stats_ptr)
+    #     return stats
 
-    def destroy_statistics(self, stats):
-        agora_local_audio_track_destroy_statistics(self.track_handle, stats)
+    # def destroy_statistics(self, stats):
+    #     agora_local_audio_track_destroy_statistics(self.track_handle, stats)
 
     def adjust_publish_volume(self, volume):
         ret = agora_local_audio_track_adjust_publish_volume(self.track_handle, volume)

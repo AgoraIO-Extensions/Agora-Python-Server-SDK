@@ -142,14 +142,14 @@ class AgoraService:
     #感觉没有理顺Track和pcm Sender之间的创建关系？？？？
     #比如创建Track的时候，需要先创建pcm Sender
     #createCustomAudioTrackPcm	创建一个自定义音频Track。
-    def create_custom_audio_track_pcm(self, audio_pcm_data_sender):
+    def create_custom_audio_track_pcm(self, audio_pcm_data_sender:AudioPcmDataSender):
         if not self.inited:
             print("AgoraService is not initialized. Please call initialize() first.")
             return None
-        audio_track = agora_service_create_custom_audio_track_pcm(self.service_handle, audio_pcm_data_sender)
+        audio_track = agora_service_create_custom_audio_track_pcm(self.service_handle, audio_pcm_data_sender.sender_handle)
         if not audio_track:
             raise Exception("Failed to create custom audio track PCM")
-        return audio_track
+        return LocalAudioTrack(audio_track)
     
     def set_log_file(self, log_path: str, log_size: int = 512 * 1024):
         if not self.inited:
