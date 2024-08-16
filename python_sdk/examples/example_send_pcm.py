@@ -181,16 +181,18 @@ with open(pcm_file_path, "rb") as file:
         frame.number_of_channels = 1
         frame.sample_rate = 16000
 
-        ret = audio_pcm_data_sender.SendPcmData(frame)
+        ret = pcm_data_sender.send(frame)
         count += 1
         print("count,ret=",count, ret)
         Pacer.pace()
            
 #---------------5. Stop Media Sender And Release
 time.sleep(10)
-audio_pcm_data_sender.Stop()
-connection.Disconnect()
-connection.Release()
+audio_track_pcm.set_enabled(0)
+local_user.unpublish_audio()
+
+connection.disconnect()
+# connection.Release()
 print("release")
-agora_service.Destroy()
+agora_service.release()
 print("end")

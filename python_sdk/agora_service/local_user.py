@@ -1,6 +1,7 @@
 import time
 import ctypes
 from .agora_base import *
+from .local_audio_track import *
 
 agora_local_user_set_user_role = agora_lib.agora_local_user_set_user_role
 agora_local_user_set_user_role.restype = AGORA_API_C_VOID
@@ -226,8 +227,8 @@ class LocalUser:
         agora_local_user_destroy_local_audio_statistics(self.user_handle, stats)
         return result
 
-    def publish_audio(self, agora_local_audio_track):
-        ret = agora_local_user_publish_audio(self.user_handle, agora_local_audio_track)
+    def publish_audio(self, agora_local_audio_track:LocalAudioTrack):
+        ret = agora_local_user_publish_audio(self.user_handle, agora_local_audio_track.track_handle)
         if ret < 0:
             print("Failed to publish audio")
         return ret
