@@ -90,9 +90,9 @@ agora_local_user_get_playback_signal_volume = agora_lib.agora_local_user_get_pla
 agora_local_user_get_playback_signal_volume.restype = AGORA_API_C_INT
 agora_local_user_get_playback_signal_volume.argtypes = [AGORA_HANDLE, ctypes.POINTER(ctypes.c_int)]
 
-agora_local_user_pull_mixed_audio_pcm_data = agora_lib.agora_local_user_pull_mixed_audio_pcm_data
-agora_local_user_pull_mixed_audio_pcm_data.restype = AGORA_API_C_INT
-agora_local_user_pull_mixed_audio_pcm_data.argtypes = [AGORA_HANDLE, ctypes.c_void_p, ctypes.POINTER(AudioPcmDataInfo)]
+# agora_local_user_pull_mixed_audio_pcm_data = agora_lib.agora_local_user_pull_mixed_audio_pcm_data
+# agora_local_user_pull_mixed_audio_pcm_data.restype = AGORA_API_C_INT
+# agora_local_user_pull_mixed_audio_pcm_data.argtypes = [AGORA_HANDLE, ctypes.c_void_p, ctypes.POINTER(AudioPcmDataInfo)]
 
 agora_local_user_set_playback_audio_frame_parameters = agora_lib.agora_local_user_set_playback_audio_frame_parameters
 agora_local_user_set_playback_audio_frame_parameters.restype = AGORA_API_C_INT
@@ -118,21 +118,21 @@ agora_local_user_unregister_audio_frame_observer = agora_lib.agora_local_user_un
 agora_local_user_unregister_audio_frame_observer.restype = AGORA_API_C_INT
 agora_local_user_unregister_audio_frame_observer.argtypes = [AGORA_HANDLE]
 
-agora_local_user_enable_audio_spectrum_monitor = agora_lib.agora_local_user_enable_audio_spectrum_monitor
-agora_local_user_enable_audio_spectrum_monitor.restype = AGORA_API_C_INT
-agora_local_user_enable_audio_spectrum_monitor.argtypes = [AGORA_HANDLE, ctypes.c_int]
+# agora_local_user_enable_audio_spectrum_monitor = agora_lib.agora_local_user_enable_audio_spectrum_monitor
+# agora_local_user_enable_audio_spectrum_monitor.restype = AGORA_API_C_INT
+# agora_local_user_enable_audio_spectrum_monitor.argtypes = [AGORA_HANDLE, ctypes.c_int]
 
-agora_local_user_disable_audio_spectrum_monitor = agora_lib.agora_local_user_disable_audio_spectrum_monitor
-agora_local_user_disable_audio_spectrum_monitor.restype = AGORA_API_C_INT
-agora_local_user_disable_audio_spectrum_monitor.argtypes = [AGORA_HANDLE]
+# agora_local_user_disable_audio_spectrum_monitor = agora_lib.agora_local_user_disable_audio_spectrum_monitor
+# agora_local_user_disable_audio_spectrum_monitor.restype = AGORA_API_C_INT
+# agora_local_user_disable_audio_spectrum_monitor.argtypes = [AGORA_HANDLE]
 
-agora_local_user_register_audio_spectrum_observer = agora_lib.agora_local_user_register_audio_spectrum_observer
-agora_local_user_register_audio_spectrum_observer.restype = AGORA_API_C_INT
-agora_local_user_register_audio_spectrum_observer.argtypes = [AGORA_HANDLE, ctypes.c_void_p]
+# agora_local_user_register_audio_spectrum_observer = agora_lib.agora_local_user_register_audio_spectrum_observer
+# agora_local_user_register_audio_spectrum_observer.restype = AGORA_API_C_INT
+# agora_local_user_register_audio_spectrum_observer.argtypes = [AGORA_HANDLE, ctypes.c_void_p]
 
-agora_local_user_unregister_audio_spectrum_observer = agora_lib.agora_local_user_unregister_audio_spectrum_observer
-agora_local_user_unregister_audio_spectrum_observer.restype = AGORA_API_C_INT
-agora_local_user_unregister_audio_spectrum_observer.argtypes = [AGORA_HANDLE, ctypes.c_void_p]
+# agora_local_user_unregister_audio_spectrum_observer = agora_lib.agora_local_user_unregister_audio_spectrum_observer
+# agora_local_user_unregister_audio_spectrum_observer.restype = AGORA_API_C_INT
+# agora_local_user_unregister_audio_spectrum_observer.argtypes = [AGORA_HANDLE, ctypes.c_void_p]
 
 agora_local_user_register_video_encoded_frame_observer = agora_lib.agora_local_user_register_video_encoded_frame_observer
 agora_local_user_register_video_encoded_frame_observer.restype = AGORA_API_C_INT
@@ -150,9 +150,9 @@ agora_local_user_unregister_video_frame_observer = agora_lib.agora_local_user_un
 agora_local_user_unregister_video_frame_observer.restype = AGORA_API_C_INT
 agora_local_user_unregister_video_frame_observer.argtypes = [AGORA_HANDLE, ctypes.c_void_p]
 
-agora_local_user_set_video_subscription_options = agora_lib.agora_local_user_set_video_subscription_options
-agora_local_user_set_video_subscription_options.restype = AGORA_API_C_INT
-agora_local_user_set_video_subscription_options.argtypes = [AGORA_HANDLE, ctypes.c_uint, ctypes.POINTER(VideoSubscriptionOptions)]
+# agora_local_user_set_video_subscription_options = agora_lib.agora_local_user_set_video_subscription_options
+# agora_local_user_set_video_subscription_options.restype = AGORA_API_C_INT
+# agora_local_user_set_video_subscription_options.argtypes = [AGORA_HANDLE, ctypes.c_uint, ctypes.POINTER(VideoSubscriptionOptions)]
 
 agora_local_user_subscribe_video = agora_lib.agora_local_user_subscribe_video
 agora_local_user_subscribe_video.restype = AGORA_API_C_INT
@@ -288,11 +288,11 @@ class LocalUser:
             print("Failed to get playback signal volume")
         return ret, volume.value
 
-    def pull_mixed_audio_pcm_data(self, payload_data, info):
-        ret = agora_local_user_pull_mixed_audio_pcm_data(self.user_handle, payload_data, info)
-        if ret < 0:
-            print("Failed to pull mixed audio PCM data")
-        return ret
+    # def pull_mixed_audio_pcm_data(self, payload_data, info):
+    #     ret = agora_local_user_pull_mixed_audio_pcm_data(self.user_handle, payload_data, info)
+    #     if ret < 0:
+    #         print("Failed to pull mixed audio PCM data")
+    #     return ret
 
     def set_playback_audio_frame_parameters(self, channels, sample_rate_hz, mode, samples_per_call):
         ret = agora_local_user_set_playback_audio_frame_parameters(self.user_handle, channels, sample_rate_hz, mode, samples_per_call)
@@ -330,29 +330,29 @@ class LocalUser:
             print("Failed to unregister audio frame observer")
         return ret
 
-    def enable_audio_spectrum_monitor(self, interval_in_ms):
-        ret = agora_local_user_enable_audio_spectrum_monitor(self.user_handle, interval_in_ms)
-        if ret < 0:
-            print("Failed to enable audio spectrum monitor")
-        return ret
+    # def enable_audio_spectrum_monitor(self, interval_in_ms):
+    #     ret = agora_local_user_enable_audio_spectrum_monitor(self.user_handle, interval_in_ms)
+    #     if ret < 0:
+    #         print("Failed to enable audio spectrum monitor")
+    #     return ret
 
-    def disable_audio_spectrum_monitor(self):
-        ret = agora_local_user_disable_audio_spectrum_monitor(self.user_handle)
-        if ret < 0:
-            print("Failed to disable audio spectrum monitor")
-        return ret
+    # def disable_audio_spectrum_monitor(self):
+    #     ret = agora_local_user_disable_audio_spectrum_monitor(self.user_handle)
+    #     if ret < 0:
+    #         print("Failed to disable audio spectrum monitor")
+    #     return ret
 
-    def register_audio_spectrum_observer(self, observer):
-        ret = agora_local_user_register_audio_spectrum_observer(self.user_handle, observer)
-        if ret < 0:
-            print("Failed to register audio spectrum observer")
-        return ret
+    # def register_audio_spectrum_observer(self, observer):
+    #     ret = agora_local_user_register_audio_spectrum_observer(self.user_handle, observer)
+    #     if ret < 0:
+    #         print("Failed to register audio spectrum observer")
+    #     return ret
 
-    def unregister_audio_spectrum_observer(self, observer):
-        ret = agora_local_user_unregister_audio_spectrum_observer(self.user_handle, observer)
-        if ret < 0:
-            print("Failed to unregister audio spectrum observer")
-        return ret
+    # def unregister_audio_spectrum_observer(self, observer):
+    #     ret = agora_local_user_unregister_audio_spectrum_observer(self.user_handle, observer)
+    #     if ret < 0:
+    #         print("Failed to unregister audio spectrum observer")
+    #     return ret
 
     def register_video_encoded_frame_observer(self, agora_video_encoded_frame_observer):
         ret = agora_local_user_register_video_encoded_frame_observer(self.user_handle, agora_video_encoded_frame_observer)
@@ -378,11 +378,11 @@ class LocalUser:
             print("Failed to unregister video frame observer")
         return ret
 
-    def set_video_subscription_options(self, user_id, options):
-        ret = agora_local_user_set_video_subscription_options(self.user_handle, user_id, options)
-        if ret < 0:
-            print("Failed to set video subscription options")
-        return ret
+    # def set_video_subscription_options(self, user_id, options):
+    #     ret = agora_local_user_set_video_subscription_options(self.user_handle, user_id, options)
+    #     if ret < 0:
+    #         print("Failed to set video subscription options")
+    #     return ret
 
     def subscribe_video(self, user_id, options):
         ret = agora_local_user_subscribe_video(self.user_handle, user_id, options)

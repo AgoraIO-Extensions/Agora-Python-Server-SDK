@@ -6,15 +6,17 @@ import sys
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 sdk_dir = os.path.dirname(os.path.dirname(script_dir))
-
 lib_path = os.path.join(sdk_dir, 'agora_sdk')
-if lib_path not in sys.path:
-    sys.path.append(lib_path)
-
 if sys.platform == 'darwin':
-    agora_lib = ctypes.CDLL('libAgoraRtcKit.dylib')
+    lib_agora_rtc_path =os.path.join(lib_path, 'libAgoraRtcKit.dylib')
 elif sys.platform == 'linux':
-    agora_lib = ctypes.CDLL('libagora_rtc_sdk.so')
+    lib_agora_rtc_path =os.path.join(lib_path, 'libagora_rtc_sdk.so')    
+try:
+    agora_lib = ctypes.CDLL(lib_agora_rtc_path)
+except OSError as e:
+    print(f"Error loading the library: {e}")
+    print(f"Attempted to load from: {lib_agora_rtc_path}")
+    sys.exit(1)
 
 
 AGORA_HANDLE = ctypes.c_void_p
@@ -136,7 +138,122 @@ class AudioEncoderConfiguration(ctypes.Structure):
     def __init__(self):
         self.audioProfile = AUDIO_PROFILE_TYPE.AUDIO_PROFILE_DEFAULT
 
+"""
+/**
+* Video buffer types.
+*/
+enum VIDEO_BUFFER_TYPE {
+/**
+    * 1: Raw data.
+    */
+VIDEO_BUFFER_RAW_DATA = 1,
+/**
+    * 2: The same as VIDEO_BUFFER_RAW_DATA.
+    */
+VIDEO_BUFFER_ARRAY = 2,
+/**
+    * 3: The video buffer in the format of texture.
+    */
+VIDEO_BUFFER_TEXTURE = 3,
+};
 
-agora_service_create_custom_audio_track_pcm = agora_lib.agora_service_create_custom_audio_track_pcm
-agora_service_create_custom_audio_track_pcm.restype = AGORA_HANDLE
-agora_service_create_custom_audio_track_pcm.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
+/**
+ * Video pixel formats.
+ */
+enum VIDEO_PIXEL_FORMAT {
+  /**
+   * 0: Default format.
+   */
+  VIDEO_PIXEL_DEFAULT = 0,
+  /**
+   * 1: I420.
+   */
+  VIDEO_PIXEL_I420 = 1,
+  /**
+   * 2: BGRA.
+   */
+  VIDEO_PIXEL_BGRA = 2,
+  /**
+   * 3: NV21.
+   */
+  VIDEO_PIXEL_NV21 = 3,
+  /**
+   * 4: RGBA.
+   */
+  VIDEO_PIXEL_RGBA = 4,
+  /**
+   * 8: NV12.
+   */
+  VIDEO_PIXEL_NV12 = 8,
+  /**
+   * 10: GL_TEXTURE_2D
+   */
+  VIDEO_TEXTURE_2D = 10,
+  /**
+   * 11: GL_TEXTURE_OES
+   */
+  VIDEO_TEXTURE_OES = 11,
+  /*
+  12: pixel format for iOS CVPixelBuffer NV12
+  */
+  VIDEO_CVPIXEL_NV12 = 12,
+  /*
+  13: pixel format for iOS CVPixelBuffer I420
+  */
+  VIDEO_CVPIXEL_I420 = 13,
+  /*
+  14: pixel format for iOS CVPixelBuffer BGRA
+  */
+  VIDEO_CVPIXEL_BGRA = 14,
+  /**
+   * 16: I422.
+   */
+  VIDEO_PIXEL_I422 = 16,
+}
+
+refer: https://doc.shengwang.cn/api-ref/rtc/windows/API/class_externalvideoframe#ExternalVideoFrame
+"""
+class ExternalVideoFrame(ctypes.Structure):
+    _fields_ = [
+        ("type", ctypes.c_int),
+        ("format", ctypes.c_int),
+        ("buffer", ctypes.c_void_p),
+        ("stride", ctypes.c_int),
+        ("height", ctypes.c_int),
+        ("crop_left", ctypes.c_int),
+        ("crop_top", ctypes.c_int),
+        ("crop_right", ctypes.c_int),
+        ("crop_bottom", ctypes.c_int),
+        ("rotation", ctypes.c_int),
+        ("timestamp", ctypes.c_longlong),
+        ("egl_context", ctypes.c_void_p),
+        ("egl_type", ctypes.c_int),
+        ("texture_id", ctypes.c_int),
+        ("matrix", ctypes.c_float * 16),
+        ("metadata_buffer", ctypes.POINTER(ctypes.c_uint8)),
+        ("metadata_size", ctypes.c_int),
+        ("alpha_buffer", ctypes.c_void_p)
+    ]
+
+    def __init__(self) -> None:
+        self.data = None
+
+
+
+class VideoDimensions(ctypes.Structure):
+    _fields_ = [
+        ("width", ctypes.c_int),
+        ("height", ctypes.c_int)
+    ]
+
+class VideoEncoderConfig(ctypes.Structure):
+    _fields_ = [
+        ("codec_type", ctypes.c_int),
+        ("dimensions", VideoDimensions),
+        ("frame_rate", ctypes.c_int),
+        ("bitrate", ctypes.c_int),
+        ("min_bitrate", ctypes.c_int),
+        ("orientation_mode", ctypes.c_int),
+        ("degradation_preference", ctypes.c_int),
+        ("mirror_mode", ctypes.c_int)
+    ]    

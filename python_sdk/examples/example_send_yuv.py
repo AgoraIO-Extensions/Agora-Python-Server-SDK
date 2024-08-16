@@ -7,7 +7,7 @@ from agora_service.rtc_connection import *
 from agora_service.media_node_factory import *
 from agora_service.audio_pcm_data_sender import *
 from agora_service.audio_frame_observer import *
-from agora_service.video_sender import *
+from python_sdk.agora_service.video_frame_sender import *
 from agora_service.video_frame_observer import *
 
 # conn_observer callback

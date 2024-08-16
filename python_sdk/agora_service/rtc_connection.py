@@ -4,7 +4,7 @@ from .agora_base import *
 from .local_user import *
 from .rtc_conn_observer import *
 from .audio_pcm_data_sender import AudioPcmDataSender
-from .video_sender import VideoSender
+from .video_frame_sender import VideoFrameSender
 from .audio_frame_observer import AudioFrameObserver
 
 
