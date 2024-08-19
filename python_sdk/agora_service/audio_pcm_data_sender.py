@@ -106,36 +106,11 @@ agora_audio_encoded_frame_sender_send = agora_lib.agora_audio_encoded_frame_send
 agora_audio_encoded_frame_sender_send.restype = AGORA_API_C_INT
 agora_audio_encoded_frame_sender_send.argtypes = [AGORA_HANDLE, ctypes.c_void_p, ctypes.c_uint32, ctypes.POINTER(OwnedEncodedAudioFrameInfo)]
 
-
 agora_local_audio_track_destroy = agora_lib.agora_local_audio_track_destroy
 agora_local_audio_track_destroy.argtypes = [AGORA_HANDLE]
 
 agora_audio_pcm_data_sender_destroy = agora_lib.agora_audio_pcm_data_sender_destroy
 agora_audio_pcm_data_sender_destroy.argtypes = [ctypes.c_void_p]
-
-agora_local_audio_track_set_enabled = agora_lib.agora_local_audio_track_set_enabled
-agora_local_audio_track_set_enabled.argtypes = [AGORA_HANDLE, ctypes.c_int]
-
-agora_local_user_publish_audio = agora_lib.agora_local_user_publish_audio
-agora_local_user_publish_audio.restype = AGORA_API_C_INT
-agora_local_user_publish_audio.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
-
-agora_local_user_unpublish_audio = agora_lib.agora_local_user_unpublish_audio
-agora_local_user_unpublish_audio.restype = AGORA_API_C_INT
-agora_local_user_unpublish_audio.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
-
-agora_local_audio_track_adjust_publish_volume = agora_lib.agora_local_audio_track_adjust_publish_volume
-agora_local_audio_track_adjust_publish_volume.restype = AGORA_API_C_INT
-agora_local_audio_track_adjust_publish_volume.argtypes = [AGORA_HANDLE, ctypes.c_int]
-
-#todo: need check restype, by wei 0720
-agora_local_audio_track_set_max_buffer_audio_frame_number = agora_lib.agora_local_audio_track_set_max_buffer_audio_frame_number
-agora_local_audio_track_set_max_buffer_audio_frame_number.restype = AGORA_API_C_INT
-agora_local_audio_track_set_max_buffer_audio_frame_number.argtypes = [AGORA_HANDLE, ctypes.c_int]
-
-agora_local_audio_track_clear_buffer = agora_lib.agora_local_audio_track_clear_buffer
-agora_local_audio_track_clear_buffer.restype = AGORA_API_C_INT
-agora_local_audio_track_clear_buffer.argtypes = [AGORA_HANDLE]
 
 
 class AudioPcmDataSender:

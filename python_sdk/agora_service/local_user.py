@@ -51,14 +51,6 @@ agora_local_user_destroy_local_audio_statistics = agora_lib.agora_local_user_des
 agora_local_user_destroy_local_audio_statistics.restype = AGORA_API_C_VOID
 agora_local_user_destroy_local_audio_statistics.argtypes = [AGORA_HANDLE, ctypes.POINTER(LocalAudioStats)]
 
-agora_local_user_publish_audio = agora_lib.agora_local_user_publish_audio
-agora_local_user_publish_audio.restype = AGORA_API_C_INT
-agora_local_user_publish_audio.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
-
-agora_local_user_unpublish_audio = agora_lib.agora_local_user_unpublish_audio
-agora_local_user_unpublish_audio.restype = AGORA_API_C_INT
-agora_local_user_unpublish_audio.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
-
 agora_local_user_publish_video = agora_lib.agora_local_user_publish_video
 agora_local_user_publish_video.restype = AGORA_API_C_INT
 agora_local_user_publish_video.argtypes = [AGORA_HANDLE, AGORA_HANDLE]

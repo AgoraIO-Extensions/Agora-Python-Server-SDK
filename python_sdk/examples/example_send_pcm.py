@@ -147,13 +147,13 @@ connection.connect(token, channel_id, uid)
 #---------------3. Create Media Sender
 media_node_factory = agora_service.create_media_node_factory()
 pcm_data_sender = media_node_factory.create_audio_pcm_data_sender()
-audio_track_pcm = agora_service.create_custom_audio_track(pcm_data_sender)
+audio_track = agora_service.create_custom_audio_track(pcm_data_sender)
 local_user = connection.get_local_user()
-audio_track_pcm.set_max_buffer_audio_frame_number(320*2000)
+audio_track.set_max_buffer_audio_frame_number(320*2000)
 
 #---------------4. Send Media Stream
-audio_track_pcm.set_enabled(1)
-local_user.publish_audio(audio_track_pcm)
+audio_track.set_enabled(1)
+local_user.publish_audio(audio_track)
 
 sendinterval = 0.1
 Pacer = Pacer(sendinterval)
@@ -183,11 +183,11 @@ with open(pcm_file_path, "rb") as file:
            
 #---------------5. Stop Media Sender And Release
 time.sleep(10)
-audio_track_pcm.set_enabled(0)
-local_user.unpublish_audio(audio_track_pcm)
+audio_track.set_enabled(0)
+local_user.unpublish_audio(audio_track)
 
 connection.disconnect()
-# connection.Release()
+# connection.release()
 print("release")
 agora_service.release()
 print("end")
