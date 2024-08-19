@@ -6,7 +6,12 @@ from .rtc_connection_observer import *
 from .audio_pcm_data_sender import AudioPcmDataSender
 from .video_frame_sender import VideoFrameSender
 from .audio_frame_observer import AudioFrameObserver
+<<<<<<< HEAD
 from .local_user_observer import RTCLocalUserObserver
+=======
+from .agora_parameter import AgoraParameter
+
+>>>>>>> 3cfee38 (add parameter,modify connection)
 
 # 定义 audio_subscription_options 结构体
 class AudioSubscriptionOptions(ctypes.Structure):
@@ -181,13 +186,15 @@ class RTCConnection:
         ret = agora_rtc_conn_renew_token(self.conn_handle, token.encode('utf-8'))
         if ret < 0:
             print("agora_rtc_conn_renew_token error:{}".format(ret))
+        return ret
 
     # 注册 RTC 连接 observer。
-    def register_observer(self, conn_observer):
+    def register_observer(self, conn_observer:RTCConnectionObserver):
         self.con_observer = conn_observer
         ret = agora_rtc_conn_register_observer(self.conn_handle, conn_observer)
         if ret < 0:
             print("agora_rtc_conn_register_observer error:{}".format(ret))
+        return ret
 
     # 销毁网络状态 observer。
     def unregister_observer(self):
@@ -195,6 +202,7 @@ class RTCConnection:
         if ret < 0:
             print(f"agora_rtc_conn_unregister_observer error: {ret}")
         self.con_observer = None
+        return ret
         
     # 创建数据流。
     def create_data_stream(self, reliable, ordered):
@@ -225,7 +233,7 @@ class RTCConnection:
         if not agora_parameter:
             print("Failed to get Agora parameter")
             return None
-        return agora_parameter
+        return AgoraParameter(agora_parameter)
 
 
     # 获取本地用户对象。
