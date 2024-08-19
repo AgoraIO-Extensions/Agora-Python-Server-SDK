@@ -23,6 +23,9 @@ agora_media_node_factory_create_video_encoded_image_sender = agora_lib.agora_med
 agora_media_node_factory_create_video_encoded_image_sender.restype = AGORA_HANDLE
 agora_media_node_factory_create_video_encoded_image_sender.argtypes = [AGORA_HANDLE]
 
+agora_media_node_factory_destroy = agora_lib.agora_media_node_factory_destroy
+agora_media_node_factory_destroy.argtypes = [AGORA_HANDLE]
+
 class MediaNodeFactory():
     def __init__(self, media_node_factory) -> None:
         self.media_node_factory = media_node_factory
@@ -31,7 +34,7 @@ class MediaNodeFactory():
     #createAudioPcmDataSender	创建一个 PCM 数据发送模块。
     def create_audio_pcm_data_sender(self):
         handle = agora_media_node_factory_create_audio_pcm_data_sender(self.media_node_factory)
-        return AudioPcmDataSender(sender_handle)
+        return AudioPcmDataSender(handle)
     #createAudioEncodedFrameSender	创建一个已编码音频数据发送模块。
     def create_audio_encoded_frame_sender(self):
         handle = agora_media_node_factory_create_audio_encoded_frame_sender(self.media_node_factory)
@@ -44,4 +47,9 @@ class MediaNodeFactory():
     def create_video_encoded_image_sender(self):
         handle = agora_media_node_factory_create_video_encoded_image_sender(self.media_node_factory)
         return VideoEncodedImageSender(handle)
+    def release(self):
+        if self.media_node_factory is not None:
+            agora_media_node_factory_destroy(self.media_node_factory)
+        self.media_node_factory = None
+   
         

@@ -160,8 +160,9 @@ agora_local_user_unpublish_video.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
 class RTCConnection:
     def __init__(self, conn_handle) -> None:
         self.conn_handle = conn_handle
+        self.con_observer = None
     
-    # 连接 RTC 频道。
+    # 连接 RTC 频道， token/chan_id/user_id 都需要为str 类型
     def connect(self, token, chan_id, user_id):
         ret = agora_rtc_conn_connect(self.conn_handle, ctypes.create_string_buffer(token.encode('utf-8')),ctypes.create_string_buffer(chan_id.encode('utf-8')), ctypes.create_string_buffer(user_id.encode('utf-8')))
         if ret < 0:
@@ -193,6 +194,7 @@ class RTCConnection:
         ret = agora_rtc_conn_unregister_observer(self.conn_handle)
         if ret < 0:
             print(f"agora_rtc_conn_unregister_observer error: {ret}")
+        self.con_observer = None
         
     # 创建数据流。
     def create_data_stream(self, reliable, ordered):
