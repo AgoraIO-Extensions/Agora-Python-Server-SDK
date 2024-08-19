@@ -8,6 +8,7 @@ from .video_frame_sender import VideoFrameSender
 from .audio_frame_observer import AudioFrameObserver
 from .local_user_observer import RTCLocalUserObserver
 from .agora_parameter import AgoraParameter
+from .globals import AgoraHandleInstanceMap
 
 
 # 定义 audio_subscription_options 结构体
@@ -240,10 +241,16 @@ class RTCConnection:
         if not local_user_handle:
             print("Failed to get local user")
             return None
-        return LocalUser(local_user_handle)
+        locoal_user = LocalUser(local_user_handle)
+        #add to map
+        AgoraHandleInstanceMap().set_local_user_map(self.conn_handle, locoal_user)
+        return locoal_user
 
     
     def release(self):
+        #release local user map
+        if self.conn_handle :
+            AgoraHandleInstanceMap().del_local_user_map(self.conn_handle)
         ret = agora_rtc_conn_release(self.conn_handle)
         if ret < 0:
             print("agora_rtc_conn_release error:{}".format(ret))
