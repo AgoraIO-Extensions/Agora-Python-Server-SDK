@@ -33,8 +33,8 @@ class MediaNodeFactory():
     
     #createAudioPcmDataSender	创建一个 PCM 数据发送模块。
     def create_audio_pcm_data_sender(self):
-        handle = agora_media_node_factory_create_audio_pcm_data_sender(self.media_node_factory)
-        return AudioPcmDataSender(handle)
+        sender_handle = agora_media_node_factory_create_audio_pcm_data_sender(self.media_node_factory)
+        return AudioPcmDataSender(sender_handle)
     #createAudioEncodedFrameSender	创建一个已编码音频数据发送模块。
     def create_audio_encoded_frame_sender(self):
         handle = agora_media_node_factory_create_audio_encoded_frame_sender(self.media_node_factory)

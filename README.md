@@ -17,7 +17,7 @@
   - CentOS 7.0 and above
   - Mac for debug & developing
 - python version:
-  - python 3.7 above
+  - python 3.8 above
 
 # Test Data
 - download and unzip [test_data.zip](https://share.weiyun.com/4x3Um6b8)

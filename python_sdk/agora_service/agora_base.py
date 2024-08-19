@@ -257,3 +257,45 @@ class VideoEncoderConfig(ctypes.Structure):
         ("degradation_preference", ctypes.c_int),
         ("mirror_mode", ctypes.c_int)
     ]    
+
+
+class LocalVideoTrackStats(ctypes.Structure):
+    _fields_ = [
+        ("number_of_streams", ctypes.c_uint64),
+        ("bytes_major_stream", ctypes.c_uint64),
+        ("bytes_minor_stream", ctypes.c_uint64),
+        ("frames_encoded", ctypes.c_uint32),
+        ("ssrc_major_stream", ctypes.c_uint32),
+        ("ssrc_minor_stream", ctypes.c_uint32),
+        ("capture_frame_rate", ctypes.c_int),
+        ("regulated_capture_frame_rate", ctypes.c_int),
+        ("input_frame_rate", ctypes.c_int),
+        ("encode_frame_rate", ctypes.c_int),
+        ("render_frame_rate", ctypes.c_int),
+        ("target_media_bitrate_bps", ctypes.c_int),
+        ("media_bitrate_bps", ctypes.c_int),
+        ("total_bitrate_bps", ctypes.c_int),
+        ("capture_width", ctypes.c_int),
+        ("capture_height", ctypes.c_int),
+        ("regulated_capture_width", ctypes.c_int),
+        ("regulated_capture_height", ctypes.c_int),
+        ("width", ctypes.c_int),
+        ("height", ctypes.c_int),
+        ("encoder_type", ctypes.c_uint32),
+        ("uplink_cost_time_ms", ctypes.c_uint32),
+        ("quality_adapt_indication", ctypes.c_int)
+    ]
+import ctypes
+
+class VideoDimensions(ctypes.Structure):
+    _fields_ = [
+        ("width", ctypes.c_int),
+        ("height", ctypes.c_int)
+    ]
+
+class SimulcastStreamConfig(ctypes.Structure):
+    _fields_ = [
+        ("dimensions", VideoDimensions),
+        ("bitrate", ctypes.c_int),
+        ("framerate", ctypes.c_int)
+    ]

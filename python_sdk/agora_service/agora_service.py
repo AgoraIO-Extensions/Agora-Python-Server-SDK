@@ -1,5 +1,7 @@
 #!/usr/python3/bin/python3.12
 
+from functools import singledispatch, singledispatchmethod
+
 # python3.6
 
 #  PYTHONPATH=../../agora_sdk/  LD_LIBRARY_PATH=../../agora_sdk/   python3.6 demo.py
@@ -177,10 +179,16 @@ class AgoraService:
             raise Exception("Failed to create RTC connection")
         return RTCConnection(rtc_conn_handle)
 
+
+    @singledispatchmethod
+    def create_custom_audio_track(self, arg):
+        raise NotImplementedError("please check the parameters!")
+
     #感觉没有理顺Track和pcm Sender之间的创建关系？？？？
     #比如创建Track的时候，需要先创建pcm Sender
     #createCustomAudioTrackPcm	创建一个自定义音频Track。
-    def create_custom_audio_track(self, audio_pcm_data_sender:AudioPcmDataSender):
+    @create_custom_audio_track.register
+    def _(self, audio_pcm_data_sender:AudioPcmDataSender):
         if not self.inited:
             print("AgoraService is not initialized. Please call initialize() first.")
             return None
@@ -189,20 +197,27 @@ class AgoraService:
             raise Exception("Failed to create custom audio track PCM")
         return LocalAudioTrack(custom_audio_track)
     #mix_mode: MIX_ENABLED = 0, MIX_DISABLED = 1
-    def create_custom_audio_track(self, audio_encoded_frame_sender:AudioEncodedFrameSender, mix_mode:int):
+    @create_custom_audio_track.register
+    def _(self, audio_encoded_frame_sender:AudioEncodedFrameSender, mix_mode:int):
         if not self.inited:
             print("AgoraService is not initialized. Please call initialize() first.")
             return None
         custom_audio_track = agora_service_create_custom_audio_track_encoded(self.service_handle, audio_encoded_frame_sender.sender_handle, mix_mode)
         return LocalAudioTrack(custom_audio_track)
     
-    def create_custom_video_track(self, video_encoded_frame_sender:VideoEncodedImageSender, options:SenderOptions):
+    @singledispatchmethod
+    def create_custom_video_track(self, arg):
+        raise NotImplementedError("please check the parameters!")
+
+    @create_custom_video_track.register
+    def _(self, video_encoded_frame_sender:VideoEncodedImageSender, options:SenderOptions):
         if not self.inited:
             print("AgoraService is not initialized. Please call initialize() first.")
             return None
         custom_video_track = agora_service_create_custom_video_track_encoded(self.service_handle, video_encoded_frame_sender.sender_handle, ctypes.byref(options))
         return LocalVideoTrack(custom_video_track)
-    def create_custom_video_track(self, video_frame_sender:VideoFrameSender):
+    @create_custom_video_track.register
+    def _(self, video_frame_sender:VideoFrameSender):
         if not self.inited:
             print("AgoraService is not initialized. Please call initialize() first.")
             return None

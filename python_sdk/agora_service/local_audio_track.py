@@ -2,21 +2,6 @@ import time
 import ctypes
 from .agora_base import *
 
-class AgoraServiceConfig(ctypes.Structure):
-    _fields_ = [
-        ('enable_audio_processor', ctypes.c_int),
-        ('enable_audio_device', ctypes.c_int),
-        ('enable_video', ctypes.c_int),
-        ('context', ctypes.c_void_p),
-
-        ('app_id', ctypes.c_char_p),
-        ('area_code', ctypes.c_uint),
-        ('channel_profile', ctypes.c_int),
-        ('audio_scenario', ctypes.c_int),
-
-        ('use_string_uid', ctypes.c_int),
-    ]
-
 # Add these function definitions at the module level
 agora_local_audio_track_set_enabled = agora_lib.agora_local_audio_track_set_enabled
 agora_local_audio_track_set_enabled.restype = ctypes.c_int

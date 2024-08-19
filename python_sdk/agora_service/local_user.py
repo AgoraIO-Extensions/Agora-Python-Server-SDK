@@ -234,8 +234,8 @@ class LocalUser:
         return ret
 
 
-    def unpublish_audio(self, agora_local_audio_track):
-        ret = agora_local_user_unpublish_audio(self.user_handle, agora_local_audio_track)
+    def unpublish_audio(self, agora_local_audio_track:LocalAudioTrack):
+        ret = agora_local_user_unpublish_audio(self.user_handle, agora_local_audio_track.track_handle)
         if ret < 0:
             print("Failed to unpublish audio")
         return ret
