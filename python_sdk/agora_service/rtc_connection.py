@@ -6,12 +6,9 @@ from .rtc_connection_observer import *
 from .audio_pcm_data_sender import AudioPcmDataSender
 from .video_frame_sender import VideoFrameSender
 from .audio_frame_observer import AudioFrameObserver
-<<<<<<< HEAD
 from .local_user_observer import RTCLocalUserObserver
-=======
 from .agora_parameter import AgoraParameter
 
->>>>>>> 3cfee38 (add parameter,modify connection)
 
 # 定义 audio_subscription_options 结构体
 class AudioSubscriptionOptions(ctypes.Structure):
