@@ -213,30 +213,30 @@ enum VIDEO_PIXEL_FORMAT {
 
 refer: https://doc.shengwang.cn/api-ref/rtc/windows/API/class_externalvideoframe#ExternalVideoFrame
 """
-class ExternalVideoFrame(ctypes.Structure):
-    _fields_ = [
-        ("type", ctypes.c_int),
-        ("format", ctypes.c_int),
-        ("buffer", ctypes.c_void_p),
-        ("stride", ctypes.c_int),
-        ("height", ctypes.c_int),
-        ("crop_left", ctypes.c_int),
-        ("crop_top", ctypes.c_int),
-        ("crop_right", ctypes.c_int),
-        ("crop_bottom", ctypes.c_int),
-        ("rotation", ctypes.c_int),
-        ("timestamp", ctypes.c_longlong),
-        ("egl_context", ctypes.c_void_p),
-        ("egl_type", ctypes.c_int),
-        ("texture_id", ctypes.c_int),
-        ("matrix", ctypes.c_float * 16),
-        ("metadata_buffer", ctypes.POINTER(ctypes.c_uint8)),
-        ("metadata_size", ctypes.c_int),
-        ("alpha_buffer", ctypes.c_void_p)
-    ]
+# class ExternalVideoFrame(ctypes.Structure):
+#     _fields_ = [
+#         ("type", ctypes.c_int),
+#         ("format", ctypes.c_int),
+#         ("buffer", ctypes.c_void_p),
+#         ("stride", ctypes.c_int),
+#         ("height", ctypes.c_int),
+#         ("crop_left", ctypes.c_int),
+#         ("crop_top", ctypes.c_int),
+#         ("crop_right", ctypes.c_int),
+#         ("crop_bottom", ctypes.c_int),
+#         ("rotation", ctypes.c_int),
+#         ("timestamp", ctypes.c_longlong),
+#         ("egl_context", ctypes.c_void_p),
+#         ("egl_type", ctypes.c_int),
+#         ("texture_id", ctypes.c_int),
+#         ("matrix", ctypes.c_float * 16),
+#         ("metadata_buffer", ctypes.POINTER(ctypes.c_uint8)),
+#         ("metadata_size", ctypes.c_int),
+#         ("alpha_buffer", ctypes.c_void_p)
+#     ]
 
-    def __init__(self) -> None:
-        self.data = None
+#     def __init__(self) -> None:
+#         self.data = None
 
 
 

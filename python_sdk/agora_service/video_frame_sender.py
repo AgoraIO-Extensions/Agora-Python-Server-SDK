@@ -117,7 +117,7 @@ class EncodedVideoFrameInfo:
         )
 
 
-class ExternalVideoFrame():
+class ExternalVideoFrame:
     def __init__(self)->None:
         self.type = 1
         self.buffer = None
@@ -130,6 +130,7 @@ class ExternalVideoFrame():
         self.crop_bottom = 0
         self.rotation = 0
         self.timestamp = 0
+
     def to_owned_external_video_frame(self):
         cdata = (ctypes.c_uint8 * len(self.buffer)).from_buffer(self.buffer)
         # 将 ctypes 数组转换为 c_void_p
@@ -155,8 +156,8 @@ class VideoFrameSender:
     def __init__(self, handle) -> None:
         self.sender_handle = handle
         
-    def send_video_frame(self, fame:ExternalVideoFrame):
-        owned_video_frame = fame.to_owned_external_video_frame()
+    def send(self, frame:ExternalVideoFrame):
+        owned_video_frame = frame.to_owned_external_video_frame()
         ret = agora_video_frame_sender_send(self.sender_handle, ctypes.byref(owned_video_frame))
         return ret
 

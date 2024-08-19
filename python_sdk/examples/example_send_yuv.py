@@ -2,13 +2,14 @@
 
 import time
 import ctypes
-from agora_service.agora_service import AgoraServiceConfig, AgoraService, AudioSubscriptionOptions, RTCConnConfig
+from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora_service.rtc_connection import *
 from agora_service.media_node_factory import *
 from agora_service.audio_pcm_data_sender import *
 from agora_service.audio_frame_observer import *
-from python_sdk.agora_service.video_frame_sender import *
+from agora_service.video_frame_sender import *
 from agora_service.video_frame_observer import *
+from agora_service.local_user_observer import *
 
 # conn_observer callback
 def on_connected(agora_rtc_conn, conn_info, reason):
@@ -97,7 +98,7 @@ config.appid = appid
 config.log_path = os.path.join(example_dir, 'agorasdk.log')
 
 agora_service = AgoraService()
-agora_service.Init(config)
+agora_service.initialize(config)
 
 con_config = RTCConnConfig(
     auto_subscribe_audio=1,
@@ -116,9 +117,9 @@ pcm_observer = AudioFrameObserver(
 
 con_config.pcm_observer = pcm_observer
 
-connection = agora_service.NewConnection(con_config)
+connection = agora_service.create_rtc_connection(con_config)
 
-conn_observer = RTCConnObserver(
+conn_observer = RTCConnectionObserver(
     on_connected=ON_CONNECTED_CALLBACK(on_connected),
     on_disconnected=ON_CONNECTED_CALLBACK(on_disconnected),
     on_user_joined=ON_USER_JOINED_CALLBACK(on_user_joined)
@@ -128,17 +129,26 @@ localuser_observer = RTCLocalUserObserver(
     on_user_info_updated=ON_USER_INFO_UPDATED_CALLBACK(on_user_info_updated)
 )
 
-connection.RegisterObserver(conn_observer,localuser_observer)
+connection.register_observer(conn_observer)
 
-connection.Connect(token, channel_id, uid)
+connection.connect(token, channel_id, uid)
 
-video_sender = connection.GetVideoSender()
+
+media_node_factory = agora_service.create_media_node_factory()
+video_sender = media_node_factory.create_video_frame_sender()
+video_track = agora_service.create_custom_video_track(video_sender)
+local_user = connection.get_local_user()
+
+
+# video_sender = connection.GetVideoSender()
 video_frame_observer = VideoFrameObserver2(
     on_frame=ON_FRAME_CALLBACK(on_frame)
 )
-video_sender.register_video_frame_observer(video_frame_observer)
+# local_user.register_video_frame_observer(video_frame_observer)
+video_track.set_enabled(1)
+local_user.publish_video(video_track)
 
-video_sender.Start()
+# video_sender.Start()
 
 sendinterval = 1/30
 Pacer = Pacer(sendinterval)
@@ -156,13 +166,13 @@ def send_test():
             if not success:
                 break
             frame = ExternalVideoFrame()
-            frame.data = frame_buf
+            frame.buffer = frame_buf
             frame.type = 1
             frame.format = 1
             frame.stride = width
             frame.height = height
             frame.timestamp = 0
-            ret = video_sender.SendVideoFrame(frame)        
+            ret = video_sender.send(frame)        
             count += 1
             print("count,ret=",count, ret)
             Pacer.pace()
@@ -171,9 +181,11 @@ for i in range(30):
     send_test()
 
 time.sleep(2)
-video_sender.Stop()
-connection.Disconnect()
-connection.Release()
+# video_sender.Stop()
+video_track.set_enable(0)
+local_user.unpublish_video(video_track)
+connection.disconnect()
+# connection.Release()
 print("release")
-agora_service.Destroy()
+agora_service.release()
 print("end")

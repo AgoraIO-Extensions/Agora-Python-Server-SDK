@@ -64,6 +64,7 @@ agora_rtc_conn_unregister_observer.argtypes = [AGORA_HANDLE]
 #release
 agora_rtc_conn_release = agora_lib.agora_rtc_conn_destroy
 #note: for c void return type, we use default
+agora_rtc_conn_release.restype = AGORA_API_C_VOID
 agora_rtc_conn_release.argtypes = [AGORA_HANDLE]
 
 agora_media_node_factory_create_audio_pcm_data_sender = agora_lib.agora_media_node_factory_create_audio_pcm_data_sender
@@ -240,3 +241,11 @@ class RTCConnection:
             print("Failed to get local user")
             return None
         return LocalUser(local_user_handle)
+
+    
+    def release(self):
+        ret = agora_rtc_conn_release(self.conn_handle)
+        if ret < 0:
+            print("agora_rtc_conn_release error:{}".format(ret))
+        return ret
+    
