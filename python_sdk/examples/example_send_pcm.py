@@ -3,13 +3,13 @@
 #coding=utf-8
 
 import time
-import ctypes
-from agora_service.agora_service import AgoraServiceConfig, AgoraService, AudioSubscriptionOptions, RTCConnConfig
+from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora_service.rtc_connection import *
 from agora_service.media_node_factory import *
 from agora_service.audio_pcm_data_sender import *
 from agora_service.audio_frame_observer import *
 from agora_service.media_node_factory import *
+from agora_service.local_user_observer import *
 
 # conn_observer callback
 def on_connected(agora_rtc_conn, conn_info, reason):

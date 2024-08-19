@@ -1,16 +1,9 @@
 #!/usr/python3/bin/python3.12
 
-from functools import singledispatch, singledispatchmethod
-
-# python3.6
-
-#  PYTHONPATH=../../agora_sdk/  LD_LIBRARY_PATH=../../agora_sdk/   python3.6 demo.py
-import time
+from functools import singledispatchmethod
 import ctypes
 
-import os
-import sys
-
+from .agora_base import *
 from .media_node_factory import *
 from .rtc_connection import *
 from .audio_pcm_data_sender import *
@@ -19,18 +12,6 @@ from .rtc_connection_observer import *
 from .video_frame_sender import *
 from .local_video_track import *
 
-
-script_dir = os.path.dirname(os.path.abspath(__file__))
-sdk_dir = os.path.dirname(os.path.dirname(script_dir))
-
-
-
-# 定义常量
-AGORA_HANDLE = ctypes.c_void_p
-AGORA_API_C_INT = ctypes.c_int
-AGORA_API_C_HDLR = ctypes.c_void_p
-
-# 定义 agora_service_config 结构体
 class AgoraServiceConfig(ctypes.Structure):
     _fields_ = [
         ('enable_audio_processor', ctypes.c_int),
@@ -54,27 +35,16 @@ class AgoraServiceConfig(ctypes.Structure):
         self.log_size = 0    
         self.appid = ""
 
-        # ('log_path', ctypes.c_char_p),
-        # ('log_size', ctypes.c_int),
-
-
-
-
-# 定义 agora_service_create 函数
 agora_service_create = agora_lib.agora_service_create
 agora_service_create.restype = AGORA_HANDLE
 
-# 定义 agora_service_initialize 函数
 agora_service_initialize = agora_lib.agora_service_initialize
 agora_service_initialize.restype = AGORA_API_C_INT
 agora_service_initialize.argtypes = [AGORA_HANDLE, ctypes.POINTER(AgoraServiceConfig)]
 
-
 agora_service_create_media_node_factory = agora_lib.agora_service_create_media_node_factory
 agora_service_create_media_node_factory.restype = AGORA_HANDLE
 agora_service_create_media_node_factory.argtypes = [AGORA_HANDLE]
-
-
 
 agora_service_release = agora_lib.agora_service_release
 agora_service_release.restype = AGORA_API_C_INT
@@ -88,7 +58,6 @@ agora_service_create_custom_audio_track_pcm = agora_lib.agora_service_create_cus
 agora_service_create_custom_audio_track_pcm.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
 agora_service_create_custom_audio_track_pcm.restype = AGORA_HANDLE  
 
-#AGORA_API_C_HDL agora_service_create_custom_audio_track_encoded(AGORA_HANDLE agora_svc, AGORA_HANDLE agora_audio_encoded_frame_sender, int mix_mode);
 agora_service_create_custom_audio_track_encoded = agora_lib.agora_service_create_custom_audio_track_encoded
 agora_service_create_custom_audio_track_encoded.argtypes = [AGORA_HANDLE, AGORA_HANDLE, ctypes.c_int]
 agora_service_create_custom_audio_track_encoded.restype = AGORA_HANDLE
@@ -97,27 +66,10 @@ agora_rtc_conn_create = agora_lib.agora_rtc_conn_create
 agora_rtc_conn_create.restype = AGORA_HANDLE
 agora_rtc_conn_create.argtypes = [AGORA_HANDLE, ctypes.POINTER(RTCConnConfig)]
 
-""""
-AGORA_API_C_HDL agora_service_create_custom_video_track_frame(AGORA_HANDLE agora_svc, AGORA_HANDLE agora_video_frame_sender);
-
-AGORA_API_C_HDL agora_service_create_custom_video_track_encoded(AGORA_HANDLE agora_svc, AGORA_HANDLE agora_video_encoded_image_sender, sender_options* options);
-
-"""
 agora_service_create_custom_video_track_frame = agora_lib.agora_service_create_custom_video_track_frame
 agora_service_create_custom_video_track_frame.restype = AGORA_HANDLE
 agora_service_create_custom_video_track_frame.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
 
-"""
-typedef struct _sender_options {
-  
-  int cc_mode;
-
-  
-  int codec_type;
-   
-  int target_bitrate;
-} sender_options;
-"""
 class SenderOptions(ctypes.Structure):
     _fields_ = [
         ("cc_mode", ctypes.c_int),

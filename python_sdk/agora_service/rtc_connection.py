@@ -6,7 +6,7 @@ from .rtc_connection_observer import *
 from .audio_pcm_data_sender import AudioPcmDataSender
 from .video_frame_sender import VideoFrameSender
 from .audio_frame_observer import AudioFrameObserver
-
+from .local_user_observer import RTCLocalUserObserver
 
 # 定义 audio_subscription_options 结构体
 class AudioSubscriptionOptions(ctypes.Structure):
