@@ -35,6 +35,9 @@ class AgoraHandleInstanceMap:
     def get_con_map(self, con_handle):
         with self.con_lock:
             return self.con_map.get(con_handle, None)
+    def del_con_map(self, con_handle):
+        with self.con_lock:
+            del self.con_map[con_handle]
         
     def set_local_user_map(self, local_user_handle, local_user_instance):
         with self.local_user_lock:
@@ -43,6 +46,9 @@ class AgoraHandleInstanceMap:
     def get_local_user_map(self, local_user_handle):
         with self.local_user_lock:
             return self.local_user_map.get(local_user_handle, None)
+    def del_local_user_map(self, local_user_handle):
+        with self.local_user_lock:
+            del self.local_user_map[local_user_handle]
         
 
 
