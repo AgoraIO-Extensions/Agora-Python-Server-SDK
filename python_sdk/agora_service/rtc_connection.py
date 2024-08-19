@@ -243,7 +243,7 @@ class RTCConnection:
             return None
         locoal_user = LocalUser(local_user_handle)
         #add to map
-        AgoraHandleInstanceMap().set_local_user_map(self.conn_handle, locoal_user)
+        AgoraHandleInstanceMap().set_local_user_map(self.conn_handle, self)
         return locoal_user
 
     
