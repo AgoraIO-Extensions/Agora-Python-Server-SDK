@@ -165,6 +165,12 @@ class RTCConnection:
     def __init__(self, conn_handle) -> None:
         self.conn_handle = conn_handle
         self.con_observer = None
+        self.local_user = None
+        self.local_user_handle = agora_rtc_conn_get_local_user(conn_handle)
+        if  self.local_user_handle:
+            self.local_user = LocalUser(self.local_user_handle)
+        #add to map
+        AgoraHandleInstanceMap().set_local_user_map(self.conn_handle, self)
     
     # 连接 RTC 频道， token/chan_id/user_id 都需要为str 类型
     def connect(self, token, chan_id, user_id):
@@ -237,22 +243,22 @@ class RTCConnection:
 
     # 获取本地用户对象。
     def get_local_user(self):
-        local_user_handle = agora_rtc_conn_get_local_user(self.conn_handle)
-        if not local_user_handle:
-            print("Failed to get local user")
-            return None
-        locoal_user = LocalUser(local_user_handle)
-        #add to map
-        AgoraHandleInstanceMap().set_local_user_map(self.conn_handle, self)
-        return locoal_user
+        return self.local_user
 
     
     def release(self):
         #release local user map
         if self.conn_handle :
             AgoraHandleInstanceMap().del_local_user_map(self.conn_handle)
+
+        #release local handle
+
+        self.local_user = None
+       
         ret = agora_rtc_conn_release(self.conn_handle)
         if ret < 0:
             print("agora_rtc_conn_release error:{}".format(ret))
+        self.conn_handle = None
+        
         return ret
     

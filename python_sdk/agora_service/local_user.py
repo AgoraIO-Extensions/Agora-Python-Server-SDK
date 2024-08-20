@@ -442,3 +442,6 @@ class LocalUser:
         if ret < 0:
             print("Failed to send intra request")
         return ret
+
+    def release(self): #do nothing, just do api allign
+        pass
