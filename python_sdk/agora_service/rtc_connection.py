@@ -9,6 +9,7 @@ from .audio_frame_observer import AudioFrameObserver
 from .local_user_observer import RTCLocalUserObserver
 from .agora_parameter import AgoraParameter
 from .globals import AgoraHandleInstanceMap
+from ._rtc_connection_observer import *
 
 
 # 定义 audio_subscription_options 结构体
@@ -56,7 +57,7 @@ agora_rtc_conn_disconnect.argtypes = [AGORA_HANDLE]
 
 agora_rtc_conn_register_observer = agora_lib.agora_rtc_conn_register_observer
 agora_rtc_conn_register_observer.restype = AGORA_API_C_INT
-agora_rtc_conn_register_observer.argtypes = [AGORA_HANDLE, ctypes.POINTER(RTCConnectionObserver)]
+agora_rtc_conn_register_observer.argtypes = [AGORA_HANDLE, ctypes.POINTER(RTCConnectionObserverInner)]
 #unregister
 agora_rtc_conn_unregister_observer = agora_lib.agora_rtc_conn_unregister_observer
 agora_rtc_conn_unregister_observer.restype = AGORA_API_C_INT
@@ -171,38 +172,41 @@ class RTCConnection:
             self.local_user = LocalUser(self.local_user_handle)
         #add to map
         AgoraHandleInstanceMap().set_local_user_map(self.conn_handle, self)
+        AgoraHandleInstanceMap().set_con_map(self.conn_handle, self)
     
     # 连接 RTC 频道， token/chan_id/user_id 都需要为str 类型
-    def connect(self, token, chan_id, user_id):
+    def connect(self, token, chan_id, user_id)->int:
         ret = agora_rtc_conn_connect(self.conn_handle, ctypes.create_string_buffer(token.encode('utf-8')),ctypes.create_string_buffer(chan_id.encode('utf-8')), ctypes.create_string_buffer(user_id.encode('utf-8')))
         if ret < 0:
             print("agora_rtc_conn_connect error:{}".format(ret))
         return ret
 
     # 与 RTC 频道断开连接。
-    def disconnect(self):
+    def disconnect(self)->int:
         ret = agora_rtc_conn_disconnect(self.conn_handle)
         if ret < 0:
             print("agora_rtc_conn_disconnect error:{}".format(ret))            
         return ret
 
     # 更新 Token。
-    def renew_token(self, token):
+    def renew_token(self, token)->int:
         ret = agora_rtc_conn_renew_token(self.conn_handle, token.encode('utf-8'))
         if ret < 0:
             print("agora_rtc_conn_renew_token error:{}".format(ret))
         return ret
 
     # 注册 RTC 连接 observer。
-    def register_observer(self, conn_observer:RTCConnectionObserver):
-        self.con_observer = conn_observer
-        ret = agora_rtc_conn_register_observer(self.conn_handle, conn_observer)
+    def register_observer(self, conn_observer:IRTCConnectionObserver)->int:
+        self.con_observer = conn_observer        
+        con_observer_inner = RTCConnectionObserverInner(self.con_observer)
+        self.con_observer_inner = con_observer_inner
+        ret = agora_rtc_conn_register_observer(self.conn_handle, con_observer_inner)
         if ret < 0:
             print("agora_rtc_conn_register_observer error:{}".format(ret))
         return ret
 
     # 销毁网络状态 observer。
-    def unregister_observer(self):
+    def unregister_observer(self)->int:
         ret = agora_rtc_conn_unregister_observer(self.conn_handle)
         if ret < 0:
             print(f"agora_rtc_conn_unregister_observer error: {ret}")
@@ -210,7 +214,7 @@ class RTCConnection:
         return ret
         
     # 创建数据流。
-    def create_data_stream(self, reliable, ordered):
+    def create_data_stream(self, reliable, ordered)->int:
         stream_id = ctypes.c_int(0)
         ret = agora_rtc_conn_create_data_stream(self.conn_handle, ctypes.byref(stream_id), int(reliable), int(ordered))
         if ret != 0:
@@ -219,7 +223,7 @@ class RTCConnection:
         return stream_id.value
 
     # 发送数据流消息。
-    def send_stream_message(self, stream_id, data):
+    def send_stream_message(self, stream_id, data)->int:
         encoded_data = data.encode('utf-8')
         length = len(encoded_data)
         ret = agora_rtc_conn_send_stream_message(
@@ -228,7 +232,7 @@ class RTCConnection:
             encoded_data,
             length
         )
-        if ret != 0:
+        if ret < 0:
             print(f"Failed to send stream message. Error code: {ret}")
         return ret
 
@@ -255,10 +259,7 @@ class RTCConnection:
 
         self.local_user = None
        
-        ret = agora_rtc_conn_release(self.conn_handle)
-        if ret < 0:
-            print("agora_rtc_conn_release error:{}".format(ret))
+        agora_rtc_conn_release(self.conn_handle)
         self.conn_handle = None
-        
-        return ret
+
     

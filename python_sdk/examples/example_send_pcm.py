@@ -11,18 +11,76 @@ from agora_service.audio_frame_observer import *
 from agora_service.media_node_factory import *
 from agora_service.local_user_observer import *
 
+
+class DYSConnectionObserver(IRTCConnectionObserver):
+    def __init__(self):
+        super(DYSConnectionObserver, self).__init__()
+
+    def on_connected(self, agora_rtc_conn, conn_info, reason):
+        print("CCC Connected:", agora_rtc_conn, conn_info, reason)
+
+    def on_disconnected(self, agora_rtc_conn, conn_info, reason):
+        print("CCC Disconnected:", agora_rtc_conn, conn_info, reason)
+
+    def on_connecting(self, agora_rtc_conn, conn_info, reason):
+        print("CCC Connecting:", agora_rtc_conn, conn_info, reason)
+
+    def on_user_joined(self, agora_rtc_conn, user_id):
+        print("CCC on_user_joined:", agora_rtc_conn, user_id)
+
+    def on_get_playback_audio_frame_param(self, agora_local_user):
+        audio_params_instance = AudioParams()
+        return audio_params_instance
+
+    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, frame):
+        print("CCC on_playback_audio_frame_before_mixing")#, channelId, uid)
+        return 0
+
+    def on_record_audio_frame(self, agora_local_user ,channelId, frame):
+        print("CCC on_record_audio_frame")
+        return 0
+
+    def on_playback_audio_frame(self, agora_local_user, channelId, frame):
+        print("CCC on_playback_audio_frame")
+        return 0
+
+    def on_mixed_audio_frame(self, agora_local_user, channelId, frame):
+        print("CCC on_mixed_audio_frame")
+        return 0
+
+    def on_ear_monitoring_audio_frame(self, agora_local_user, frame):
+        print("CCC on_ear_monitoring_audio_frame")
+        return 0
+
+    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, frame):
+        print("CCC on_playback_audio_frame_before_mixing")
+        return 0
+
+    def on_get_audio_frame_position(self, agora_local_user):
+        print("CCC on_get_audio_frame_position")
+        return 0
+
+    def on_stream_message(self, local_user, user_id, stream_id, data, length):
+        print("CCC on_stream_message:", user_id, stream_id, data, length)
+        return 0
+
+    def on_user_info_updated(self, local_user, user_id, msg, val):
+        print("CCC on_user_info_updated:", user_id, msg, val)
+        return 0
+
+
 # conn_observer callback
 def on_connected(agora_rtc_conn, conn_info, reason):
-    print("Connected:", agora_rtc_conn, conn_info, reason)
+    print("BBB Connected:", agora_rtc_conn, conn_info, reason)
 
 def on_disconnected(agora_rtc_conn, conn_info, reason):
-    print("Disconnected:", agora_rtc_conn, conn_info, reason)
+    print("BBB Disconnected:", agora_rtc_conn, conn_info, reason)
 
 def on_connecting(agora_rtc_conn, conn_info, reason):
-    print("Connecting:", agora_rtc_conn, conn_info, reason)
+    print("BBB Connecting:", agora_rtc_conn, conn_info, reason)
 
 def on_user_joined(agora_rtc_conn, user_id):
-    print("on_user_joined:", agora_rtc_conn, user_id)
+    print("BBB on_user_joined:", agora_rtc_conn, user_id)
 
 # def on_get_playback_audio_frame_param(agora_local_user):
 #     audio_params_instance = AudioParams()
@@ -131,11 +189,13 @@ pcm_observer = AudioFrameObserver(
 con_config.pcm_observer = pcm_observer
 connection = agora_service.create_rtc_connection(con_config)
 
-conn_observer = RTCConnectionObserver(
-    on_connected=ON_CONNECTED_CALLBACK(on_connected),
-    on_disconnected=ON_CONNECTED_CALLBACK(on_disconnected),
-    on_user_joined=ON_USER_JOINED_CALLBACK(on_user_joined)
-)
+# conn_observer = RTCConnectionObserver(
+#     on_connected=ON_CONNECTED_CALLBACK(on_connected),
+#     on_disconnected=ON_CONNECTED_CALLBACK(on_disconnected),
+#     on_user_joined=ON_USER_JOINED_CALLBACK(on_user_joined)
+# )
+
+conn_observer = DYSConnectionObserver()
 
 localuser_observer = RTCLocalUserObserver( 
     on_stream_message=ON_STREAM_MESSAGE_CALLBACK(on_stream_message),

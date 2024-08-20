@@ -59,5 +59,5 @@ if __name__ == "__main__":
 
     print(instance1 is instance2)  # 应该输出 True
 
-    instance1.set_data('key', 'value')
-    print(instance2.get_data('key'))  # 应该输出 'value'
+    instance1.set_con_map('key', 'value')
+    print(instance2.get_con_map('key'))  # 应该输出 'value'
