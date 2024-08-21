@@ -198,7 +198,7 @@ class RTCConnection:
     # 注册 RTC 连接 observer。
     def register_observer(self, conn_observer:IRTCConnectionObserver)->int:
         self.con_observer = conn_observer        
-        con_observer_inner = RTCConnectionObserverInner(self.con_observer)
+        con_observer_inner = RTCConnectionObserverInner(self.con_observer, self)
         self.con_observer_inner = con_observer_inner
         ret = agora_rtc_conn_register_observer(self.conn_handle, con_observer_inner)
         if ret < 0:

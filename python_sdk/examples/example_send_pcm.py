@@ -188,21 +188,22 @@ pcm_observer = AudioFrameObserver(
 )
 con_config.pcm_observer = pcm_observer
 connection = agora_service.create_rtc_connection(con_config)
-
-# conn_observer = RTCConnectionObserver(
-#     on_connected=ON_CONNECTED_CALLBACK(on_connected),
-#     on_disconnected=ON_CONNECTED_CALLBACK(on_disconnected),
-#     on_user_joined=ON_USER_JOINED_CALLBACK(on_user_joined)
-# )
-
 conn_observer = DYSConnectionObserver()
+connection.register_observer(conn_observer)
+connection.connect(token, channel_id, uid)
+
+# connection2 = agora_service.create_rtc_connection(con_config)
+# conn_observer2 = DYSConnectionObserver()
+# connection2.register_observer(conn_observer2)
+# connection2.connect(token, "channel_id222", "2323")
+
 
 localuser_observer = RTCLocalUserObserver( 
     on_stream_message=ON_STREAM_MESSAGE_CALLBACK(on_stream_message),
     on_user_info_updated=ON_USER_INFO_UPDATED_CALLBACK(on_user_info_updated)
 )
-connection.register_observer(conn_observer)
-connection.connect(token, channel_id, uid)
+
+
 
 #---------------3. Create Media Sender
 media_node_factory = agora_service.create_media_node_factory()
