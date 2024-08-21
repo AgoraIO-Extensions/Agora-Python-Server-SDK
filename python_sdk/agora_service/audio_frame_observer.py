@@ -1,67 +1,44 @@
-import ctypes
-from .agora_base import *
-from .local_user import *
-import ctypes
-
-AGORA_HANDLE = ctypes.c_void_p
-user_id_t = ctypes.c_uint
-
-class RAW_AUDIO_FRAME_OP_MODE_TYPE(ctypes.c_int):
-    RAW_AUDIO_FRAME_OP_MODE_READ_ONLY = 0
-    RAW_AUDIO_FRAME_OP_MODE_READ_WRITE = 2
-
-class AUDIO_FRAME_POSITION(ctypes.c_int):
-    AUDIO_FRAME_POSITION_PLAYBACK = 0x0001
-    AUDIO_FRAME_POSITION_RECORD = 0x0002
-    AUDIO_FRAME_POSITION_MIXED = 0x0004
-    AUDIO_FRAME_POSITION_BEFORE_MIXING = 0x0008
-
-class AudioFrame(ctypes.Structure):
-    _fields_ = [
-        ("type", ctypes.c_int),
-        ("samples_per_channel", ctypes.c_int),
-        ("bytes_per_sample", ctypes.c_int),
-        ("channels", ctypes.c_int),
-        ("samples_per_sec", ctypes.c_int),
-        ("buffer", ctypes.c_void_p),
-        ("render_time_ms", ctypes.c_int64),
-        ("avsync_type", ctypes.c_int)
-    ]
-    pass
+#   /* return value stands for a 'bool' in C++: 1 for success, 0 for failure */
+#   int (*on_record_audio_frame)(AGORA_HANDLE agora_local_user /* raw pointer */,const char* channelId, const audio_frame* frame);
+#   int (*on_playback_audio_frame)(AGORA_HANDLE agora_local_user, const char* channelId, const audio_frame* frame);
+#   int (*on_mixed_audio_frame)(AGORA_HANDLE agora_local_user, const char* channelId, const audio_frame* frame);
+#   int (*on_ear_monitoring_audio_frame)(AGORA_HANDLE agora_local_user, const audio_frame* frame);
+#   int (*on_playback_audio_frame_before_mixing)(AGORA_HANDLE agora_local_user, const char* channelId, user_id_t uid, const audio_frame* frame);
+#   int (*on_get_audio_frame_position)(AGORA_HANDLE agora_local_user);
+#   audio_params (*on_get_playback_audio_frame_param)(AGORA_HANDLE agora_local_user);
+#   audio_params (*on_get_record_audio_frame_param)(AGORA_HANDLE agora_local_user);
+#   audio_params (*on_get_mixed_audio_frame_param)(AGORA_HANDLE agora_local_user);
+#   audio_params (*on_get_ear_monitoring_audio_frame_param)(AGORA_HANDLE agora_local_user);
 
 
-class AudioParams(ctypes.Structure):
-    _fields_ = [
-        ("sample_rate", ctypes.c_int),
-        ("channels", ctypes.c_int),
-        ("mode", ctypes.c_int),
-        ("samples_per_call", ctypes.c_int)
-    ]
-    pass
+class IAudioFrameObserver:
 
-ON_RECORD_AUDIO_FRAME_CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int, AGORA_HANDLE, ctypes.c_char_p, ctypes.POINTER(AudioFrame))
-ON_PLAYBACK_AUDIO_FRAME_CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int, AGORA_HANDLE, ctypes.c_char_p, ctypes.POINTER(AudioFrame))
-ON_MIXED_AUDIO_FRAME_CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int, AGORA_HANDLE, ctypes.c_char_p, ctypes.POINTER(AudioFrame))
-ON_EAR_MONITORING_AUDIO_FRAME_CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int, AGORA_HANDLE, ctypes.POINTER(AudioFrame))
-ON_PLAYBACK_AUDIO_FRAME_BEFORE_MIXING_CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int, AGORA_HANDLE, ctypes.c_char_p, user_id_t, ctypes.POINTER(AudioFrame))
-ON_GET_AUDIO_FRAME_POSITION_CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int, AGORA_HANDLE)
-ON_GET_PLAYBACK_AUDIO_FRAME_PARAM_CALLBACK = ctypes.CFUNCTYPE(AudioParams, AGORA_HANDLE)
-ON_GET_RECORD_AUDIO_FRAME_PARAM_CALLBACK = ctypes.CFUNCTYPE(AudioParams, AGORA_HANDLE)
-ON_GET_MIXED_AUDIO_FRAME_PARAM_CALLBACK = ctypes.CFUNCTYPE(AudioParams, AGORA_HANDLE)
-ON_GET_EAR_MONITORING_AUDIO_FRAME_PARAM_CALLBACK = ctypes.CFUNCTYPE(AudioParams, AGORA_HANDLE)
+    def on_record_audio_frame(self, agora_local_user, channelId, frame):
+        pass
 
-class AudioFrameObserver(ctypes.Structure):
-    _fields_ = [
-        ("on_record_audio_frame", ON_RECORD_AUDIO_FRAME_CALLBACK),
-        ("on_playback_audio_frame", ON_PLAYBACK_AUDIO_FRAME_CALLBACK),
-        ("on_mixed_audio_frame", ON_MIXED_AUDIO_FRAME_CALLBACK),
-        ("on_ear_monitoring_audio_frame", ON_EAR_MONITORING_AUDIO_FRAME_CALLBACK),
+    def on_playback_audio_frame(self, agora_local_user, channelId, frame):
+        pass
 
-        ("on_playback_audio_frame_before_mixing", ON_PLAYBACK_AUDIO_FRAME_BEFORE_MIXING_CALLBACK),
-        ("on_get_audio_frame_position", ON_GET_AUDIO_FRAME_POSITION_CALLBACK),
-        ("on_get_playback_audio_frame_param", ON_GET_PLAYBACK_AUDIO_FRAME_PARAM_CALLBACK),
-        ("on_get_record_audio_frame_param", ON_GET_RECORD_AUDIO_FRAME_PARAM_CALLBACK),
-        
-        ("on_get_mixed_audio_frame_param", ON_GET_MIXED_AUDIO_FRAME_PARAM_CALLBACK),
-        ("on_get_ear_monitoring_audio_frame_param", ON_GET_EAR_MONITORING_AUDIO_FRAME_PARAM_CALLBACK)
-    ]
+    def on_mixed_audio_frame(self, agora_local_user, channelId, frame):
+        pass
+
+    def on_ear_monitoring_audio_frame(self, agora_local_user, frame):
+        pass
+
+    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, frame):
+        pass
+
+    def on_get_audio_frame_position(self, agora_local_user):
+        pass
+
+    def on_get_playback_audio_frame_param(self, agora_local_user):
+        pass
+
+    def on_get_record_audio_frame_param(self, agora_local_user):
+        pass
+
+    def on_get_mixed_audio_frame_param(self, agora_local_user):
+        pass
+
+    def on_get_ear_monitoring_audio_frame_param(self, agora_local_user):
+        pass

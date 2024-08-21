@@ -2,6 +2,10 @@ import time
 import ctypes
 from .agora_base import *
 from .local_video_track import *
+from .local_user_observer import *
+from ._local_user_observer import *
+from ._audio_frame_observer import *
+from .audio_frame_observer import *
 
 agora_local_user_set_user_role = agora_lib.agora_local_user_set_user_role
 agora_local_user_set_user_role.restype = AGORA_API_C_VOID
@@ -105,7 +109,7 @@ agora_local_user_set_playback_audio_frame_before_mixing_parameters.argtypes = [A
 
 agora_local_user_register_audio_frame_observer = agora_lib.agora_local_user_register_audio_frame_observer
 agora_local_user_register_audio_frame_observer.restype = AGORA_API_C_INT
-agora_local_user_register_audio_frame_observer.argtypes = [AGORA_HANDLE, ctypes.c_void_p]
+agora_local_user_register_audio_frame_observer.argtypes = [AGORA_HANDLE, ctypes.POINTER(AudioFrameObserverInner)]
 
 agora_local_user_unregister_audio_frame_observer = agora_lib.agora_local_user_unregister_audio_frame_observer
 agora_local_user_unregister_audio_frame_observer.restype = AGORA_API_C_INT
@@ -169,7 +173,7 @@ agora_local_user_set_audio_volume_indication_parameters.argtypes = [AGORA_HANDLE
 
 agora_local_user_register_observer = agora_lib.agora_local_user_register_observer
 agora_local_user_register_observer.restype = AGORA_API_C_INT
-agora_local_user_register_observer.argtypes = [AGORA_HANDLE, ctypes.c_void_p]
+agora_local_user_register_observer.argtypes = [AGORA_HANDLE, ctypes.POINTER(RTCLocalUserObserverInner)]
 
 agora_local_user_unregister_observer = agora_lib.agora_local_user_unregister_observer
 agora_local_user_unregister_observer.restype = AGORA_API_C_INT
@@ -311,8 +315,9 @@ class LocalUser:
             print("Failed to set playback audio frame before mixing parameters")
         return ret
 
-    def register_audio_frame_observer(self, observer):
-        ret = agora_local_user_register_audio_frame_observer(self.user_handle, observer)
+    def register_audio_frame_observer(self, observer:IAudioFrameObserver):
+        audio_frame_observer = AudioFrameObserverInner(observer, self)
+        ret = agora_local_user_register_audio_frame_observer(self.user_handle, audio_frame_observer)
         if ret < 0:
             print("Failed to register audio frame observer")
         return ret
@@ -407,8 +412,9 @@ class LocalUser:
             print("Failed to set audio volume indication parameters")
         return ret
 
-    def register_observer(self, observer):
-        ret = agora_local_user_register_observer(self.user_handle, observer)
+    def register_observer(self, observer:IRTCLocalUserObserver):
+        local_user_observer = RTCLocalUserObserverInner(observer, self)
+        ret = agora_local_user_register_observer(self.user_handle, local_user_observer)
         if ret < 0:
             print("Failed to register observer")
         return ret

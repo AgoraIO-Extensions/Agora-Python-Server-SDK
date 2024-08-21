@@ -5,8 +5,7 @@ from .local_user import *
 from .rtc_connection_observer import *
 from .audio_pcm_data_sender import AudioPcmDataSender
 from .video_frame_sender import VideoFrameSender
-from .audio_frame_observer import AudioFrameObserver
-from .local_user_observer import RTCLocalUserObserver
+from ._audio_frame_observer import AudioFrameObserverInner
 from .agora_parameter import AgoraParameter
 from .globals import AgoraHandleInstanceMap
 from ._rtc_connection_observer import *
@@ -109,7 +108,7 @@ agora_video_frame_sender_destroy.argtypes = [AGORA_HANDLE]
 
 agora_local_user_register_audio_frame_observer = agora_lib.agora_local_user_register_audio_frame_observer
 agora_local_user_register_audio_frame_observer.restype = AGORA_API_C_INT
-agora_local_user_register_audio_frame_observer.argtypes = [AGORA_HANDLE, ctypes.POINTER(AudioFrameObserver)]
+agora_local_user_register_audio_frame_observer.argtypes = [AGORA_HANDLE, ctypes.POINTER(AudioFrameObserverInner)]
 
 agora_local_user_unregister_audio_frame_observer = agora_lib.agora_local_user_unregister_audio_frame_observer
 agora_local_user_unregister_audio_frame_observer.restype = AGORA_API_C_INT
@@ -130,14 +129,6 @@ agora_rtc_conn_send_stream_message = agora_lib.agora_rtc_conn_send_stream_messag
 agora_rtc_conn_send_stream_message.restype = AGORA_API_C_INT
 agora_rtc_conn_send_stream_message.argtypes = [AGORA_HANDLE, ctypes.c_int, ctypes.c_char_p, ctypes.c_uint32]
 
-
-agora_local_user_register_observer = agora_lib.agora_local_user_register_observer
-agora_local_user_register_observer.restype = AGORA_API_C_INT
-agora_local_user_register_observer.argtypes = [AGORA_HANDLE, ctypes.POINTER(RTCLocalUserObserver)]
-
-agora_local_user_unregister_observer = agora_lib.agora_local_user_unregister_observer
-agora_local_user_unregister_observer.restype = AGORA_API_C_INT
-agora_local_user_unregister_observer.argtypes = [AGORA_HANDLE]
 
 #set paramter 
 #AGORA_API_C_HDL agora_rtc_conn_get_agora_parameter(AGORA_HANDLE agora_rtc_conn);
