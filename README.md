@@ -20,7 +20,7 @@
   - python 3.8 above
 
 # Test Data
-- download and unzip [test_data.zip](https://share.weiyun.com/4x3Um6b8)
+- download and unzip [test_data.zip](https://download.agora.io/demo/test/test_data_202408221437.zip)
 - make **test_data** directory in the same directory with **agora_service**
 
 # Linux debug & develop

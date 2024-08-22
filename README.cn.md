@@ -20,7 +20,7 @@
   - Python 3.8 及以上
 
 # 测试数据
-- 下载并解压 [test_data.zip](https://share.weiyun.com/4x3Um6b8)
+- 下载并解压 [test_data.zip](https://download.agora.io/demo/test/test_data_202408221437.zip)
 - 在与 **agora_service** 同一目录下创建 **test_data** 目录
 
 # Linux 调试与开发
