@@ -2,10 +2,10 @@ import time
 import ctypes
 from .agora_base import *
 from .local_video_track import *
-from .local_user_observer import *
-from ._local_user_observer import *
-from ._audio_frame_observer import *
-from .audio_frame_observer import *
+from .local_user_observer import IRTCLocalUserObserver
+from ._local_user_observer import RTCLocalUserObserverInner
+from ._audio_frame_observer import AudioFrameObserverInner
+from .audio_frame_observer import IAudioFrameObserver
 
 agora_local_user_set_user_role = agora_lib.agora_local_user_set_user_role
 agora_local_user_set_user_role.restype = AGORA_API_C_VOID
@@ -451,3 +451,6 @@ class LocalUser:
 
     def release(self): #do nothing, just do api allign
         pass
+
+    def get_rtc_connection():
+        pass    

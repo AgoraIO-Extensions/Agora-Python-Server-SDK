@@ -3,14 +3,19 @@
 #coding=utf-8
 
 import time
+import os
+import sys
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+sdk_dir = os.path.dirname(script_dir)
+if sdk_dir not in sys.path:
+    sys.path.insert(0, sdk_dir)
+
 from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
-from agora_service.rtc_connection import *
-from agora_service.media_node_factory import *
-from agora_service.audio_pcm_data_sender import *
-from agora_service.audio_frame_observer import *
-from agora_service.media_node_factory import *
-from agora_service.local_user_observer import *
-from agora_service.audio_frame_observer import *
+from agora_service.rtc_connection_observer import IRTCConnectionObserver
+from agora_service.audio_pcm_data_sender import PcmAudioFrame
+from agora_service.audio_frame_observer import IAudioFrameObserver
+from agora_service.local_user_observer import IRTCLocalUserObserver
 
 class DYSConnectionObserver(IRTCConnectionObserver):
     def __init__(self):

@@ -2,7 +2,7 @@
 
 import time
 import ctypes
-from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
+from python_sdk.agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora_service.rtc_connection import *
 from agora_service.media_node_factory import *
 from agora_service.audio_pcm_data_sender import *

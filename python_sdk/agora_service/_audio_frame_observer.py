@@ -4,8 +4,6 @@ from .local_user import *
 import ctypes
 from .audio_frame_observer import *
 
-AGORA_HANDLE = ctypes.c_void_p
-user_id_t = ctypes.c_uint
 
 class RAW_AUDIO_FRAME_OP_MODE_TYPE(ctypes.c_int):
     RAW_AUDIO_FRAME_OP_MODE_READ_ONLY = 0

@@ -114,3 +114,8 @@ class LocalAudioTrack:
             print(f"Failed to clear buffer, error code: {ret}")
         return ret
 
+    def release(self):
+        pass
+        # if self.track_handle:
+        #     agora_local_audio_track_release(self.track_handle)
+        #     self.track_handle = None

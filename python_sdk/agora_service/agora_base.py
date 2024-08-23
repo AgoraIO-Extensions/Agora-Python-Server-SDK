@@ -7,6 +7,8 @@ import sys
 script_dir = os.path.dirname(os.path.abspath(__file__))
 sdk_dir = os.path.dirname(os.path.dirname(script_dir))
 lib_path = os.path.join(sdk_dir, 'agora_sdk')
+
+
 if sys.platform == 'darwin':
     lib_agora_rtc_path =os.path.join(lib_path, 'libAgoraRtcKit.dylib')
 elif sys.platform == 'linux':
@@ -23,6 +25,9 @@ AGORA_HANDLE = ctypes.c_void_p
 AGORA_API_C_INT = ctypes.c_int
 AGORA_API_C_HDLL = ctypes.c_void_p
 AGORA_API_C_VOID = None
+AGORA_HANDLE = ctypes.c_void_p
+user_id_t = ctypes.c_uint
+
 
 class LastmileProbeOneWayResult(ctypes.Structure):
     _fields_ = [
