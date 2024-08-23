@@ -161,11 +161,11 @@ connection.connect(token, channel_id, uid)
 #---------------3. Create Media Sender
 media_node_factory = agora_service.create_media_node_factory()
 pcm_data_sender = media_node_factory.create_audio_pcm_data_sender()
-audio_track = agora_service.create_custom_audio_track(pcm_data_sender)
+audio_track = agora_service.create_custom_audio_track_pcm(pcm_data_sender)
 
 local_user = connection.get_local_user()
 localuser_observer = DYSLocalUserObserver()
-local_user.register_observer(localuser_observer)
+local_user.register_local_user_observer(localuser_observer)
 audio_frame_observer = DYSAudioFrameObserver()
 local_user.register_audio_frame_observer(audio_frame_observer)
 
@@ -196,7 +196,7 @@ with open(pcm_file_path, "rb") as file:
         frame.number_of_channels = 1
         frame.sample_rate = 16000
 
-        ret = pcm_data_sender.send(frame)
+        ret = pcm_data_sender.send_audio_pcm_data(frame)
         count += 1
         print("count,ret=",count, ret)
         Pacer.pace()

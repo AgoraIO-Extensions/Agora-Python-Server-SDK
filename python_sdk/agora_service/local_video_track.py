@@ -44,7 +44,7 @@ class LocalVideoTrack:
             print(f"Failed to set local video track enabled state, error code: {ret}")
         return ret
 
-    def set_video_encoder_config(self, config):
+    def set_video_encoder_configuration(self, config):
         ret = agora_local_video_track_set_video_encoder_config(self.track_handle, ctypes.byref(config))
         if ret != 0:
             print(f"Failed to set video encoder configuration, error code: {ret}")

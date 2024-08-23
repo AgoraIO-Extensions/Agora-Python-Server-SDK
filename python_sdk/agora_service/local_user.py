@@ -35,26 +35,6 @@ agora_local_user_unpublish_audio = agora_lib.agora_local_user_unpublish_audio
 agora_local_user_unpublish_audio.restype = AGORA_API_C_INT
 agora_local_user_unpublish_audio.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
 
-agora_local_user_set_user_role = agora_lib.agora_local_user_set_user_role
-agora_local_user_set_user_role.restype = AGORA_API_C_VOID
-agora_local_user_set_user_role.argtypes = [AGORA_HANDLE, ctypes.c_int]
-
-agora_local_user_get_user_role = agora_lib.agora_local_user_get_user_role
-agora_local_user_get_user_role.restype = ctypes.c_int
-agora_local_user_get_user_role.argtypes = [AGORA_HANDLE]
-
-agora_local_user_set_audio_encoder_config = agora_lib.agora_local_user_set_audio_encoder_config
-agora_local_user_set_audio_encoder_config.restype = AGORA_API_C_INT
-agora_local_user_set_audio_encoder_config.argtypes = [AGORA_HANDLE, ctypes.POINTER(AudioEncoderConfiguration)]
-
-agora_local_user_get_local_audio_statistics = agora_lib.agora_local_user_get_local_audio_statistics
-agora_local_user_get_local_audio_statistics.restype = ctypes.POINTER(LocalAudioStats)
-agora_local_user_get_local_audio_statistics.argtypes = [AGORA_HANDLE]
-
-agora_local_user_destroy_local_audio_statistics = agora_lib.agora_local_user_destroy_local_audio_statistics
-agora_local_user_destroy_local_audio_statistics.restype = AGORA_API_C_VOID
-agora_local_user_destroy_local_audio_statistics.argtypes = [AGORA_HANDLE, ctypes.POINTER(LocalAudioStats)]
-
 agora_local_user_publish_video = agora_lib.agora_local_user_publish_video
 agora_local_user_publish_video.restype = AGORA_API_C_INT
 agora_local_user_publish_video.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
@@ -211,7 +191,7 @@ class LocalUser:
             print("Failed to get user role")
         return ret
 
-    def set_audio_encoder_config(self, config):
+    def set_audio_encoder_configuration(self, config):
         ret = agora_local_user_set_audio_encoder_config(self.user_handle, config)
         if ret < 0:
             print("Failed to set audio encoder config")
@@ -412,14 +392,14 @@ class LocalUser:
             print("Failed to set audio volume indication parameters")
         return ret
 
-    def register_observer(self, observer:IRTCLocalUserObserver):
+    def register_local_user_observer(self, observer:IRTCLocalUserObserver):
         local_user_observer = RTCLocalUserObserverInner(observer, self)
         ret = agora_local_user_register_observer(self.user_handle, local_user_observer)
         if ret < 0:
             print("Failed to register observer")
         return ret
 
-    def unregister_observer(self):
+    def unregister_local_user_observer(self):
         ret = agora_local_user_unregister_observer(self.user_handle)
         if ret < 0:
             print("Failed to unregister observer")

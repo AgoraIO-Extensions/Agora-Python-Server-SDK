@@ -7,8 +7,6 @@ import sys
 script_dir = os.path.dirname(os.path.abspath(__file__))
 sdk_dir = os.path.dirname(os.path.dirname(script_dir))
 lib_path = os.path.join(sdk_dir, 'agora_sdk')
-
-
 if sys.platform == 'darwin':
     lib_agora_rtc_path =os.path.join(lib_path, 'libAgoraRtcKit.dylib')
 elif sys.platform == 'linux':
