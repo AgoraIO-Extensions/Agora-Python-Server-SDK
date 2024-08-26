@@ -149,18 +149,18 @@ class AgoraService:
         custom_audio_track = agora_service_create_custom_audio_track_encoded(self.service_handle, audio_encoded_frame_sender.sender_handle, mix_mode)
         return LocalAudioTrack(custom_audio_track)
     
-    def create_custom_video_track_frame(self, video_encoded_frame_sender:VideoEncodedImageSender, options:SenderOptions):
-        if not self.inited:
-            print("AgoraService is not initialized. Please call initialize() first.")
-            return None
-        custom_video_track = agora_service_create_custom_video_track_encoded(self.service_handle, video_encoded_frame_sender.sender_handle, ctypes.byref(options))
-        return LocalVideoTrack(custom_video_track)
-    
-    def create_custom_video_track_encoded(self, video_frame_sender:VideoFrameSender):
+    def create_custom_video_track_frame(self, video_frame_sender:VideoFrameSender):
         if not self.inited:
             print("AgoraService is not initialized. Please call initialize() first.")
             return None
         custom_video_track = agora_service_create_custom_video_track_frame(self.service_handle, video_frame_sender.sender_handle)
+        return LocalVideoTrack(custom_video_track)
+    
+    def create_custom_video_track_encoded(self, video_encoded_frame_sender:VideoEncodedImageSender, options:SenderOptions):
+        if not self.inited:
+            print("AgoraService is not initialized. Please call initialize() first.")
+            return None
+        custom_video_track = agora_service_create_custom_video_track_encoded(self.service_handle, video_encoded_frame_sender.sender_handle, ctypes.byref(options))
         return LocalVideoTrack(custom_video_track)
     
     def set_log_file(self, log_path: str, log_size: int = 512 * 1024):

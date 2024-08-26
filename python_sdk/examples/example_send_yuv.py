@@ -1,8 +1,15 @@
 #coding=utf-8
 
 import time
-import ctypes
-from python_sdk.agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
+import os
+import sys
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+sdk_dir = os.path.dirname(script_dir)
+if sdk_dir not in sys.path:
+    sys.path.insert(0, sdk_dir)
+
+from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora_service.rtc_connection import *
 from agora_service.media_node_factory import *
 from agora_service.audio_pcm_data_sender import *
@@ -69,50 +76,44 @@ class DYSConnectionObserver(IRTCConnectionObserver):
         return 0
 
 
-# conn_observer callback
-def on_connected(agora_rtc_conn, conn_info, reason):
-    print("on_connected:", agora_rtc_conn, conn_info, reason)
 
-def on_disconnected(agora_rtc_conn, conn_info, reason):
-    print("on_disconnected:", agora_rtc_conn, conn_info, reason)
 
-def on_connecting(agora_rtc_conn, conn_info, reason):
-    print("on_connecting:", agora_rtc_conn, conn_info, reason)
+class DYSLocalUserObserver(IRTCLocalUserObserver):
+    def __init__(self):
+        super(DYSLocalUserObserver, self).__init__()
 
-def on_user_joined(agora_rtc_conn, user_id):
-    print("on_user_joined:", agora_rtc_conn, user_id)
+    def on_stream_message(self, local_user, user_id, stream_id, data, length):
+        print("CCC on_stream_message:", user_id, stream_id, data, length)
+        return 0
 
-def on_playback_audio_frame_before_mixing(agora_local_user, channelId, uid, frame):
-    # print("on_playback_audio_frame_before_mixing")#, channelId, uid)
-    return 0
+    def on_user_info_updated(self, local_user, user_id, msg, val):
+        print("CCC on_user_info_updated:", user_id, msg, val)
+        return 0
 
-def on_record_audio_frame(agora_local_user ,channelId, frame):
-    print("on_record_audio_frame")
-    return 0
 
-def on_playback_audio_frame(agora_local_user, channelId, frame):
-    print("on_playback_audio_frame")
-    return 0
+    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, frame):
+        # print("on_playback_audio_frame_before_mixing")#, channelId, uid)
+        return 0
 
-def on_mixed_audio_frame(agora_local_user, channelId, frame):
-    print("on_mixed_audio_frame")
-    return 0
+    def on_record_audio_frame(self, agora_local_user ,channelId, frame):
+        print("on_record_audio_frame")
+        return 0
 
-def on_ear_monitoring_audio_frame(agora_local_user, frame):
-    print("on_ear_monitoring_audio_frame")
-    return 0
+    def on_playback_audio_frame(self, agora_local_user, channelId, frame):
+        print("on_playback_audio_frame")
+        return 0
 
-def on_get_audio_frame_position(agora_local_user):
-    print("on_get_audio_frame_position")
-    return 0
+    def on_mixed_audio_frame(self, agora_local_user, channelId, frame):
+        print("on_mixed_audio_frame")
+        return 0
 
-def on_stream_message(local_user, user_id, stream_id, data, length):
-    print("on_stream_message:", user_id, stream_id, data, length)
-    return 0
+    def on_ear_monitoring_audio_frame(self, agora_local_user, frame):
+        print("on_ear_monitoring_audio_frame")
+        return 0
 
-def on_user_info_updated(local_user, user_id, msg, val):
-    print("on_user_info_updated:", user_id, msg, val)
-    return 0
+    def on_get_audio_frame_position(self, agora_local_user):
+        print("on_get_audio_frame_position")
+        return 0
 
 def on_frame(agora_video_frame_observer2, channel_id, remote_uid, frame):
     print("on_frame")
@@ -165,31 +166,17 @@ con_config = RTCConnConfig(
     channel_profile=1,
 )
 
-pcm_observer = AudioFrameObserver(
-    on_record_audio_frame=ON_RECORD_AUDIO_FRAME_CALLBACK(on_record_audio_frame),
-    on_playback_audio_frame=ON_PLAYBACK_AUDIO_FRAME_CALLBACK(on_playback_audio_frame),
-    on_ear_monitoring_audio_frame=ON_EAR_MONITORING_AUDIO_FRAME_CALLBACK(on_ear_monitoring_audio_frame),
-    on_playback_audio_frame_before_mixing=ON_PLAYBACK_AUDIO_FRAME_BEFORE_MIXING_CALLBACK(on_playback_audio_frame_before_mixing),
-    on_get_audio_frame_position=ON_GET_AUDIO_FRAME_POSITION_CALLBACK(on_get_audio_frame_position),
-)
-
-con_config.pcm_observer = pcm_observer
-
 connection = agora_service.create_rtc_connection(con_config)
-
 conn_observer = DYSConnectionObserver()
-localuser_observer = RTCLocalUserObserver(
-    on_stream_message=ON_STREAM_MESSAGE_CALLBACK(on_stream_message),
-    on_user_info_updated=ON_USER_INFO_UPDATED_CALLBACK(on_user_info_updated)
-)
-
 connection.register_observer(conn_observer)
+connection.connect(token, channel_id, uid)
 
+media_node_factory = agora_service.create_media_node_factory()
 connection.connect(token, channel_id, uid)
 
 media_node_factory = agora_service.create_media_node_factory()
 video_sender = media_node_factory.create_video_frame_sender()
-video_track = agora_service.create_custom_video_track(video_sender)
+video_track = agora_service.create_custom_video_track_frame(video_sender)
 local_user = connection.get_local_user()
 
 
@@ -225,7 +212,7 @@ def send_test():
             frame.stride = width
             frame.height = height
             frame.timestamp = 0
-            ret = video_sender.send(frame)        
+            ret = video_sender.send_video_frame(frame)        
             count += 1
             print("count,ret=",count, ret)
             Pacer.pace()
@@ -234,9 +221,9 @@ for i in range(30):
     send_test()
 
 time.sleep(2)
-# video_sender.Stop()
-video_track.set_enable(0)
 local_user.unpublish_video(video_track)
+video_track.set_enable(0)
+connection.unregister_observer()
 connection.disconnect()
 # connection.Release()
 print("release")
