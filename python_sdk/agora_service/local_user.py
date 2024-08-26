@@ -2,6 +2,7 @@ import time
 import ctypes
 from .agora_base import *
 from .local_video_track import *
+from .local_audio_track import *
 from .local_user_observer import IRTCLocalUserObserver
 from ._local_user_observer import RTCLocalUserObserverInner
 from ._audio_frame_observer import AudioFrameObserverInner
@@ -203,14 +204,14 @@ class LocalUser:
         agora_local_user_destroy_local_audio_statistics(self.user_handle, stats)
         return result
 
-    def publish_audio(self, agora_local_audio_track:LocalVideoTrack):
+    def publish_audio(self, agora_local_audio_track:LocalAudioTrack):
         ret = agora_local_user_publish_audio(self.user_handle, agora_local_audio_track.track_handle)
         if ret < 0:
             print("Failed to publish audio")
         return ret
 
 
-    def unpublish_audio(self, agora_local_audio_track:LocalVideoTrack):
+    def unpublish_audio(self, agora_local_audio_track:LocalAudioTrack):
         ret = agora_local_user_unpublish_audio(self.user_handle, agora_local_audio_track.track_handle)
         if ret < 0:
             print("Failed to unpublish audio")
@@ -222,8 +223,8 @@ class LocalUser:
             print("Failed to publish video")
         return ret
 
-    def unpublish_video(self, agora_local_video_track):
-        ret = agora_local_user_unpublish_video(self.user_handle, agora_local_video_track)
+    def unpublish_video(self, agora_local_video_track: LocalVideoTrack):
+        ret = agora_local_user_unpublish_video(self.user_handle, agora_local_video_track.track_handle)
         if ret < 0:
             print("Failed to unpublish video")
         return ret

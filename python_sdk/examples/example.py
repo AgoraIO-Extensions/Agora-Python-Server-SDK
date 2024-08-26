@@ -76,15 +76,19 @@ class BizConnectionObserver(IRTCConnectionObserver):
 
     def on_connected(self, agora_rtc_conn, conn_info, reason):
         print("CCC Connected:", agora_rtc_conn, conn_info, reason)
+        return 
 
     def on_disconnected(self, agora_rtc_conn, conn_info, reason):
         print("CCC Disconnected:", agora_rtc_conn, conn_info, reason)
+        return 
 
     def on_connecting(self, agora_rtc_conn, conn_info, reason):
         print("CCC Connecting:", agora_rtc_conn, conn_info, reason)
+        return
 
     def on_user_joined(self, agora_rtc_conn, user_id):
         print("CCC on_user_joined:", agora_rtc_conn, user_id)
+        return
 
     # def on_get_playback_audio_frame_param(self, agora_local_user):
     #     audio_params_instance = AudioParams()
@@ -191,7 +195,7 @@ def pushPcmDatafromFile(file, packnum, pcmsender):
    
 
     ret = pcmsender.send_audio_pcm_data(frame)
-    print("first,ret=",packnum, ret)
+    #print("first,ret=",packnum, ret)
     return ret
 
 #sig handleer
@@ -375,7 +379,7 @@ with open(pcm_file_path, "rb") as file:
     #第一次读区 180ms的数据
     packnum = 18
     ret = pushPcmDatafromFile(file, packnum, pcm_data_sender)
-    print("first,ret=",packnum, ret)
+    #print("first,ret=",packnum, ret)
 
     #fortesting
 
