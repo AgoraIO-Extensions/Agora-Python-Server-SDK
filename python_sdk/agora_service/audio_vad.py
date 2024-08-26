@@ -5,12 +5,19 @@ import os
 import sys
 from enum import Enum,IntEnum
 
-
-# ctypes to load ved module
+script_dir = os.path.dirname(os.path.abspath(__file__))
+sdk_dir = os.path.dirname(os.path.dirname(script_dir))
+lib_path = os.path.join(sdk_dir, 'agora_sdk')
 if sys.platform == 'darwin':
-    agoravad_lib = ctypes.CDLL('libuap_aed.dylib')
+    agora_vad_lib_path =os.path.join(lib_path, 'libuap_aed.dylib')
 elif sys.platform == 'linux':
-    agoravad_lib = ctypes.CDLL('libuap_aed.so')
+    agora_vad_lib_path =os.path.join(lib_path, 'libuap_aed.so')    
+try:
+    agora_vad_lib = ctypes.CDLL(agora_vad_lib_path)
+except OSError as e:
+    print(f"Error loading the library: {e}")
+    print(f"Attempted to load from: {agora_vad_lib_path}")
+    sys.exit(1)
 
 
 class VAD_STATE(ctypes.c_int):
@@ -88,15 +95,15 @@ int Agora_UAP_VAD_Create(void** stPtr, const Vad_Config* config);
 int Agora_UAP_VAD_Destroy(void** stPtr);
 int Agora_UAP_VAD_Proc(void* stPtr, const Vad_AudioData* pIn, Vad_AudioData* pOut, VAD_STATE* state);
 """
-agora_uap_vad_create = agoravad_lib.Agora_UAP_VAD_Create
+agora_uap_vad_create = agora_vad_lib.Agora_UAP_VAD_Create
 agora_uap_vad_create.restype = ctypes.c_int
 agora_uap_vad_create.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.POINTER(VadConfig)]
 
-agora_uap_vad_destroy = agoravad_lib.Agora_UAP_VAD_Destroy
+agora_uap_vad_destroy = agora_vad_lib.Agora_UAP_VAD_Destroy
 agora_uap_vad_destroy.restype = ctypes.c_int
 agora_uap_vad_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
 
-agora_uap_vad_proc = agoravad_lib.Agora_UAP_VAD_Proc
+agora_uap_vad_proc = agora_vad_lib.Agora_UAP_VAD_Proc
 agora_uap_vad_proc.restype = ctypes.c_int
 agora_uap_vad_proc.argtypes = [ctypes.c_void_p, ctypes.POINTER(VadAudioData), ctypes.POINTER(VadAudioData), ctypes.POINTER(VAD_STATE)]
 

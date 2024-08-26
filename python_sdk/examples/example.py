@@ -22,53 +22,6 @@ from agora_service.local_user_observer import *
 
 import gc
 
-# conn_observer callback
-def on_connected(agora_rtc_conn, conn_info, reason):
-    print("Connected:", agora_rtc_conn, conn_info, reason)
-
-def on_disconnected(agora_rtc_conn, conn_info, reason):
-    print("Disconnected:", agora_rtc_conn, conn_info, reason)
-
-def on_connecting(agora_rtc_conn, conn_info, reason):
-    print("Connecting:", agora_rtc_conn, conn_info, reason)
-
-def on_user_joined(agora_rtc_conn, user_id):
-    print("on_user_joined:", agora_rtc_conn, user_id)
-def on_user_left(agora_rtc_conn, user_id, reason):
-    print("on_user_left:", agora_rtc_conn, user_id, reason)
-
-# def on_get_playback_audio_frame_param(agora_local_user):
-#     audio_params_instance = AudioParams()
-#     return audio_params_instance
-
-def on_playback_audio_frame_before_mixing(agora_local_user, channelId, uid, frame):
-    print("on_playback_audio_frame_before_mixing")#, channelId, uid)
-    return 0
-
-def on_record_audio_frame(agora_local_user ,channelId, frame):
-    print("on_record_audio_frame")
-    return 0
-
-def on_playback_audio_frame(agora_local_user, channelId, frame):
-    print("on_playback_audio_frame")
-    return 0
-
-def on_mixed_audio_frame(agora_local_user, channelId, frame):
-    print("on_mixed_audio_frame")
-    return 0
-
-def on_ear_monitoring_audio_frame(agora_local_user, frame):
-    print("on_ear_monitoring_audio_frame")
-    return 0
-
-def on_playback_audio_frame_before_mixing(agora_local_user, channelId, uid, frame):
-    print("on_playback_audio_frame_before_mixing")
-    return 0
-
-def on_get_audio_frame_position(agora_local_user):
-    print("on_get_audio_frame_position")
-    return 0
-
 #conneciton observer: inherit form interface
 class BizConnectionObserver(IRTCConnectionObserver):
     def __init__(self):
@@ -158,23 +111,6 @@ class BizAudioFrameObserver(IAudioFrameObserver):
         print("CCC on_get_audio_frame_position")
         return 0
 
-
-
-#c api def
-# AGORA_HANDLE agora_local_user, user_id_t user_id, int stream_id, const char* data, size_t length
-#user_id: string type; steream_id: int, data: byte, lenght: int
-def on_stream_message(local_user, user_id, stream_id, data, length):
-    print("on_stream_message:", user_id, stream_id, data, length)
-    #print("on_stream_message: userid is {user_id}, streamid is {stream_id}, data is {data}, length is {length }")
-    return 0
-
-#void (*on_user_info_updated)(AGORA_HANDLE agora_local_user, user_id_t user_id, int msg, int val);
-#user_id: string type; msg: int, val: int
-def on_user_info_updated(local_user, user_id, msg, val):
-    print("on_user_info_updated:", user_id, msg, val)
-    return 0
-
-#adjust volume
 
 
 def pushPcmDatafromFile(file, packnum, pcmsender):
@@ -276,8 +212,6 @@ g_runing = True
 
 signal.signal(signal.SIGINT, signal_handler)
 
-
-
 # 通过传参将参数传进来
 # 例如： python examples/example.py {appid} {token} {channel_id} ./test_data/demo.pcm {userid}
 appid = sys.argv[1]
@@ -318,9 +252,7 @@ con_config = RTCConnConfig(
 
 connection = agora_service.create_rtc_connection(con_config)
 conn_observer = BizConnectionObserver()
-
 connection.register_observer(conn_observer)
-
 connection.connect(token, channel_id, uid)
 
 #step2: 
@@ -332,7 +264,6 @@ audio_track = agora_service.create_custom_audio_track_pcm(pcm_data_sender)
 #step3: localuser
 localuser = connection.get_local_user()
 localuser.register_local_user_observer(observer = BizLocalUserObserver())
-
 localuser.register_audio_frame_observer(observer = BizAudioFrameObserver())
 
 ret = localuser.get_user_role()
