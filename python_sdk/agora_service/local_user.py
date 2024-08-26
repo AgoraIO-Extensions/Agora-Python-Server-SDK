@@ -8,7 +8,7 @@ from ._audio_frame_observer import AudioFrameObserverInner
 from .audio_frame_observer import IAudioFrameObserver
 
 agora_local_user_set_user_role = agora_lib.agora_local_user_set_user_role
-agora_local_user_set_user_role.restype = AGORA_API_C_VOID
+agora_local_user_set_user_role.restype = ctypes.c_int
 agora_local_user_set_user_role.argtypes = [AGORA_HANDLE, ctypes.c_int]
 
 agora_local_user_get_user_role = agora_lib.agora_local_user_get_user_role
