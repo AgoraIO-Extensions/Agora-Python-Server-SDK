@@ -286,9 +286,9 @@ class RTCLocalUserObserverInner(ctypes.Structure):
         print("LocalUserCB _on_local_audio_track_state_changed:", agora_local_user, agora_local_audio_track, state, error)
         self.local_user_observer.on_local_audio_track_state_changed(self.local_user, agora_local_audio_track, state, error)
 
-    def _on_local_audio_track_statistics(self, agora_local_user, agora_local_audio_track, stats):
-        print("LocalUserCB _on_local_audio_track_statistics:", agora_local_user, agora_local_audio_track, stats)
-        self.local_user_observer.on_local_audio_track_statistics(self.local_user, agora_local_audio_track, stats)
+    def _on_local_audio_track_statistics(self, agora_local_user, stats):
+        print("LocalUserCB _on_local_audio_track_statistics:", agora_local_user, stats)
+        self.local_user_observer.on_local_audio_track_statistics(self.local_user, stats)
     
     def _on_remote_audio_track_statistics(self, agora_local_user, agora_remote_audio_track, stats):
         print("LocalUserCB _on_remote_audio_track_statistics:", agora_local_user, agora_remote_audio_track, stats)

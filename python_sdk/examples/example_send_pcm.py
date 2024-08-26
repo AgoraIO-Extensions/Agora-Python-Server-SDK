@@ -203,11 +203,11 @@ with open(pcm_file_path, "rb") as file:
            
 #---------------5. Stop Media Sender And Release
 time.sleep(10)
-audio_track.set_enabled(0)
 local_user.unpublish_audio(audio_track)
-
+audio_track.set_enabled(0)
+connection.unregister_observer()
 connection.disconnect()
-# connection.release()
+connection.release()
 print("release")
 agora_service.release()
 print("end")

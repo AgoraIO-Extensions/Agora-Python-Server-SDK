@@ -53,10 +53,7 @@ class LocalAudioTrack:
         self.track_handle = track_handle
 
     def set_enabled(self, enable):
-        ret = agora_local_audio_track_set_enabled(self.track_handle, enable)
-        if ret != 0:
-            print(f"Failed to set local audio track enabled state, error code: {ret}")
-        return ret
+         agora_local_audio_track_set_enabled(self.track_handle, enable)        
 
     def is_enabled(self):
         enabled = ctypes.c_int()
