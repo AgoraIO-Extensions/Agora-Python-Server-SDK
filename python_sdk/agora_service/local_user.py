@@ -223,7 +223,7 @@ class LocalUser:
             print("Failed to publish video")
         return ret
 
-    def unpublish_video(self, agora_local_video_track: LocalVideoTrack):
+    def unpublish_video(self, agora_local_video_track:LocalVideoTrack):
         ret = agora_local_user_unpublish_video(self.user_handle, agora_local_video_track.track_handle)
         if ret < 0:
             print("Failed to unpublish video")

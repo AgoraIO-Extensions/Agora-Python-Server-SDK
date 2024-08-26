@@ -145,11 +145,6 @@ agora_rtc_conn_renew_token = agora_lib.agora_rtc_conn_renew_token
 agora_rtc_conn_renew_token.restype = AGORA_API_C_INT
 agora_rtc_conn_renew_token.argtypes = [AGORA_HANDLE, ctypes.c_char_p]
 
-#unpublish video track
-agora_local_user_unpublish_video = agora_lib.agora_local_user_unpublish_video
-agora_local_user_unpublish_video.restype = AGORA_API_C_INT
-agora_local_user_unpublish_video.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
-
 
 class RTCConnection:
     def __init__(self, conn_handle) -> None:

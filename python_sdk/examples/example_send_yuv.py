@@ -36,8 +36,9 @@ class DYSConnectionObserver(IRTCConnectionObserver):
         print("CCC on_user_joined:", agora_rtc_conn, user_id)
 
     def on_get_playback_audio_frame_param(self, agora_local_user):
-        audio_params_instance = AudioParams()
-        return audio_params_instance
+        # audio_params_instance = AudioParams()
+        # return audio_params_instance
+        return 0
 
     def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, frame):
         print("CCC on_playback_audio_frame_before_mixing")#, channelId, uid)
@@ -172,13 +173,9 @@ connection.register_observer(conn_observer)
 connection.connect(token, channel_id, uid)
 
 media_node_factory = agora_service.create_media_node_factory()
-connection.connect(token, channel_id, uid)
-
-media_node_factory = agora_service.create_media_node_factory()
 video_sender = media_node_factory.create_video_frame_sender()
 video_track = agora_service.create_custom_video_track_frame(video_sender)
 local_user = connection.get_local_user()
-
 
 # video_sender = connection.GetVideoSender()
 video_frame_observer = VideoFrameObserver2(
@@ -217,15 +214,15 @@ def send_test():
             print("count,ret=",count, ret)
             Pacer.pace()
 
-for i in range(30):
+for i in range(1):
     send_test()
 
 time.sleep(2)
 local_user.unpublish_video(video_track)
-video_track.set_enable(0)
+video_track.set_enabled(0)
 connection.unregister_observer()
 connection.disconnect()
-# connection.Release()
+connection.release()
 print("release")
 agora_service.release()
 print("end")
