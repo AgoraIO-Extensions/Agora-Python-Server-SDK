@@ -113,14 +113,12 @@ class AudioPcmDataInfo(ctypes.Structure):
 
 class LocalAudioStats(ctypes.Structure):
     _fields_ = [
-        ("numChannels", ctypes.c_int),
-        ("sentSampleRate", ctypes.c_int),
-        ("sentBitrate", ctypes.c_int),
-        ("internalCodec", ctypes.c_int),
-        ("txPacketLossRate", ctypes.c_ushort),
-        ("audioDeviceDelay", ctypes.c_int)
+        ("num_channels", ctypes.c_int),
+        ("sent_sample_rate", ctypes.c_int),
+        ("sent_bitrate", ctypes.c_int),
+        ("internal_codec", ctypes.c_int),
+        ("voice_pitch", ctypes.c_double)
     ]
-
 
 
 class AUDIO_PROFILE_TYPE(ctypes.c_int):

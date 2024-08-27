@@ -352,7 +352,12 @@ with open(pcm_file_path, "rb") as file:
         #print("goruning = ", g_runing)
               
 
+localuser.unpublish_audio(audio_track)
+audio_track.set_enabled(0)
+connection.unregister_observer()
+connection.disconnect()
+connection.release()
 print("release")
 time.sleep(0.01)
-agora_service.Destroy()
+agora_service.release()
 print("end")

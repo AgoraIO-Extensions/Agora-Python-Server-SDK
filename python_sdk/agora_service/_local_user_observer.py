@@ -9,14 +9,7 @@ track_id_t = ctypes.c_uint
 
 #========localuser observer=====
 
-class LocalAudioStats(ctypes.Structure):
-    _fields_ = [
-        ("num_channels", ctypes.c_int),
-        ("sent_sample_rate", ctypes.c_int),
-        ("sent_bitrate", ctypes.c_int),
-        ("internal_codec", ctypes.c_int),
-        ("voice_pitch", ctypes.c_double)
-    ]
+
 
 class RemoteAudioTrackStats(ctypes.Structure):
     _fields_ = [
