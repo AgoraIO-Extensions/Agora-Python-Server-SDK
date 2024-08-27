@@ -28,9 +28,7 @@ class AgoraServiceConfig(ctypes.Structure):
         # ('log_size', ctypes.c_int),
     ]
 
-    def __init__(self) -> None:
-        self.log_path = ""
-        self.log_size = 0    
+    def __init__(self) -> None: 
         self.appid = ""
 
 agora_service_create = agora_lib.agora_service_create
@@ -91,7 +89,7 @@ class AgoraService:
 
     def initialize(self, config: AgoraServiceConfig):       
         if self.inited == True:
-            return
+            return 0
         config.app_id = config.appid.encode('utf-8')
         result = agora_service_initialize(self.service_handle, ctypes.byref(config))
         if result == 0:
@@ -104,6 +102,7 @@ class AgoraService:
                 log_size = config.log_size            
             agora_service_set_log_file(self.service_handle, ctypes.create_string_buffer(config.log_path.encode('utf-8')),log_size)
         
+        return result
         
     def release(self):                
         if self.inited == False:
