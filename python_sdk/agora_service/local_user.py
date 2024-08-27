@@ -23,7 +23,7 @@ agora_local_user_set_audio_encoder_config.restype = AGORA_API_C_INT
 agora_local_user_set_audio_encoder_config.argtypes = [AGORA_HANDLE, ctypes.POINTER(AudioEncoderConfiguration)]
 
 agora_local_user_get_local_audio_statistics = agora_lib.agora_local_user_get_local_audio_statistics
-agora_local_user_get_local_audio_statistics.restype = ctypes.POINTER(LocalAudioStats)
+agora_local_user_get_local_audio_statistics.restype = ctypes.POINTER(LocalAudioDetailedStats)
 agora_local_user_get_local_audio_statistics.argtypes = [AGORA_HANDLE]
 
 agora_local_user_destroy_local_audio_statistics = agora_lib.agora_local_user_destroy_local_audio_statistics
@@ -202,9 +202,7 @@ class LocalUser:
 
     def get_local_audio_statistics(self):
         stats = agora_local_user_get_local_audio_statistics(self.user_handle)
-        result = stats.contents  # Assuming this returns a pointer to the struct
-        agora_local_user_destroy_local_audio_statistics(self.user_handle, stats)
-        return result
+        return stats
 
     def publish_audio(self, agora_local_audio_track:LocalAudioTrack):
         ret = agora_local_user_publish_audio(self.user_handle, agora_local_audio_track.track_handle)

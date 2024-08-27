@@ -300,3 +300,50 @@ class SimulcastStreamConfig(ctypes.Structure):
         ("bitrate", ctypes.c_int),
         ("framerate", ctypes.c_int)
     ]
+
+
+
+k_max_codec_name_len = 100
+
+class AnaStats(ctypes.Structure):
+    _fields_ = [
+        ("bitrate_action_counter", ctypes.c_uint32),
+        ("channel_action_counter", ctypes.c_uint32),
+        ("dtx_action_counter", ctypes.c_uint32),
+        ("fec_action_counter", ctypes.c_uint32),
+        ("frame_length_increase_counter", ctypes.c_uint32),
+        ("frame_length_decrease_counter", ctypes.c_uint32),
+        ("uplink_packet_loss_fraction", ctypes.c_float)
+    ]
+
+class AudioProcessingStats(ctypes.Structure):
+    _fields_ = [
+        ("echo_return_loss", ctypes.c_double),
+        ("echo_return_loss_enhancement", ctypes.c_double),
+        ("divergent_filter_fraction", ctypes.c_double),
+        ("delay_median_ms", ctypes.c_int32),
+        ("delay_standard_deviation_ms", ctypes.c_int32),
+        ("residual_echo_likelihood", ctypes.c_double),
+        ("residual_echo_likelihood_recent_max", ctypes.c_double),
+        ("delay_ms", ctypes.c_int32)
+    ]
+
+class LocalAudioDetailedStats(ctypes.Structure):
+    _fields_ = [
+        ("local_ssrc", ctypes.c_uint32),
+        ("bytes_sent", ctypes.c_int64),
+        ("packets_sent", ctypes.c_int32),
+        ("packets_lost", ctypes.c_int32),
+        ("fraction_lost", ctypes.c_float),
+        ("codec_name", ctypes.c_char * k_max_codec_name_len),
+        ("codec_payload_type", ctypes.c_int),
+        ("ext_seqnum", ctypes.c_int32),
+        ("jitter_ms", ctypes.c_int32),
+        ("rtt_ms", ctypes.c_int64),
+        ("audio_level", ctypes.c_int32),
+        ("total_input_energy", ctypes.c_double),
+        ("total_input_duration", ctypes.c_double),
+        ("typing_noise_detected", ctypes.c_int),
+        ("ana_statistics", AnaStats),
+        ("apm_statistics", AudioProcessingStats)
+    ]    
