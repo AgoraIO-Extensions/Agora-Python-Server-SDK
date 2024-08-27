@@ -1,6 +1,7 @@
 #coding=utf-8
 
 import time
+import datetime
 import os
 import sys
 
@@ -161,7 +162,9 @@ config = AgoraServiceConfig()
 config.enable_audio_processor = 1
 config.enable_audio_device = 0
 config.appid = appid
-config.log_path = os.path.join(example_dir, 'agorasdk.log')
+sdk_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+log_folder = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+config.log_path = os.path.join(sdk_dir, 'logs/example_send_yuv', log_folder, 'agorasdk.log')
 
 agora_service = AgoraService()
 agora_service.initialize(config)

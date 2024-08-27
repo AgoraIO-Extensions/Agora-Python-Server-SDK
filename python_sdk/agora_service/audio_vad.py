@@ -9,7 +9,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 sdk_dir = os.path.dirname(os.path.dirname(script_dir))
 lib_path = os.path.join(sdk_dir, 'agora_sdk')
 if sys.platform == 'darwin':
-    agora_vad_lib_path =os.path.join(lib_path, 'libagora_uap_aed.dylib')
+    agora_vad_lib_path =os.path.join(lib_path, 'libuap_aed.dylib')
 elif sys.platform == 'linux':
     agora_vad_lib_path =os.path.join(lib_path, 'libagora_uap_aed.so')    
 try:

@@ -1,6 +1,7 @@
 #coding=utf-8
 
 import time
+import datetime
 import ctypes
 import os
 import sys
@@ -86,6 +87,15 @@ class BizLocalUserObserver(IRTCLocalUserObserver):
     def on_user_info_updated(self, local_user, user_id, msg, val):
         print("CCC on_user_info_updated:", user_id, msg, val)
         return 0
+    
+    def on_local_audio_track_statistics(self, local_user, stats):
+        print("CCC on_local_audio_track_statistics:", stats)
+        return 0
+    
+    def on_audio_subscribe_state_changed(self, agora_local_user, channel, user_id, old_state, new_state, elapse_since_last_state):
+        print("CCC on_audio_subscribe_state_changed:")
+
+
 
 class BizAudioFrameObserver(IAudioFrameObserver):
     def __init__(self):
@@ -204,9 +214,6 @@ def DoVadTest(filepath):
     return 0
 
 
-example_dir = os.path.dirname(os.path.abspath(__file__))
-pcm_file_path = os.path.join(example_dir, 'demo.pcm')
-
 #signal handler
 g_runing = True
 
@@ -236,7 +243,9 @@ config.enable_audio_processor = 1
 config.enable_audio_device = 0
 # config.enable_video = 1
 config.appid = appid
-config.log_path = os.path.join(example_dir, 'agorasdk.log')
+sdk_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+log_folder = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+config.log_path = os.path.join(sdk_dir, 'logs/example', log_folder, 'agorasdk.log')
 
 agora_service = AgoraService()
 agora_service.initialize(config)

@@ -9,6 +9,7 @@ if sdk_dir not in sys.path:
 
 import time
 import ctypes
+import datetime
 from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora_service.rtc_connection import IRTCConnectionObserver
 from agora_service.local_user_observer import IRTCLocalUserObserver
@@ -110,7 +111,9 @@ config.enable_audio_processor = 1
 config.enable_audio_device = 0
 # config.enable_video = 1
 config.appid = appid
-config.log_path = os.path.join(example_dir, 'agorasdk.log')
+sdk_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+log_folder = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+config.log_path = os.path.join(sdk_dir, 'logs/example_send_stream_message', log_folder, 'agorasdk.log')
 
 agora_service = AgoraService()
 agora_service.initialize(config)

@@ -5,6 +5,7 @@
 import time
 import os
 import sys
+import datetime
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 sdk_dir = os.path.dirname(script_dir)
@@ -117,8 +118,7 @@ class Pacer:
         self.last_call_time = time.time()
 
 
-example_dir = os.path.dirname(os.path.abspath(__file__))
-pcm_file_path = os.path.join(example_dir, 'demo.pcm')
+
 
 
 # 通过传参将参数传进来
@@ -140,7 +140,10 @@ config.enable_audio_processor = 1
 config.enable_audio_device = 0
 # config.enable_video = 1
 config.appid = appid
-config.log_path = os.path.join(example_dir, 'agorasdk.log')
+
+sdk_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+log_folder = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+config.log_path = os.path.join(sdk_dir, 'logs/example_send_pcm', log_folder, 'agorasdk.log')
 
 agora_service = AgoraService()
 agora_service.initialize(config)
