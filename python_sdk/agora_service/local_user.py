@@ -298,6 +298,7 @@ class LocalUser:
 
     def register_audio_frame_observer(self, observer:IAudioFrameObserver):
         audio_frame_observer = AudioFrameObserverInner(observer, self)
+        self.audio_frame_observer = audio_frame_observer
         ret = agora_local_user_register_audio_frame_observer(self.user_handle, audio_frame_observer)
         if ret < 0:
             print("Failed to register audio frame observer")
@@ -334,6 +335,8 @@ class LocalUser:
     #     return ret
 
     def register_video_encoded_frame_observer(self, agora_video_encoded_frame_observer):
+        #TO-DO: Inner
+        self.agora_video_encoded_frame_observer = agora_video_encoded_frame_observer
         ret = agora_local_user_register_video_encoded_frame_observer(self.user_handle, agora_video_encoded_frame_observer)
         if ret < 0:
             print("Failed to register video encoded frame observer")
@@ -347,6 +350,7 @@ class LocalUser:
 
     def register_video_frame_observer(self, agora_video_frame_observer2:IVideoFrameObserver):
         video_frame_observer = VideoFrameObserverInner(agora_video_frame_observer2, self)
+        self.video_frame_observer = video_frame_observer
         ret = agora_local_user_register_video_frame_observer(self.user_handle, ctypes.byref(video_frame_observer))
         if ret < 0:
             print("Failed to register video frame observer")
@@ -396,6 +400,7 @@ class LocalUser:
 
     def register_local_user_observer(self, observer:IRTCLocalUserObserver):
         local_user_observer = RTCLocalUserObserverInner(observer, self)
+        self.local_user_observer = local_user_observer
         ret = agora_local_user_register_observer(self.user_handle, local_user_observer)
         if ret < 0:
             print("Failed to register observer")
