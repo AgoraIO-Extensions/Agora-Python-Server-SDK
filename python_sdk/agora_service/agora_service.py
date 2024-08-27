@@ -28,7 +28,9 @@ class AgoraServiceConfig(ctypes.Structure):
         # ('log_size', ctypes.c_int),
     ]
 
-    def __init__(self) -> None: 
+    def __init__(self) -> None:
+        self.log_path = ""
+        self.log_size = 0    
         self.appid = ""
 
 agora_service_create = agora_lib.agora_service_create
