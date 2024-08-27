@@ -6,7 +6,7 @@ from .globals import *
 # from  .rtc_connection import *
 from .rtc_connection_observer import *
 
-class RTCConnInfo(ctypes.Structure):
+class RTCConnInfoInner(ctypes.Structure):
     _fields_ = [
         ("id", ctypes.c_uint64),
         ("channel_id", ctypes.c_char_p),
@@ -14,24 +14,31 @@ class RTCConnInfo(ctypes.Structure):
         ("local_user_id", ctypes.c_char_p),
         ("internal_uid", ctypes.c_uint)
     ]
+    def __init__(self) -> None:
+        self.id = 0
+        self.channel_id = ""
+        self.state = 0
+        self.local_user_id = ""
+        self.internal_uid = 0
+    
 
 uid_t = ctypes.c_uint
 track_id_t = ctypes.c_uint
 
-ON_CONNECTED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCConnInfo), ctypes.c_int)
-ON_DISCONNECTED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCConnInfo), ctypes.c_int)
-ON_CONNECTING_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCConnInfo), ctypes.c_int)
-ON_RECONNECTING_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCConnInfo), ctypes.c_int)
-ON_RECONNECTED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCConnInfo), ctypes.c_int)
+ON_CONNECTED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCConnInfoInner), ctypes.c_int)
+ON_DISCONNECTED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCConnInfoInner), ctypes.c_int)
+ON_CONNECTING_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCConnInfoInner), ctypes.c_int)
+ON_RECONNECTING_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCConnInfoInner), ctypes.c_int)
+ON_RECONNECTED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCConnInfoInner), ctypes.c_int)
 
-ON_CONNECTION_LOST_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCConnInfo))
+ON_CONNECTION_LOST_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCConnInfoInner))
 ON_LASTMILE_QUALITY_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_int)
 ON_LASTMILE_PROBE_RESULT_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(LastmileProbeResult))
 ON_TOKEN_PRIVILEGE_WILL_EXPIRE_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_char_p)
 ON_TOKEN_PRIVILEGE_DID_EXPIRE_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE)
 
 ON_CONNECTION_LICENSE_VALIDATION_FAILURE_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_int)
-ON_CONNECTION_FAILURE_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCConnInfo), ctypes.c_int)
+ON_CONNECTION_FAILURE_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCConnInfoInner), ctypes.c_int)
 ON_USER_JOINED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, user_id_t)
 ON_USER_LEFT_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, user_id_t, ctypes.c_int)
 ON_TRANSPORT_STATS_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCStats))
@@ -127,29 +134,53 @@ class RTCConnectionObserverInner(ctypes.Structure):
         self.on_stream_message_error = ON_STREAM_MESSAGE_ERROR_CALLBACK(self._on_stream_message_error)
         self.on_encryption_error = ON_ENCRYPTION_ERROR_CALLBACK(self._on_encryption_error)
         self.on_upload_log_result = ON_UPLOAD_LOG_RESULT_CALLBACK(self._on_upload_log_result)
+
+    def _convert_to_rtcconinfo(self, inner_conn_info:RTCConnInfoInner):
+        from .rtc_connection import RTCConnInfo
+        con_info =  RTCConnInfo()
+        con_info.id = inner_conn_info.id
+        channel_id_bytes = ctypes.string_at(inner_conn_info.channel_id)
+
+        con_info.channel_id = bytearray(channel_id_bytes)
+        con_info.state = inner_conn_info.state
+
+        local_user_id_bytes = ctypes.string_at(inner_conn_info.local_user_id)
+        con_info.local_user_id = bytearray(local_user_id_bytes)
         
-    def _on_connected(self, agora_rtc_conn, conn_info, reason):
-        print("ConnCB _on_connected:", agora_rtc_conn, conn_info, reason)
+        con_info.internal_uid = inner_conn_info.internal_uid
+        return con_info
+
+
+        
+    def _on_connected(self, agora_rtc_conn, innerconn_info, reason):
+        print("ConnCB _on_connected:", agora_rtc_conn, innerconn_info, reason)
+        conn_info = self._convert_to_rtcconinfo(innerconn_info)
+
         self.conn_observer.on_connected(self.conn, conn_info, reason)
 
-    def _on_disconnected(self, agora_rtc_conn, conn_info, reason):
-        print("ConnCB _on_disconnected:", agora_rtc_conn, conn_info, reason)
+    def _on_disconnected(self, agora_rtc_conn, innerconn_info, reason):
+        print("ConnCB _on_disconnected:", agora_rtc_conn, innerconn_info, reason)
+        conn_info = self._convert_to_rtcconinfo(innerconn_info)
         self.conn_observer.on_disconnected(self.conn, conn_info, reason)
 
-    def _on_connecting(self, agora_rtc_conn, conn_info, reason):
-        print("ConnCB _on_connecting:", agora_rtc_conn, conn_info, reason)
+    def _on_connecting(self, agora_rtc_conn, innerconn_info, reason):
+        print("ConnCB _on_connecting:", agora_rtc_conn, innerconn_info, reason)
+        conn_info = self._convert_to_rtcconinfo(innerconn_info)
         self.conn_observer.on_connecting(self.conn, conn_info, reason)
 
-    def _on_reconnecting(self, agora_rtc_conn, conn_info, reason):
-        print("ConnCB _on_reconnecting:", agora_rtc_conn, conn_info, reason)
+    def _on_reconnecting(self, agora_rtc_conn, innerconn_info, reason):
+        print("ConnCB _on_reconnecting:", agora_rtc_conn, innerconn_info, reason)
+        conn_info = self._convert_to_rtcconinfo(innerconn_info)
         self.conn_observer.on_reconnecting(self.conn, conn_info, reason)
 
-    def _on_reconnected(self, agora_rtc_conn, conn_info, reason):
-        print("ConnCB _on_reconnected:", agora_rtc_conn, conn_info, reason)
+    def _on_reconnected(self, agora_rtc_conn, innerconn_info, reason):
+        print("ConnCB _on_reconnected:", agora_rtc_conn, innerconn_info, reason)
+        conn_info = self._convert_to_rtcconinfo(innerconn_info)
         self.conn_observer.on_reconnected(self.conn, conn_info, reason)
 
-    def _on_connection_lost(self, agora_rtc_conn, conn_info):
-        print("ConnCB _on_connection_lost:", agora_rtc_conn, conn_info)
+    def _on_connection_lost(self, agora_rtc_conn, innerconn_info):
+        print("ConnCB _on_connection_lost:", agora_rtc_conn, innerconn_info)
+        conn_info = self._convert_to_rtcconinfo(innerconn_info)
         self.conn_observer.on_connection_lost(self.conn, conn_info)
 
     def _on_lastmile_quality(self, agora_rtc_conn, quality):
@@ -172,8 +203,9 @@ class RTCConnectionObserverInner(ctypes.Structure):
         print("ConnCB _on_connection_license_validation_failure:", agora_rtc_conn, reason)
         self.conn_observer.on_connection_license_validation_failure(self.conn, reason)
 
-    def _on_connection_failure(self, agora_rtc_conn, conn_info, reason):
-        print("ConnCB _on_connection_failure:", agora_rtc_conn, conn_info, reason)
+    def _on_connection_failure(self, agora_rtc_conn, innerconn_info, reason):
+        print("ConnCB _on_connection_failure:", agora_rtc_conn, innerconn_info, reason)
+        conn_info = self._convert_to_rtcconinfo(innerconn_info)
         self.conn_observer.on_connection_failure(self.conn, conn_info, reason)
 
     def _on_user_joined(self, agora_rtc_conn, user_id):

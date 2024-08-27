@@ -8,6 +8,24 @@ from .agora_parameter import AgoraParameter
 from .globals import AgoraHandleInstanceMap
 from ._rtc_connection_observer import RTCConnectionObserverInner
 
+#rtcconnection info
+"""
+class RTCConnInfo()
+  ("id", ctypes.c_uint64),
+        ("channel_id", ctypes.c_char_p),
+        ("state", ctypes.c_int),
+        ("local_user_id", ctypes.c_char_p),
+        ("internal_uid", ctypes.c_uint)
+"""
+class RTCConnInfo():
+    def __init__(self):
+        self.id = 0
+        self.channel_id = "" #byte
+        self.state = 0
+        self.local_user_id = ""  #byte
+        self.internal_uid = 0
+
+
 
 # 定义 audio_subscription_options 结构体
 class AudioSubscriptionOptions(ctypes.Structure):
