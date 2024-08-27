@@ -4,7 +4,6 @@ from .local_user import *
 from .video_frame_observer import *
 
 AGORA_HANDLE = ctypes.c_void_p
-user_id_t = ctypes.c_uint
 
 class VideoFrame(ctypes.Structure):
     _fields_ = [

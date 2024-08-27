@@ -3,7 +3,6 @@ from .agora_base import *
 from .local_user import *
 from .local_user_observer import *
 
-user_id_t = ctypes.c_char_p
 uid_t = ctypes.c_uint
 track_id_t = ctypes.c_uint
 
