@@ -116,9 +116,15 @@ class DYSLocalUserObserver(IRTCLocalUserObserver):
         print("on_get_audio_frame_position")
         return 0
 
-def on_frame(agora_video_frame_observer2, channel_id, remote_uid, frame):
-    print("on_frame")
-    return 0
+
+class DYSVideoFrameObserver(IVideoFrameObserver):
+    def __init__(self):
+        super(DYSVideoFrameObserver, self).__init__()
+
+    def on_frame(self, video_frame_observer, channel_id, remote_uid, frame):
+        print("DYSVideoFrameObserver on_frame:", video_frame_observer, channel_id, remote_uid, frame)
+        return 0
+
 
 class Pacer:
     def __init__(self,interval):
@@ -178,10 +184,9 @@ video_track = agora_service.create_custom_video_track_frame(video_sender)
 local_user = connection.get_local_user()
 
 # video_sender = connection.GetVideoSender()
-video_frame_observer = VideoFrameObserver2(
-    on_frame=ON_FRAME_CALLBACK(on_frame)
-)
+video_frame_observer = DYSVideoFrameObserver()
 # local_user.register_video_frame_observer(video_frame_observer)
+
 video_track.set_enabled(1)
 local_user.publish_video(video_track)
 

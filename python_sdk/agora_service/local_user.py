@@ -7,6 +7,8 @@ from .local_user_observer import IRTCLocalUserObserver
 from ._local_user_observer import RTCLocalUserObserverInner
 from ._audio_frame_observer import AudioFrameObserverInner
 from .audio_frame_observer import IAudioFrameObserver
+from ._video_frame_observer import VideoFrameObserverInner
+from .video_frame_observer import IVideoFrameObserver
 
 agora_local_user_set_user_role = agora_lib.agora_local_user_set_user_role
 agora_local_user_set_user_role.restype = ctypes.c_int
@@ -345,8 +347,9 @@ class LocalUser:
             print("Failed to unregister video encoded frame observer")
         return ret
 
-    def register_video_frame_observer(self, agora_video_frame_observer2):
-        ret = agora_local_user_register_video_frame_observer(self.user_handle, agora_video_frame_observer2)
+    def register_video_frame_observer(self, agora_video_frame_observer2:IVideoFrameObserver):
+        video_frame_observer = VideoFrameObserverInner(agora_video_frame_observer2, self)
+        ret = agora_local_user_register_video_frame_observer(self.user_handle, ctypes.byref(video_frame_observer))
         if ret < 0:
             print("Failed to register video frame observer")
         return ret
