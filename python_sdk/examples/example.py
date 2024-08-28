@@ -28,31 +28,40 @@ class BizConnectionObserver(IRTCConnectionObserver):
     def __init__(self):
         super().__init__()
     def on_connected(self, agora_rtc_conn, conn_info:RTCConnInfo, reason):
-        print("on_connected", conn_info.channel_id, conn_info.id, conn_info.local_user_id,reason)
+        print(f"-----on_connected {conn_info.channel_id} {conn_info.id} {conn_info.local_user_id} {reason}")
         pass
 
     def on_disconnected(self, agora_rtc_conn, conn_info, reason):
+        print(f"on_discoonected {conn_info.channel_id} {conn_info.id} {conn_info.local_user_id} {reason}")
         pass
 
     def on_connecting(self, agora_rtc_conn, conn_info):
+        print(f"on_connecting {conn_info.channel_id} {conn_info.id} {conn_info.local_user_id} ")
         pass
 
     def on_reconnecting(self, agora_rtc_conn, conn_info, reason):
+        print(f"on_reconnecting {conn_info.channel_id} {conn_info.id} {conn_info.local_user_id} {reason}")
         pass
 
     def on_reconnected(self, agora_rtc_conn, conn_info, reason):
+        print(f"on_reconnected {conn_info.channel_id} {conn_info.id} {conn_info.local_user_id} {reason}")
         pass
 
-    def on_connection_lost(self, agora_rtc_conn):
+    def on_connection_lost(self, agora_rtc_conn, conn_info):
+        print(f"on_connection_lost {conn_info.channel_id} {conn_info.id} {conn_info.local_user_id} ")
         pass
 
     def on_lastmile_quality(self, agora_rtc_conn, quality):
+        print(f"on_lastmile_quality {quality}")
         pass
 
     def on_lastmile_probe_result(self, agora_rtc_conn, result):
+        #result: LastmileProbeResult
+        print(f"on_lastmile_probe_result {result.state} {result.uplink_report.available_bandwidth} {result.downlink_report.available_bandwidth} {result.rtt}")
         pass
 
     def on_token_privilege_will_expire(self, agora_rtc_conn, token):
+        print(f"on_token_privilege_will_expire {token}")
         pass
 
     def on_token_privilege_did_expire(self, agora_rtc_conn):
@@ -65,58 +74,75 @@ class BizConnectionObserver(IRTCConnectionObserver):
         pass
 
     def on_user_joined(self, agora_rtc_conn, user_id):
+        print(f"on_user_joined {user_id}")
         pass
 
     def on_user_left(self, agora_rtc_conn, user_id, reason):
+        print(f"on_user_left {user_id} {reason}")
         pass
 
-    def on_transport_stats(self, agora_rtc_conn, stats):
+    def on_transport_stats(self, agora_rtc_conn, stats:RTCStats):
+        print(f"** trans port stats {stats.duration}, {stats.tx_bytes}, {stats.rx_bytes}, {stats.rx_k_bit_rate}, {stats.tx_k_bit_rate}")
         pass
 
-    def on_change_role_success(self, agora_rtc_conn):
+    def on_change_role_success(self, agora_rtc_conn, old_role, new_role):
+        print(f"on_change_role_success old:{old_role} new:{new_role}")
         pass
 
-    def on_change_role_failure(self, agora_rtc_conn, reason):
+    def on_change_role_failure(self, agora_rtc_conn, reason,cur_role):
+        print(f"on_change_role_failure reason:{reason} cur_role:{cur_role}")
         pass
 
     def on_user_network_quality(self, agora_rtc_conn, uid, tx_quality, rx_quality):
-        print("on_user_network_quality")
+        print(f"on_user_network_quality {uid} {tx_quality} {rx_quality}")
         pass
 
     def on_network_type_changed(self, agora_rtc_conn, network_type):
+        print(f"on_network_type_changed {network_type}")
         pass
 
-    def on_api_call_executed(self, agora_rtc_conn, error, api, result):
+    def on_api_call_executed(self, agora_rtc_conn, error, api_type, api_param):
+        print(f"on_api_call_executed {error} {api_type} {api_param}")
         pass
 
     def on_content_inspect_result(self, agora_rtc_conn, result):
+        print(f"on_content_inspect_result {result}")
         pass
 
     def on_snapshot_taken(self, agora_rtc_conn, uid, file_path, width, height, err_code):
+        print(f"on_snapshot_taken {uid} {file_path} {width} {height} {err_code}")
         pass
 
-    def on_error(self, agora_rtc_conn, error_code):
+    def on_error(self, agora_rtc_conn, error_code, error_msg):
+        print(f"on_error {error_code} {error_msg}")
         pass
 
-    def on_warning(self, agora_rtc_conn, warn_code):
+    def on_warning(self, agora_rtc_conn, warn_code, warn_msg):
+        print(f"on_warning {warn_code} {warn_msg}")
         pass
 
     def on_channel_media_relay_state_changed(self, agora_rtc_conn, state, code):
+        print(f"on_channel_media_relay_state_changed {state} {code}")
         pass
 
-    def on_local_user_registered(self, agora_rtc_conn, uid, user_account):
+    def on_local_user_registered(self, agora_rtc_conn, uid, user_account_str):
+        print(f"on_local_user_registered {uid} {user_account_str}")
         pass
 
-    def on_user_account_updated(self, agora_rtc_conn, uid, user_account):
+    def on_user_account_updated(self, agora_rtc_conn, uid, user_account_str):
+        print(f"on_user_account_updated {uid} {user_account_str}")
         pass
 
-    def on_stream_message_error(self, agora_rtc_conn, uid, stream_id, error, missed, cached):
+    def on_stream_message_error(self, agora_rtc_conn, user_id_str, stream_id, code, missed, cached):
+        print(f"on_stream_message_error {user_id_str} {stream_id} {code} {missed} {cached}")
         pass
 
     def on_encryption_error(self, agora_rtc_conn, error_type):
+        print(f"on_encryption_error {error_type}")
         pass
 
-    def on_upload_log_result(self, agora_rtc_conn, request_id, success, reason):
+    def on_upload_log_result(self, agora_rtc_conn, request_id_str, success, reason):
+        print(f"on_upload_log_result {request_id_str} {success} {reason}")
         pass
     
 class BizLocalUserObserver(IRTCLocalUserObserver):

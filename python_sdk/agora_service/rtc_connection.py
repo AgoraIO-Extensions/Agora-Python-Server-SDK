@@ -20,9 +20,9 @@ class RTCConnInfo()
 class RTCConnInfo():
     def __init__(self):
         self.id = 0
-        self.channel_id = "" #byte
+        self.channel_id :str = None #str
         self.state = 0
-        self.local_user_id = ""  #byte
+        self.local_user_id  :str = None #str
         self.internal_uid = 0
 
 
