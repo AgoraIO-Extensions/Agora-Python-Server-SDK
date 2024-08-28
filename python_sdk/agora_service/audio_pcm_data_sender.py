@@ -94,13 +94,13 @@ class OwnedEncodedAudioFrameInfo(ctypes.Structure):
         ('number_of_channels', ctypes.c_int)
     ]
 
-    def __init__(self):
-        self.speech = 1
-        self.codec = 1
-        self.sample_rate_hz = 16000
-        self.samples_per_channel = 960
-        self.send_even_if_empty = 1
-        self.number_of_channels = 2
+    # def __init__(self):
+    #     self.speech = 1
+    #     self.codec = 1
+    #     self.sample_rate_hz = 16000
+    #     self.samples_per_channel = 960
+    #     self.send_even_if_empty = 1
+    #     self.number_of_channels = 2
 
 agora_audio_encoded_frame_sender_send = agora_lib.agora_audio_encoded_frame_sender_send
 agora_audio_encoded_frame_sender_send.restype = AGORA_API_C_INT
@@ -134,7 +134,7 @@ class AudioEncodedFrameSender:
         c_date = (ctypes.c_char * len(frame.data)).from_buffer(frame.data)
         size = frame.size
         ownedinfo = frame.to_owned_encoded_audio_frame()
-        return agora_audio_encoded_frame_sender_send(self.sender_handle, c_date, ctypes.c_uint32(size), ctypes.POINTER(ownedinfo))
+        return agora_audio_encoded_frame_sender_send(self.sender_handle, c_date, ctypes.c_uint32(size), ctypes.byref(ownedinfo))
     
     def release(self):
         # agora_local_audio_track_destroy(self.sender_handle)

@@ -138,15 +138,29 @@ class RTCConnectionObserverInner(ctypes.Structure):
     def _convert_to_rtc_conn_info(self, inner_conn_info: RTCConnInfoInner):
         from .rtc_connection import RTCConnInfo
         con_info = RTCConnInfo()
-        # 解引用指针以访问结构体字段
+        # 解引用指针以访问结构体字段        
         con_info.id = inner_conn_info.contents.id
-        channel_id_bytes = ctypes.string_at(inner_conn_info.contents.channel_id)
 
-        con_info.channel_id = bytearray(channel_id_bytes)
+        # Convert channel_id to Python string
+        if inner_conn_info.contents.channel_id:
+            # con_info.channel_id = ctypes.c_char_p(inner_conn_info.contents.channel_id).value.decode('utf-8')
+            con_info.channel_id = inner_conn_info.contents.channel_id.decode('utf-8')
+        else:
+            con_info.channel_id = None
+
+        # channel_id_bytes = ctypes.string_at(inner_conn_info.contents.channel_id)
+        # con_info.channel_id = bytearray(channel_id_bytes)
+
         con_info.state = inner_conn_info.contents.state
 
-        local_user_id_bytes = ctypes.string_at(inner_conn_info.contents.local_user_id)
-        con_info.local_user_id = bytearray(local_user_id_bytes)
+        if inner_conn_info.contents.local_user_id:
+            # con_info.local_user_id = ctypes.c_char_p(inner_conn_info.contents.local_user_id).value.decode('utf-8')
+            con_info.local_user_id = inner_conn_info.contents.local_user_id.decode('utf-8')
+        else:
+            con_info.local_user_id = None
+
+        # local_user_id_bytes = ctypes.string_at(inner_conn_info.contents.local_user_id)
+        # con_info.local_user_id = bytearray(local_user_id_bytes)
         
         con_info.internal_uid = inner_conn_info.contents.internal_uid
         return con_info
