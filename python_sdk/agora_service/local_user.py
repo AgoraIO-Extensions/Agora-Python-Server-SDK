@@ -1,5 +1,6 @@
 import time
 import ctypes
+from threading import RLock
 from .agora_base import *
 from .local_video_track import *
 from .local_audio_track import *
@@ -180,8 +181,37 @@ agora_local_user_send_intra_request.argtypes = [AGORA_HANDLE, ctypes.c_uint]
 
 
 class LocalUser:
-    def __init__(self, local_user):
-        self.user_handle = local_user
+    def __init__(self, local_user_handle, connection):
+        self.user_handle = local_user_handle
+        self.connection = connection
+        #for AudioTrack/videoTrack in local_user, we need to keep the reference of them
+        self._audio_track_lock = RLock()
+        self._video_track_lock = RLock()
+        #map
+        self._audio_track_map = {}
+        self._video_track_map = {}
+
+    def _set_audio_map(self, track_handle, track:LocalAudioTrack):
+        with self._audio_track_lock:
+            # no need to theck key is existed or not,just do replace
+            self._audio_track_map[track_handle] = track
+    def get_audio_map(self, track_handle):
+        with self._audio_track_lock:
+            return self._audio_track_map.get(track_handle)
+    def _del_audio_map(self, track_handle):
+        with self._audio_track_lock:
+            del self._audio_track_map[track_handle]
+
+    def _set_video_map(self, track_handle, track:LocalVideoTrack):
+        with self._video_track_lock:
+            # no need to theck key is existed or not,just do replace
+            self._video_track_map[track_handle] = track
+    def get_video_map(self, track_handle):
+        with self._video_track_lock:
+            return self._video_track_map.get(track_handle)
+    def _del_video_map(self, track_handle):
+        with self._video_track_lock:
+            del self._video_track_map[track_handle]
 
     def set_user_role(self, role):
         ret = agora_local_user_set_user_role(self.user_handle, role)
@@ -208,6 +238,8 @@ class LocalUser:
         ret = agora_local_user_publish_audio(self.user_handle, agora_local_audio_track.track_handle)
         if ret < 0:
             print("Failed to publish audio")
+        else:
+            self._set_audio_map(agora_local_audio_track.track_handle, agora_local_audio_track)
         return ret
 
 
@@ -215,18 +247,22 @@ class LocalUser:
         ret = agora_local_user_unpublish_audio(self.user_handle, agora_local_audio_track.track_handle)
         if ret < 0:
             print("Failed to unpublish audio")
+        self._del_audio_map(agora_local_audio_track.track_handle)
         return ret
 
     def publish_video(self, agora_local_video_track:LocalVideoTrack):
         ret = agora_local_user_publish_video(self.user_handle, agora_local_video_track.track_handle)
         if ret < 0:
             print("Failed to publish video")
+        else:
+            self._set_video_map(agora_local_video_track.track_handle, agora_local_video_track)
         return ret
 
     def unpublish_video(self, agora_local_video_track:LocalVideoTrack):
         ret = agora_local_user_unpublish_video(self.user_handle, agora_local_video_track.track_handle)
         if ret < 0:
             print("Failed to unpublish video")
+        self._del_video_map(agora_local_video_track.track_handle)
         return ret
 
     def subscribe_audio(self, user_id):
@@ -308,6 +344,7 @@ class LocalUser:
         ret = agora_local_user_unregister_audio_frame_observer(self.user_handle)
         if ret < 0:
             print("Failed to unregister audio frame observer")
+       
         return ret
 
     # def enable_audio_spectrum_monitor(self, interval_in_ms):
@@ -399,9 +436,10 @@ class LocalUser:
         return ret
 
     def register_local_user_observer(self, observer:IRTCLocalUserObserver):
-        local_user_observer = RTCLocalUserObserverInner(observer, self)
-        self.local_user_observer = local_user_observer
-        ret = agora_local_user_register_observer(self.user_handle, local_user_observer)
+        user_observer_inner = RTCLocalUserObserverInner(observer, self)
+        self.user_observer_inner = user_observer_inner
+        self.user_observer = observer
+        ret = agora_local_user_register_observer(self.user_handle, user_observer_inner)
         if ret < 0:
             print("Failed to register observer")
         return ret
@@ -437,6 +475,7 @@ class LocalUser:
         return ret
 
     def release(self): #do nothing, just do api allign
+        #clean all
         pass
 
     def get_rtc_connection():

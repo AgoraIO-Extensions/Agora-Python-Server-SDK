@@ -304,6 +304,8 @@ class SimulcastStreamConfig(ctypes.Structure):
 
 
 k_max_codec_name_len = 100
+uid_t = ctypes.c_uint
+track_id_t = ctypes.c_uint
 
 class AnaStats(ctypes.Structure):
     _fields_ = [
@@ -347,3 +349,15 @@ class LocalAudioDetailedStats(ctypes.Structure):
         ("ana_statistics", AnaStats),
         ("apm_statistics", AudioProcessingStats)
     ]    
+
+class VideoTrackInfo(ctypes.Structure):
+    def __init__(self) -> None:
+        self.is_local = 1
+        self.owner_uid = 0
+        self.track_id = 0
+        self.channel_id = None
+        self.stream_type = 0
+        self.codec_type = 0
+        self.encoded_frame_only = 0
+        self.source_type = 0
+        self.observation_position = 0

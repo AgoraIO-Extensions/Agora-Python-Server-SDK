@@ -171,7 +171,7 @@ class RTCConnection:
         self.local_user = None
         self.local_user_handle = agora_rtc_conn_get_local_user(conn_handle)
         if  self.local_user_handle:
-            self.local_user = LocalUser(self.local_user_handle)
+            self.local_user = LocalUser(self.local_user_handle,self)
         #add to map
         AgoraHandleInstanceMap().set_local_user_map(self.conn_handle, self)
         AgoraHandleInstanceMap().set_con_map(self.conn_handle, self)

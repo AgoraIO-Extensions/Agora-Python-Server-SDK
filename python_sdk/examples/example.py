@@ -252,6 +252,7 @@ class BizLocalUserObserver(IRTCLocalUserObserver):
         pass
 
     def on_stream_message(self, agora_local_user, user_id, stream_id, data, length):
+        print(f"^^^^^^^on_stream_message: {data}, length: {length}")
         pass
 
     def on_user_state_changed(self, agora_local_user, user_id, state):

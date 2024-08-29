@@ -1,3 +1,11 @@
+"""
+#param 
+# agora_local_user: LocalUser
+# agora_local_audio_track: LocalAudioTrack
+# error: int
+# state: int
+# agora_remote_audio_track: RemoteAudioTrack
+"""
 class IRTCLocalUserObserver():
 
     def on_audio_track_publish_success(self, agora_local_user, agora_local_audio_track):
@@ -14,7 +22,7 @@ class IRTCLocalUserObserver():
 
     def on_local_audio_track_state_changed(self, agora_local_user, agora_local_audio_track, state, error):
         pass
-
+    #stats: instance of LocalAudioStats
     def on_local_audio_track_statistics(self, agora_local_user, stats):
         pass
 

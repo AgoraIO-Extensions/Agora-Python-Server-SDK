@@ -25,7 +25,7 @@ class RemoteAudioTrackStats(ctypes.Structure):
         ("received_bytes", ctypes.c_int64)
     ]
 
-class VideoTrackInfo(ctypes.Structure):
+class VideoTrackInfoInner(ctypes.Structure):
     _fields_ = [
         ("is_local", ctypes.c_int),
         ("owner_uid", uid_t),
@@ -37,6 +37,21 @@ class VideoTrackInfo(ctypes.Structure):
         ("source_type", ctypes.c_int),
         ("observation_position", ctypes.c_uint32)
     ]
+    def _convert_to_video_track_info(self):
+        
+        track_info = VideoTrackInfo()
+        track_info.is_local = self.is_local
+        track_info.channel_id = self.channel_id.decode('utf-8') if self.channel_id else ''
+        track_info.codec_type = self.codec_type
+        track_info.track_id = self.track_id
+        track_info.stream_type = self.stream_type
+        track_info.source_type = self.source_type
+        track_info.observation_position = self.observation_position
+        track_info.track_id = self.track_id
+        track_info.owner_uid = self.owner_uid
+        return track_info
+
+    
 
 class LocalVideoTrackStats(ctypes.Structure):
  _fields_ = [
@@ -123,7 +138,7 @@ ON_VIDEO_TRACK_UNPUBLISHED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, AGORA
 ON_VIDEO_TRACK_PUBLICATION_FAILURE_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, AGORA_HANDLE, ctypes.c_int)
 ON_LOCAL_VIDEO_TRACK_STATE_CHANGED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, AGORA_HANDLE, ctypes.c_int, ctypes.c_int)
 ON_LOCAL_VIDEO_TRACK_STATISTICS_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, AGORA_HANDLE, ctypes.POINTER(LocalVideoTrackStats))
-ON_USER_VIDEO_TRACK_SUBSCRIBED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, user_id_t, ctypes.POINTER(VideoTrackInfo), AGORA_HANDLE)
+ON_USER_VIDEO_TRACK_SUBSCRIBED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, user_id_t, ctypes.POINTER(VideoTrackInfoInner), AGORA_HANDLE)
 ON_USER_VIDEO_TRACK_STATE_CHANGED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, user_id_t, AGORA_HANDLE, ctypes.c_int, ctypes.c_int, ctypes.c_int)
 ON_REMOTE_VIDEO_TRACK_STATISTICS_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, AGORA_HANDLE, ctypes.POINTER(RemoteVideoTrackStats))
 ON_AUDIO_VOLUME_INDICATION_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(AudioVolumeInfo), ctypes.c_uint, ctypes.c_int)
@@ -249,147 +264,206 @@ class RTCLocalUserObserverInner(ctypes.Structure):
         self.on_stream_message = ON_STREAM_MESSAGE_CALLBACK(self._on_stream_message)
         self.on_user_state_changed = ON_USER_STATE_CHANGED_CALLBACK(self._on_user_state_changed)
 
-
-    def _on_audio_track_publish_success(self, agora_local_user, agora_local_audio_track):
-        print("LocalUserCB _on_audio_track_publish_success:", agora_local_user, agora_local_audio_track)
-        self.local_user_observer.on_audio_track_publish_success(self.local_user, agora_local_audio_track)
+    """
+    it seems that this interface does not provide much value to the user's business, 
+    therefore, there is no need to convert audio_track(ctypes.handle type) into LocalAudioTrack.
+    If convert is necessary, it would require recording the LocalAudioTrack during LocalUser.pub_audio, and support a get methond in LocalAudioTrack to
+    get LocalAudioTrack instance from handle.
+    codes may  like: LocalAudioTrack = self.local_user.get(local_audio_track_handle)
+    Avoid to create a global LocalAudioTrack map table as it can significantly impact performance .
+    """
+    def _on_audio_track_publish_success(self, local_user_handle, local_audio_track_handle):
+        print("LocalUserCB _on_audio_track_publish_success:", local_user_handle, local_audio_track_handle)
+        #note: to get 
+        audio_track = self.local_user.get_audio_map(local_audio_track_handle)
+        self.local_user_observer.on_audio_track_publish_success(self.local_user, audio_track)
     
-    def _on_video_track_publish_success(self, agora_local_user, agora_local_video_track):
-        print("LocalUserCB _on_video_track_publish_success:", agora_local_user, agora_local_video_track)
-        self.local_user_observer.on_video_track_publish_success(self.local_user, agora_local_video_track)
+    def _on_video_track_publish_success(self, local_user_handle, local_video_track_handle):
+        print("LocalUserCB _on_video_track_publish_success:", local_user_handle, local_video_track_handle)
+        video_track = self.local_user.get_video_map(local_video_track_handle)
+        self.local_user_observer.on_video_track_publish_success(self.local_user, video_track)
 
-    def _on_video_track_publish_start(self, agora_local_user, agora_local_video_track):
-        print("LocalUserCB _on_video_track_publish_start:", agora_local_user, agora_local_video_track)
-        self.local_user_observer.on_video_track_publish_start(self.local_user, agora_local_video_track)
+    def _on_video_track_publish_start(self, local_user_handle, local_video_track_handle):
+        print("LocalUserCB _on_video_track_publish_start:", local_user_handle, local_video_track_handle)
+        video_track = self.local_user.get_video_map(local_video_track_handle)
+        self.local_user_observer.on_video_track_publish_start(self.local_user, video_track)
         
-    def _on_audio_track_publish_start(self, agora_local_user, agora_local_audio_track):
-        print("LocalUserCB _on_audio_track_publish_start:", agora_local_user, agora_local_audio_track)
-        self.local_user_observer.on_audio_track_publish_start(self.local_user, agora_local_audio_track)
+    def _on_audio_track_publish_start(self, local_user_handle, local_audio_track_handle):
+        print("LocalUserCB _on_audio_track_publish_start:", local_user_handle, local_audio_track_handle)
+        audio_track = self.local_user.get_audio_map(local_audio_track_handle)
+        self.local_user_observer.on_audio_track_publish_start(self.local_user, audio_track)
 
-    def _on_audio_track_unpublished(self, agora_local_user, agora_local_audio_track):
-        print("LocalUserCB _on_audio_track_unpublished:", agora_local_user, agora_local_audio_track)
-        self.local_user_observer.on_audio_track_unpublished(self.local_user, agora_local_audio_track)
+    def _on_audio_track_unpublished(self, local_user_handle, local_audio_track_handle):
+        print("LocalUserCB _on_audio_track_unpublished:", local_user_handle, local_audio_track_handle)
+        audio_track = self.local_user.get_audio_map(local_audio_track_handle)
+        self.local_user_observer.on_audio_track_unpublished(self.local_user, audio_track)
 
-    def _on_audio_track_publication_failure(self, agora_local_user, agora_local_audio_track, error_code):
-        print("LocalUserCB _on_audio_track_publication_failure:", agora_local_user, agora_local_audio_track, error_code)
-        self.local_user_observer.on_audio_track_publication_failure(self.local_user, agora_local_audio_track, error_code)
+    def _on_audio_track_publication_failure(self, local_user_handle, local_audio_track_handle, error_code):
+        print("LocalUserCB _on_audio_track_publication_failure:", local_user_handle, local_audio_track_handle, error_code)
+        audio_track = self.local_user.get_audio_map(local_audio_track_handle)
+        self.local_user_observer.on_audio_track_publication_failure(self.local_user, audio_track, error_code)
     
-    def _on_local_audio_track_state_changed(self, agora_local_user, agora_local_audio_track, state, error):
-        print("LocalUserCB _on_local_audio_track_state_changed:", agora_local_user, agora_local_audio_track, state, error)
-        self.local_user_observer.on_local_audio_track_state_changed(self.local_user, agora_local_audio_track, state, error)
+    def _on_local_audio_track_state_changed(self, local_user_handle, local_audio_track_handle, state, error):
+        print("LocalUserCB _on_local_audio_track_state_changed:", local_user_handle, local_audio_track_handle, state, error)
+        audio_track = self.local_user.get_audio_map(local_audio_track_handle)
+        self.local_user_observer.on_local_audio_track_state_changed(self.local_user, audio_track, state, error)
 
-    def _on_local_audio_track_statistics(self, agora_local_user, stats):
-        print("LocalUserCB _on_local_audio_track_statistics:", agora_local_user, stats)
-        self.local_user_observer.on_local_audio_track_statistics(self.local_user, stats)
-    
-    def _on_remote_audio_track_statistics(self, agora_local_user, agora_remote_audio_track, stats):
-        print("LocalUserCB _on_remote_audio_track_statistics:", agora_local_user, agora_remote_audio_track, stats)
+    def _on_local_audio_track_statistics(self, local_user_handle, stats):
+        print("LocalUserCB _on_local_audio_track_statistics:", local_user_handle, stats)
+        #stats: pointer to LocalAudioStats
+        local_audio_stats = stats.contents
+        self.local_user_observer.on_local_audio_track_statistics(self.local_user, local_audio_stats)
+    #这个有点trick
+    """
+    # 在LocalUser中是通过LocalUser.sub_audio(uid) 创建的，所以这里直接用uid来获取对应的RemoteAudioTrack
+    # 也就是说从app层的视角，对audio的区分是uid，但这边的回调并没有userid，所以对app层是不太友好的
+    # 也就是需要在LocalUser层中建立一个map表，用来记录userid和handle
+    # 然后在回调中，通过handle，找到uid，然后call 给app层的是uid
+    # 这样的话，在LocalUser层，就可以直接通过uid来获取对应的RemoteAudioTrack
+    """
+    def _on_remote_audio_track_statistics(self, local_user_handle, agora_remote_audio_track, stats):
+        print("LocalUserCB _on_remote_audio_track_statistics:", local_user_handle, agora_remote_audio_track, stats)
         self.local_user_observer.on_remote_audio_track_statistics(self.local_user, agora_remote_audio_track, stats)
 
-    def _on_user_audio_track_subscribed(self, agora_local_user, user_id, agora_remote_audio_track):
-        print("LocalUserCB _on_user_audio_track_subscribed:", agora_local_user, user_id, agora_remote_audio_track)
-        self.local_user_observer.on_user_audio_track_subscribed(self.local_user, user_id, agora_remote_audio_track)
+    def _on_user_audio_track_subscribed(self, local_user_handle, user_id, agora_remote_audio_track):
+        print("LocalUserCB _on_user_audio_track_subscribed:", local_user_handle, user_id, agora_remote_audio_track)
+        user_id_str = user_id.decode('utf-8')
+        self.local_user_observer.on_user_audio_track_subscribed(self.local_user, user_id_str, agora_remote_audio_track)
 
-    def _on_user_audio_track_state_changed(self, agora_local_user, user_id, agora_remote_audio_track, state, reason, elapsed):
-        print("LocalUserCB _on_user_audio_track_state_changed:", agora_local_user, user_id, agora_remote_audio_track, state, reason, elapsed)
-        self.local_user_observer.on_user_audio_track_state_changed(self.local_user, user_id, agora_remote_audio_track, state, reason, elapsed)
+    def _on_user_audio_track_state_changed(self, local_user_handle, user_id, agora_remote_audio_track, state, reason, elapsed):
+        print("LocalUserCB _on_user_audio_track_state_changed:", local_user_handle, user_id, agora_remote_audio_track, state, reason, elapsed)
+        user_id_str = user_id.decode('utf-8')
+        self.local_user_observer.on_user_audio_track_state_changed(self.local_user, user_id_str, agora_remote_audio_track, state, reason, elapsed)
     
-    def _on_audio_subscribe_state_changed(self, agora_local_user, channel_id, user_id, state, reason, elapsed):
-        print("LocalUserCB _on_audio_subscribe_state_changed:", agora_local_user, channel_id, user_id, state, reason, elapsed)
-        self.local_user_observer.on_audio_subscribe_state_changed(self.local_user, channel_id, user_id, state, reason, elapsed)
+    def _on_audio_subscribe_state_changed(self, local_user_handle, channel_id, user_id, state, reason, elapsed):
+        print("LocalUserCB _on_audio_subscribe_state_changed:", local_user_handle, channel_id, user_id, state, reason, elapsed)
+        user_id_str = user_id.decode('utf-8')
+        channel_id_str = channel_id.decode('utf-8')
+        self.local_user_observer.on_audio_subscribe_state_changed(self.local_user, channel_id_str, user_id_str, state, reason, elapsed)
 
-    def _on_audio_publish_state_changed(self, agora_local_user, channel_id, state, reason, elapsed):
-        print("LocalUserCB _on_audio_publish_state_changed:", agora_local_user, channel_id, state, reason, elapsed)
-        self.local_user_observer.on_audio_publish_state_changed(self.local_user, channel_id, state, reason, elapsed)
+    def _on_audio_publish_state_changed(self, local_user_handle, channel_id, state, reason, elapsed):
+        print("LocalUserCB _on_audio_publish_state_changed:", local_user_handle, channel_id, state, reason, elapsed)
+        channel_id_str = channel_id.decode('utf-8')
+        self.local_user_observer.on_audio_publish_state_changed(self.local_user, channel_id_str, state, reason, elapsed)
 
-    def _on_first_remote_audio_frame(self, agora_local_user, user_id, elapsed):
-        print("LocalUserCB _on_first_remote_audio_frame:", agora_local_user, user_id, elapsed)
-        self.local_user_observer.on_first_remote_audio_frame(self.local_user, user_id, elapsed)
+    def _on_first_remote_audio_frame(self, local_user_handle, user_id, elapsed):
+        print("LocalUserCB _on_first_remote_audio_frame:", local_user_handle, user_id, elapsed)
+        user_id_str = user_id.decode('utf-8')
+        self.local_user_observer.on_first_remote_audio_frame(self.local_user, user_id_str, elapsed)
     
-    def _on_first_remote_audio_decoded(self, agora_local_user, user_id, elapsed):
-        print("LocalUserCB _on_first_remote_audio_decoded:", agora_local_user, user_id, elapsed)
-        self.local_user_observer.on_first_remote_audio_decoded(self.local_user, user_id, elapsed)
+    def _on_first_remote_audio_decoded(self, local_user_handle, user_id, elapsed):
+        print("LocalUserCB _on_first_remote_audio_decoded:", local_user_handle, user_id, elapsed)
+        user_id_str = user_id.decode('utf-8')
+        self.local_user_observer.on_first_remote_audio_decoded(self.local_user, user_id_str, elapsed)
 
-    def _on_video_track_unpublished(self, agora_local_user, agora_local_video_track):
-        print("LocalUserCB _on_video_track_unpublished:", agora_local_user, agora_local_video_track)
-        self.local_user_observer.on_video_track_unpublished(self.local_user, agora_local_video_track)
+    def _on_video_track_unpublished(self, local_user_handle, local_video_track_handle):
+        print("LocalUserCB _on_video_track_unpublished:", local_user_handle, local_video_track_handle)
+        local_video_track = self.local_user.get_video_map(local_video_track_handle)
+        self.local_user_observer.on_video_track_unpublished(self.local_user, local_video_track)
 
-    def _on_video_track_publication_failure(self, agora_local_user, agora_local_video_track, error_code):
-        print("LocalUserCB _on_video_track_publication_failure:", agora_local_user, agora_local_video_track, error_code)
-        self.local_user_observer.on_video_track_publication_failure(self.local_user, agora_local_video_track, error_code)
+    def _on_video_track_publication_failure(self, local_user_handle, local_video_track_handle, error_code):
+        print("LocalUserCB _on_video_track_publication_failure:", local_user_handle, local_video_track_handle, error_code)
+        local_video_track = self.local_user.get_video_map(local_video_track_handle)
+        self.local_user_observer.on_video_track_publication_failure(self.local_user, local_video_track, error_code)
 
-    def _on_local_video_track_state_changed(self, agora_local_user, agora_local_video_track, state, error):
-        print("LocalUserCB _on_local_video_track_state_changed:", agora_local_user, agora_local_video_track, state, error)
-        self.local_user_observer.on_local_video_track_state_changed(self.local_user, agora_local_video_track, state, error)
+    def _on_local_video_track_state_changed(self, local_user_handle, local_video_track_handle, state, error):
+        print("LocalUserCB _on_local_video_track_state_changed:", local_user_handle, local_video_track_handle, state, error)
+        local_video_track = self.local_user.get_video_map(local_video_track_handle)
+        self.local_user_observer.on_local_video_track_state_changed(self.local_user, local_video_track, state, error)
 
-    def _on_local_video_track_statistics(self, agora_local_user, agora_local_video_track, stats):
-        print("LocalUserCB _on_local_video_track_statistics:", agora_local_user, agora_local_video_track, stats)
-        self.local_user_observer.on_local_video_track_statistics(self.local_user, agora_local_video_track, stats)
+    def _on_local_video_track_statistics(self, local_user_handle, local_video_track_handle, stats):
+        print("LocalUserCB _on_local_video_track_statistics:", local_user_handle, local_video_track_handle, stats)
+        #stats: ctypes.pointer to LocalVideoTrackStats
+        local_video_track = self.local_user.get_video_map(local_video_track_handle)
+        video_stats = stats.contents
+        self.local_user_observer.on_local_video_track_statistics(self.local_user, local_video_track, video_stats)
+    #ON_USER_VIDEO_TRACK_SUBSCRIBED_CALLBACK = 
+    # # #ctypes.CFUNCTYPE(None, AGORA_HANDLE, user_id_t, ctypes.POINTER(VideoTrackInfo), AGORA_HANDLE)
+    def _on_user_video_track_subscribed(self, local_user_handle, user_id, video_track_info, remote_video_track_handle):
+        print("LocalUserCB _on_user_video_track_subscribed:", local_user_handle, user_id, remote_video_track_handle, video_track_info)
+        user_id_str = user_id.decode('utf-8')
+        track_info = video_track_info.contents._to_track_info()
+        self.local_user_observer.on_user_video_track_subscribed(self.local_user, user_id_str, track_info, remote_video_track_handle)
 
-    def _on_user_video_track_subscribed(self, agora_local_user, user_id, agora_remote_video_track, video_track_info):
-        print("LocalUserCB _on_user_video_track_subscribed:", agora_local_user, user_id, agora_remote_video_track, video_track_info)
-        self.local_user_observer.on_user_video_track_subscribed(self.local_user, user_id, video_track_info, agora_remote_video_track)
+    def _on_user_video_track_state_changed(self, local_user_handle, user_id, remote_video_track_handle, state, reason, elapsed):
+        print("LocalUserCB _on_user_video_track_state_changed:", local_user_handle, user_id, remote_video_track_handle, state, reason, elapsed)
+        user_id_str = user_id.decode('utf-8')
+        self.local_user_observer.on_user_video_track_state_changed(self.local_user, user_id_str, remote_video_track_handle, state, reason, elapsed)
 
-    def _on_user_video_track_state_changed(self, agora_local_user, user_id, agora_remote_video_track, state, reason, elapsed):
-        print("LocalUserCB _on_user_video_track_state_changed:", agora_local_user, user_id, agora_remote_video_track, state, reason, elapsed)
-        self.local_user_observer.on_user_video_track_state_changed(self.local_user, user_id, agora_remote_video_track, state, reason, elapsed)
+    def _on_remote_video_track_statistics(self, local_user_handle, remote_video_track_handle, stats_ptr):
+        print("LocalUserCB _on_remote_video_track_statistics:", local_user_handle, remote_video_track_handle, stats_ptr)
+        remote_stats = stats_ptr.contents
+        self.local_user_observer.on_remote_video_track_statistics(self.local_user, remote_video_track_handle, remote_stats)
 
-    def _on_remote_video_track_statistics(self, agora_local_user, agora_remote_video_track, stats):
-        print("LocalUserCB _on_remote_video_track_statistics:", agora_local_user, agora_remote_video_track, stats)
-        self.local_user_observer.on_remote_video_track_statistics(self.local_user, agora_remote_video_track, stats)
-
-    def _on_audio_volume_indication(self, agora_local_user, audio_volume_info, speaker_number, total_volume):
-        print("LocalUserCB _on_audio_volume_indication:", agora_local_user, audio_volume_info, speaker_number, total_volume)
+    def _on_audio_volume_indication(self, local_user_handle, audio_volume_info_ptr, speaker_number, total_volume):
+        print("LocalUserCB _on_audio_volume_indication:", local_user_handle, audio_volume_info_ptr, speaker_number, total_volume)
+        audio_volume_info = audio_volume_info_ptr.contents
         self.local_user_observer.on_audio_volume_indication(self.local_user, audio_volume_info, speaker_number, total_volume)
 
-    def _on_active_speaker(self, agora_local_user, user_id):
-        print("LocalUserCB _on_active_speaker:", agora_local_user, user_id)
-        self.local_user_observer.on_active_speaker(self.local_user, user_id)
+    def _on_active_speaker(self, local_user_handle, user_id):
+        print("LocalUserCB _on_active_speaker:", local_user_handle, user_id)
+        user_id_str = user_id.decode('utf-8')
+        self.local_user_observer.on_active_speaker(self.local_user, user_id_str)
 
-    def _on_remote_video_stream_info_updated(self, agora_local_user, remote_video_stream_info):
-        print("LocalUserCB _on_remote_video_stream_info_updated:", agora_local_user, remote_video_stream_info)
-        self.local_user_observer.on_remote_video_stream_info_updated(self.local_user, remote_video_stream_info)
+    def _on_remote_video_stream_info_updated(self, local_user_handle, remote_video_stream_info_ptr):
+        print("LocalUserCB _on_remote_video_stream_info_updated:", local_user_handle, remote_video_stream_info_ptr)
+        video_stream_info = remote_video_stream_info_ptr.contents
+        self.local_user_observer.on_remote_video_stream_info_updated(self.local_user, video_stream_info)
 
-    def _on_video_subscribe_state_changed(self, agora_local_user, channel_id, user_id, state, reason, elapsed):
-        print("LocalUserCB _on_video_subscribe_state_changed:", agora_local_user, channel_id, user_id, state, reason, elapsed)
-        self.local_user_observer.on_video_subscribe_state_changed(self.local_user, channel_id, user_id, state, reason, elapsed)
+    def _on_video_subscribe_state_changed(self, local_user_handle, channel_id, user_id, state, reason, elapsed):
+        print("LocalUserCB _on_video_subscribe_state_changed:", local_user_handle, channel_id, user_id, state, reason, elapsed)
+        user_id_str = user_id.decode('utf-8')
+        channel_id_str = channel_id.decode('utf-8')
+        self.local_user_observer.on_video_subscribe_state_changed(self.local_user, channel_id_str, user_id_str, state, reason, elapsed)
 
-    def _on_video_publish_state_changed(self, agora_local_user, channel_id, state, reason, elapsed):
-        print("LocalUserCB _on_video_publish_state_changed:", agora_local_user, channel_id, state, reason, elapsed)
-        self.local_user_observer.on_video_publish_state_changed(self.local_user, channel_id, state, reason, elapsed)
+    def _on_video_publish_state_changed(self, local_user_handle, channel_id, state, reason, elapsed):
+        print("LocalUserCB _on_video_publish_state_changed:", local_user_handle, channel_id, state, reason, elapsed)
+        channel_id_str = channel_id.decode('utf-8')
+        self.local_user_observer.on_video_publish_state_changed(self.local_user, channel_id_str, state, reason, elapsed)
 
-    def _on_first_remote_video_frame(self, agora_local_user, user_id, width, height, elapsed):
-        print("LocalUserCB _on_first_remote_video_frame:", agora_local_user, user_id, width, height, elapsed)
+    def _on_first_remote_video_frame(self, local_user_handle, user_id, width, height, elapsed):
+        print("LocalUserCB _on_first_remote_video_frame:", local_user_handle, user_id, width, height, elapsed)
         self.local_user_observer.on_first_remote_video_frame(self.local_user, user_id, width, height, elapsed)
 
-    def _on_first_remote_video_decoded(self, agora_local_user, user_id, width, height, elapsed):
-        print("LocalUserCB _on_first_remote_video_decoded:", agora_local_user, user_id, width, height, elapsed)
+    def _on_first_remote_video_decoded(self, local_user_handle, user_id, width, height, elapsed):
+        print("LocalUserCB _on_first_remote_video_decoded:", local_user_handle, user_id, width, height, elapsed)
         self.local_user_observer.on_first_remote_video_decoded(self.local_user, user_id, width, height, elapsed)
 
-    def _on_first_remote_video_frame_rendered(self, agora_local_user, user_id, width, height, elapsed):
-        print("LocalUserCB _on_first_remote_video_frame_rendered:", agora_local_user, user_id, width, height, elapsed)
-        self.local_user_observer.on_first_remote_video_frame_rendered(self.local_user, user_id, width, height, elapsed)
+    def _on_first_remote_video_frame_rendered(self, local_user_handle, user_id, width, height, elapsed):
+        print("LocalUserCB _on_first_remote_video_frame_rendered:", local_user_handle, user_id, width, height, elapsed)
+        user_id_str = user_id.decode('utf-8')
+        self.local_user_observer.on_first_remote_video_frame_rendered(self.local_user, user_id_str, width, height, elapsed)
 
-    def _on_video_size_changed(self, agora_local_user, user_id, width, height, elapsed):
-        print("LocalUserCB _on_video_size_changed:", agora_local_user, user_id, width, height, elapsed)
-        self.local_user_observer.on_video_size_changed(self.local_user, user_id, width, height, elapsed)
+    def _on_video_size_changed(self, local_user_handle, user_id, width, height, elapsed):
+        print("LocalUserCB _on_video_size_changed:", local_user_handle, user_id, width, height, elapsed)
+        user_id_str = user_id.decode('utf-8')
+        self.local_user_observer.on_video_size_changed(self.local_user, user_id_str, width, height, elapsed)
 
-    def _on_user_info_updated(self, agora_local_user, user_id, msg, val):
-        print("LocalUserCB _on_user_info_updated:", agora_local_user, user_id, msg, val)
-        self.local_user_observer.on_user_info_updated(self.local_user, user_id, msg, val)
+    def _on_user_info_updated(self, local_user_handle, user_id, msg, val):
+        print("LocalUserCB _on_user_info_updated:", local_user_handle, user_id, msg, val)
+        user_id_str = user_id.decode('utf-8')
+        self.local_user_observer.on_user_info_updated(self.local_user, user_id_str, msg, val)
 
-    def _on_intra_request_received(self, agora_local_user):
-        print("LocalUserCB _on_intra_request_received:", agora_local_user)
+    def _on_intra_request_received(self, local_user_handle):
+        print("LocalUserCB _on_intra_request_received:", local_user_handle)
         self.local_user_observer.on_intra_request_received(self.local_user)
 
-    def _on_remote_subscribe_fallback_to_audio_only(self, agora_local_user, user_id, is_fallback):
-        print("LocalUserCB _on_remote_subscribe_fallback_to_audio_only:", agora_local_user, user_id, is_fallback)
-        self.local_user_observer.on_remote_subscribe_fallback_to_audio_only(self.local_user, user_id, is_fallback)
+    def _on_remote_subscribe_fallback_to_audio_only(self, local_user_handle, user_id, is_fallback):
+        print("LocalUserCB _on_remote_subscribe_fallback_to_audio_only:", local_user_handle, user_id, is_fallback)
+        user_id_str = user_id.decode('utf-8')
+        self.local_user_observer.on_remote_subscribe_fallback_to_audio_only(self.local_user, user_id_str, is_fallback)
 
-    def _on_stream_message(self, agora_local_user, user_id, stream_id, data, size):
-        print("LocalUserCB _on_stream_message:", agora_local_user, user_id, stream_id, data, size)
-        self.local_user_observer.on_stream_message(self.local_user, user_id, stream_id, data, size)
+    def _on_stream_message(self, local_user_handle, user_id, stream_id, data, size):
+        print("LocalUserCB _on_stream_message:", local_user_handle, user_id, stream_id, data, size)
+        user_id_str = user_id.decode('utf-8')\
+        #for data is binary, we can not decode to utf 8  str
+        bytes_from_c = ctypes.string_at(data, size)  
+        data_byte_array = bytearray(bytes_from_c)  
+    
+        
+        self.local_user_observer.on_stream_message(self.local_user, user_id_str, stream_id, data_byte_array, size)
 
-    def _on_user_state_changed(self, agora_local_user, user_id, state):
-        print("LocalUserCB _on_user_state_changed:", agora_local_user, user_id, state)
-        self.local_user_observer.on_user_state_changed(self.local_user, user_id, state)        
+    def _on_user_state_changed(self, local_user_handle, user_id, state):
+        print("LocalUserCB _on_user_state_changed:", local_user_handle, user_id, state)
+        user_id_str = user_id.decode('utf-8')
+        self.local_user_observer.on_user_state_changed(self.local_user, user_id_str, state)        
