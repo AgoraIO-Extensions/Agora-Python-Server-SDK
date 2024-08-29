@@ -34,38 +34,6 @@ class DYSConnectionObserver(IRTCConnectionObserver):
     def on_user_joined(self, agora_rtc_conn, user_id):
         print("CCC on_user_joined:", agora_rtc_conn, user_id)
 
-    # def on_get_playback_audio_frame_param(self, agora_local_user):
-    #     audio_params_instance = AudioParams()
-    #     return audio_params_instance
-
-    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, frame):
-        print("CCC on_playback_audio_frame_before_mixing")#, channelId, uid)
-        return 0
-
-    def on_record_audio_frame(self, agora_local_user ,channelId, frame):
-        print("CCC on_record_audio_frame")
-        return 0
-
-    def on_playback_audio_frame(self, agora_local_user, channelId, frame):
-        print("CCC on_playback_audio_frame")
-        return 0
-
-    def on_mixed_audio_frame(self, agora_local_user, channelId, frame):
-        print("CCC on_mixed_audio_frame")
-        return 0
-
-    def on_ear_monitoring_audio_frame(self, agora_local_user, frame):
-        print("CCC on_ear_monitoring_audio_frame")
-        return 0
-
-    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, frame):
-        print("CCC on_playback_audio_frame_before_mixing")
-        return 0
-
-    def on_get_audio_frame_position(self, agora_local_user):
-        print("CCC on_get_audio_frame_position")
-        return 0
-
 class DYSLocalUserObserver(IRTCLocalUserObserver):
     def __init__(self):
         super(DYSLocalUserObserver, self).__init__()
@@ -92,32 +60,15 @@ class DYSAudioFrameObserver(IAudioFrameObserver):
     def on_playback_audio_frame(self, agora_local_user, channelId, frame):
         print("CCC on_playback_audio_frame")
         return 0
-    def on_mixed_audio_frame(self, agora_local_user, channelId, frame):
-        print("CCC on_mixed_audio_frame")
-        return 0
     def on_ear_monitoring_audio_frame(self, agora_local_user, frame):
         print("CCC on_ear_monitoring_audio_frame")
         return 0
     def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, frame):
         print("CCC on_playback_audio_frame_before_mixing")
         return 0
-    
-    # def on_get_audio_frame_position(self, agora_local_user):
-    #     print("CCC on_get_audio_frame_position")
-    #     return 0
-    # def on_get_playback_audio_frame_param(self, agora_local_user):
-    #     print("CCC on_get_playback_audio_frame_param")
-    #     return 0
-    # def on_get_record_audio_frame_param(self, agora_local_user):
-    #     print("CCC on_get_record_audio_frame_param")
-    #     return 0
-    # def on_get_mixed_audio_frame_param(self, agora_local_user):
-    #     print("CCC on_get_mixed_audio_frame_param")
-    #     return 0
-    # def on_get_ear_monitoring_audio_frame_param(self, agora_local_user):
-    #     print("CCC on_get_ear_monitoring_audio_frame_param")
-    #     return 0
-    
+    def on_get_audio_frame_position(self, agora_local_user):
+        print("CCC on_get_audio_frame_position")
+        return 0
 
 
 #pacer class
@@ -149,7 +100,7 @@ print("appid:", appid, "token:", token, "channel_id:", channel_id, "aac_file_pat
 
 #---------------1. Init SDK
 config = AgoraServiceConfig()
-config.enable_audio_processor = 1
+config.enable_audio_processor = 0
 config.enable_audio_device = 0
 # config.enable_video = 1
 config.appid = appid
@@ -164,11 +115,9 @@ agora_service.initialize(config)
 #---------------2. Create Connection
 con_config = RTCConnConfig(
     auto_subscribe_audio=1,
-    auto_subscribe_video=1,
-    client_role_type=2,
+    auto_subscribe_video=0,
+    client_role_type=1,
     channel_profile=1,
-    audio_recv_media_packet = 1,
-    audio_send_media_packet = 1
 )
 
 connection = agora_service.create_rtc_connection(con_config)
@@ -190,8 +139,8 @@ local_user.register_audio_frame_observer(audio_frame_observer)
 audio_track.set_max_buffer_audio_frame_number(320*2000)
 
 #---------------4. Send Media Stream
-# audio_track.set_enabled(1)
-# local_user.publish_audio(audio_track)
+audio_track.set_enabled(1)
+local_user.publish_audio(audio_track)
 
 sendinterval = 0.1
 Pacer = Pacer(sendinterval)
@@ -352,7 +301,7 @@ def get_aac_packets(file_path):
 # 使用示例
 # aac_packets = extract_aac_packets(aac_file_path)
 
-def read_adts_header(file_path):
+def read_adts_header(file_path):  
     adts_header_size = 7  
     with open(file_path, 'rb') as f:  
         while True:  
@@ -416,37 +365,37 @@ def read_adts_header(file_path):
 # get_aac_packets(aac_file_path)
 
 
-# packnum = int((sendinterval*1000)/10)
-# with open(aac_file_path, "rb") as file:
+packnum = int((sendinterval*1000)/10)
+with open(aac_file_path, "rb") as file:
 
-#     while True:
-#         if count < 10:
-#             packnum = 100
-#         frame_buf = bytearray(320*packnum)            
-#         success = file.readinto(frame_buf)
-#         if not success:
-#             break
-#         frame = EncodedAudioFrame()
-#         frame.data = frame_buf
-#         frame.size = len(frame_buf)
-#         frame.capture_timems = 0
-#         frame.codec = 8
-#         frame.speech = 1
-#         frame.send_even_if_empty = 1
+    while True:
+        if count < 10:
+            packnum = 100
+        frame_buf = bytearray(320*packnum)            
+        success = file.readinto(frame_buf)
+        if not success:
+            break
+        frame = EncodedAudioFrame()
+        frame.data = frame_buf
+        frame.size = len(frame_buf)
+        frame.capture_timems = 0
+        frame.codec = 8
+        frame.speech = 1
+        frame.send_even_if_empty = 1
 
-#         frame.samples_per_channel = 1024
-#         frame.number_of_channels = 1
-#         frame.sample_rate = 16000
+        frame.samples_per_channel = 1024
+        frame.number_of_channels = 1
+        frame.sample_rate = 16000
 
-#         ret = audio_sender.send_encoded_audio_frame(frame)
-#         count += 1
-#         print("count,ret=",count, ret)
-#         Pacer.pace()
+        ret = audio_sender.send_encoded_audio_frame(frame)
+        count += 1
+        print("count,ret=",count, ret)
+        Pacer.pace()
            
 #---------------5. Stop Media Sender And Release
 time.sleep(100)
-# local_user.unpublish_audio(audio_track)
-# audio_track.set_enabled(0)
+local_user.unpublish_audio(audio_track)
+audio_track.set_enabled(0)
 connection.unregister_observer()
 connection.disconnect()
 connection.release()

@@ -48,7 +48,7 @@ agora_local_user_unpublish_video.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
 
 agora_local_user_subscribe_audio = agora_lib.agora_local_user_subscribe_audio
 agora_local_user_subscribe_audio.restype = AGORA_API_C_INT
-agora_local_user_subscribe_audio.argtypes = [AGORA_HANDLE, ctypes.c_uint]
+agora_local_user_subscribe_audio.argtypes = [AGORA_HANDLE, user_id_t]
 
 agora_local_user_subscribe_all_audio = agora_lib.agora_local_user_subscribe_all_audio
 agora_local_user_subscribe_all_audio.restype = AGORA_API_C_INT
@@ -230,7 +230,7 @@ class LocalUser:
         return ret
 
     def subscribe_audio(self, user_id):
-        ret = agora_local_user_subscribe_audio(self.user_handle, user_id)
+        ret = agora_local_user_subscribe_audio(self.user_handle,ctypes.c_char_p(user_id.encode()) )
         if ret < 0:
             print("Failed to subscribe audio")
         return ret

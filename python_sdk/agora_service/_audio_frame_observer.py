@@ -26,17 +26,10 @@ class AudioFrame(ctypes.Structure):
         ("render_time_ms", ctypes.c_int64),
         ("avsync_type", ctypes.c_int)
     ]
-    pass
 
 
-class AudioParams(ctypes.Structure):
-    _fields_ = [
-        ("sample_rate", ctypes.c_int),
-        ("channels", ctypes.c_int),
-        ("mode", ctypes.c_int),
-        ("samples_per_call", ctypes.c_int)
-    ]
-    pass
+
+
 
 ON_RECORD_AUDIO_FRAME_CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int, AGORA_HANDLE, ctypes.c_char_p, ctypes.POINTER(AudioFrame))
 ON_PLAYBACK_AUDIO_FRAME_CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int, AGORA_HANDLE, ctypes.c_char_p, ctypes.POINTER(AudioFrame))
@@ -73,7 +66,8 @@ class AudioFrameObserverInner(ctypes.Structure):
         self.on_mixed_audio_frame = ON_MIXED_AUDIO_FRAME_CALLBACK(self._on_mixed_audio_frame)
         self.on_ear_monitoring_audio_frame = ON_EAR_MONITORING_AUDIO_FRAME_CALLBACK(self._on_ear_monitoring_audio_frame)
         self.on_playback_audio_frame_before_mixing = ON_PLAYBACK_AUDIO_FRAME_BEFORE_MIXING_CALLBACK(self._on_playback_audio_frame_before_mixing)
-        # self.on_get_audio_frame_position = ON_GET_AUDIO_FRAME_POSITION_CALLBACK(self._on_get_audio_frame_position)
+        self.on_get_audio_frame_position = ON_GET_AUDIO_FRAME_POSITION_CALLBACK(self._on_get_audio_frame_position)
+
         # self.on_get_playback_audio_frame_param = ON_GET_PLAYBACK_AUDIO_FRAME_PARAM_CALLBACK(self._on_get_playback_audio_frame_param)
         # self.on_get_record_audio_frame_param = ON_GET_RECORD_AUDIO_FRAME_PARAM_CALLBACK(self._on_get_record_audio_frame_param)
         # self.on_get_mixed_audio_frame_param = ON_GET_MIXED_AUDIO_FRAME_PARAM_CALLBACK(self._on_get_mixed_audio_frame_param)
@@ -95,27 +89,62 @@ class AudioFrameObserverInner(ctypes.Structure):
         print("AudioFrameObserverInner _on_ear_monitoring_audio_frame", agora_handle, audio_frame)
         self.observer.on_ear_monitoring_audio_frame(self.local_user, audio_frame)
 
-    def _on_playback_audio_frame_before_mixing(self, agora_handle, channel_id, user_id, audio_frame):
+    def _on_playback_audio_frame_before_mixing(self, agora_handle, channel_id, user_id, audio_frame) -> ctypes.c_int:
         print("AudioFrameObserverInner _on_playback_audio_frame_before_mixing", agora_handle, channel_id, user_id, audio_frame)
-        self.observer.on_playback_audio_frame_before_mixing(self.local_user, audio_frame)
+        return self.observer.on_playback_audio_frame_before_mixing(self.local_user, channel_id, user_id, audio_frame)
     
     def _on_get_audio_frame_position(self, agora_handle):
         print("AudioFrameObserverInner _on_get_audio_frame_position", agora_handle)
-        self.observer.on_get_audio_frame_position(self.local_user)
+        return 0
+        # return self.observer.on_get_audio_frame_position(self.local_user)
 
-    def _on_get_playback_audio_frame_param(self, agora_handle):
+    def _on_get_playback_audio_frame_param(self, agora_handle) -> AudioParams:
         print("AudioFrameObserverInner _on_get_playback_audio_frame_param", agora_handle)
-        self.observer.on_get_playback_audio_frame_param(self.local_user)
+        params = AudioParams()
+        # 设置参数的值
+        params.sample_rate = 16000  # 示例值
+        params.channels = 1          # 示例值
+        params.mode = 0              # 示例值
+        params.samples_per_call = 1024  # 示例值
+        return params  # 确保返回的是 AudioParams 实例        # return self.observer.on_get_playback_audio_frame_param(self.local_user)
 
-    def _on_get_record_audio_frame_param(self, agora_handle):
+    def _on_get_record_audio_frame_param(self, agora_handle) -> AudioParams:
         print("AudioFrameObserverInner _on_get_record_audio_frame_param", agora_handle)
-        self.observer.on_get_record_audio_frame_param(self.local_user)
+        # return self.observer.on_get_record_audio_frame_param(self.local_user)
 
-    def _on_get_mixed_audio_frame_param(self, agora_handle):
+        params = AudioParams()
+        # 设置参数的值
+        params.sample_rate = 16000  # 示例值
+        params.channels = 1          # 示例值
+        params.mode = 0              # 示例值
+        params.samples_per_call = 1024  # 示例值
+        return params  # 确保返回的是 AudioParams 实例        # return self.observer.on_get_playback_audio_frame_param(self.local_user)
+
+
+    def _on_get_mixed_audio_frame_param(self, agora_handle) -> AudioParams:
         print("AudioFrameObserverInner _on_get_mixed_audio_frame_param", agora_handle)
-        self.observer.on_get_mixed_audio_frame_param(self.local_user)
+        
+        # return self.observer.on_get_mixed_audio_frame_param(self.local_user)
 
-    def _on_get_ear_monitoring_audio_frame_param(self, agora_handle):
+        params = AudioParams()
+        # 设置参数的值
+        params.sample_rate = 16000  # 示例值
+        params.channels = 1          # 示例值
+        params.mode = 0              # 示例值
+        params.samples_per_call = 1024  # 示例值
+        return params  # 确保返回的是 AudioParams 实例        # return self.observer.on_get_playback_audio_frame_param(self.local_user)
+
+
+    def _on_get_ear_monitoring_audio_frame_param(self, agora_handle) -> AudioParams:
         print("AudioFrameObserverInner _on_get_ear_monitoring_audio_frame_param", agora_handle)
-        self.observer.on_get_ear_monitoring_audio_frame_param(self.local_user)
+        # return self.observer.on_get_ear_monitoring_audio_frame_param(self.local_user)
+
+        params = AudioParams()
+        # 设置参数的值
+        params.sample_rate = 16000  # 示例值
+        params.channels = 1          # 示例值
+        params.mode = 0              # 示例值
+        params.samples_per_call = 1024  # 示例值
+        return params  # 确保返回的是 AudioParams 实例        # return self.observer.on_get_playback_audio_frame_param(self.local_user)
+
 
