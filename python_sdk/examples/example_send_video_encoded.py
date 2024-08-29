@@ -58,6 +58,7 @@ class DYSVideoFrameObserver(IVideoFrameObserver):
         print("DYSVideoFrameObserver on_frame:", video_frame_observer, channel_id, remote_uid, frame)
         return 0
 
+
 class Pacer:
     def __init__(self,interval):
         self.last_call_time = time.time()
@@ -96,15 +97,14 @@ config.enable_video = 1
 config.appid = appid
 sdk_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 log_folder = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-filename, _ = os.path.splitext(os.path.basename(__file__))
-config.log_path = os.path.join(sdk_dir, 'logs', filename ,log_folder, 'agorasdk.log')
+config.log_path = os.path.join(sdk_dir, 'logs/example_send_yuv', log_folder, 'agorasdk.log')
 
 agora_service = AgoraService()
 agora_service.initialize(config)
 
 con_config = RTCConnConfig(
     auto_subscribe_audio=0,
-    auto_subscribe_video=1,
+    auto_subscribe_video=0,
     client_role_type=1,
     channel_profile=1,
 )
@@ -121,12 +121,45 @@ local_user = connection.get_local_user()
 
 # video_sender = connection.GetVideoSender()
 video_frame_observer = DYSVideoFrameObserver()
-local_user.register_video_frame_observer(video_frame_observer)
+# local_user.register_video_frame_observer(video_frame_observer)
 
 video_track.set_enabled(1)
+local_user.publish_video(video_track)
 
-time.sleep(100)
+# video_sender.Start()
 
+sendinterval = 1/30
+Pacer = Pacer(sendinterval)
+
+width = 416
+height = 240
+
+def send_test():
+    count = 0
+    yuv_len = int(width*height*3/2)
+    frame_buf = bytearray(yuv_len)            
+    with open(yuv_file_path, "rb") as file:
+        while True:            
+            success = file.readinto(frame_buf)
+            if not success:
+                break
+            frame = ExternalVideoFrame()
+            frame.buffer = frame_buf
+            frame.type = 1
+            frame.format = 1
+            frame.stride = width
+            frame.height = height
+            frame.timestamp = 0
+            ret = video_sender.send_video_framee(frame)        
+            count += 1
+            print("count,ret=",count, ret)
+            Pacer.pace()
+
+for i in range(1):
+    send_test()
+
+time.sleep(2)
+local_user.unpublish_video(video_track)
 video_track.set_enabled(0)
 connection.unregister_observer()
 connection.disconnect()

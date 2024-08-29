@@ -34,37 +34,6 @@ class DYSConnectionObserver(IRTCConnectionObserver):
     def on_user_joined(self, agora_rtc_conn, user_id):
         print("CCC on_user_joined:", agora_rtc_conn, user_id)
 
-    # def on_get_playback_audio_frame_param(self, agora_local_user):
-    #     audio_params_instance = AudioParams()
-    #     return audio_params_instance
-
-    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, frame):
-        print("CCC on_playback_audio_frame_before_mixing")#, channelId, uid)
-        return 0
-
-    def on_record_audio_frame(self, agora_local_user ,channelId, frame):
-        print("CCC on_record_audio_frame")
-        return 0
-
-    def on_playback_audio_frame(self, agora_local_user, channelId, frame):
-        print("CCC on_playback_audio_frame")
-        return 0
-
-    def on_mixed_audio_frame(self, agora_local_user, channelId, frame):
-        print("CCC on_mixed_audio_frame")
-        return 0
-
-    def on_ear_monitoring_audio_frame(self, agora_local_user, frame):
-        print("CCC on_ear_monitoring_audio_frame")
-        return 0
-
-    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, frame):
-        print("CCC on_playback_audio_frame_before_mixing")
-        return 0
-
-    def on_get_audio_frame_position(self, agora_local_user):
-        print("CCC on_get_audio_frame_position")
-        return 0
 
 class DYSLocalUserObserver(IRTCLocalUserObserver):
     def __init__(self):
