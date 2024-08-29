@@ -10,7 +10,7 @@ sdk_dir = os.path.dirname(script_dir)
 if sdk_dir not in sys.path:
     sys.path.insert(0, sdk_dir)
 
-from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
+from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig, SenderOptions
 from agora_service.rtc_connection import *
 from agora_service.media_node_factory import *
 from agora_service.audio_pcm_data_sender import *
@@ -116,8 +116,9 @@ connection.register_observer(conn_observer)
 connection.connect(token, channel_id, uid)
 
 media_node_factory = agora_service.create_media_node_factory()
-video_sender = media_node_factory.create_video_frame_sender()
-video_track = agora_service.create_custom_video_track_frame(video_sender)
+video_sender = media_node_factory.create_video_encoded_image_sender()
+sender_options = SenderOptions(0, 2, 640)
+video_track = agora_service.create_custom_video_track_encoded(video_sender, sender_options)
 local_user = connection.get_local_user()
 
 # video_sender = connection.GetVideoSender()
@@ -151,7 +152,33 @@ def send_test():
             frame.stride = width
             frame.height = height
             frame.timestamp = 0
-            ret = video_sender.send_video_framee(frame)        
+
+
+        # self.codec_type = codec_type
+        # self.width = width
+        # self.height = height
+        # self.frames_per_second = frames_per_second
+        # self.frame_type = frame_type
+        # self.rotation = rotation
+        # self.track_id = track_id
+        # self.render_time_ms = render_time_ms
+        # self.internal_send_ts = internal_send_ts
+        # self.uid = uid
+
+            encoded_video_frame_info = EncodedVideoFrameInfo()
+            encoded_video_frame_info.codec_type = 2            
+            encoded_video_frame_info.width = width
+            encoded_video_frame_info.height = height
+            encoded_video_frame_info.frames_per_second = 30                        
+            encoded_video_frame_info.frame_type = 0
+            encoded_video_frame_info.rotation = 0
+            encoded_video_frame_info.track_id = 0
+            encoded_video_frame_info.render_time_ms = 0
+            encoded_video_frame_info.internal_send_ts = 0
+            encoded_video_frame_info.uid = 0
+            
+
+            ret = video_sender.send_encoded_video_image(frame_buf, len(frame_buf) ,encoded_video_frame_info)        
             count += 1
             print("count,ret=",count, ret)
             Pacer.pace()
