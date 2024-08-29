@@ -97,7 +97,8 @@ config.enable_video = 1
 config.appid = appid
 sdk_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 log_folder = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-config.log_path = os.path.join(sdk_dir, 'logs/example_send_yuv', log_folder, 'agorasdk.log')
+filename, _ = os.path.splitext(os.path.basename(__file__))
+config.log_path = os.path.join(sdk_dir, 'logs', filename ,log_folder, 'agorasdk.log')
 
 agora_service = AgoraService()
 agora_service.initialize(config)

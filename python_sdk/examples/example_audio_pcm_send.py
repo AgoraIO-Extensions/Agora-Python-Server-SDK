@@ -12,9 +12,9 @@ sdk_dir = os.path.dirname(script_dir)
 if sdk_dir not in sys.path:
     sys.path.insert(0, sdk_dir)
 
-from agora_service.agora_service import AgoraServiceConfig, AgoraService, AudioSubscriptionOptions, RTCConnConfig
+from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora_service.rtc_connection_observer import IRTCConnectionObserver
-from agora_service.audio_pcm_data_sender import EncodedAudioFrame
+from agora_service.audio_pcm_data_sender import PcmAudioFrame
 from agora_service.audio_frame_observer import IAudioFrameObserver
 from agora_service.local_user_observer import IRTCLocalUserObserver
 
@@ -33,6 +33,7 @@ class DYSConnectionObserver(IRTCConnectionObserver):
 
     def on_user_joined(self, agora_rtc_conn, user_id):
         print("CCC on_user_joined:", agora_rtc_conn, user_id)
+
 
 class DYSLocalUserObserver(IRTCLocalUserObserver):
     def __init__(self):
@@ -60,79 +61,69 @@ class DYSAudioFrameObserver(IAudioFrameObserver):
     def on_playback_audio_frame(self, agora_local_user, channelId, frame):
         print("CCC on_playback_audio_frame")
         return 0
-    def on_mixed_audio_frame(self, agora_local_user, channelId, frame):
-        print("CCC on_mixed_audio_frame")
-        return 0
     def on_ear_monitoring_audio_frame(self, agora_local_user, frame):
         print("CCC on_ear_monitoring_audio_frame")
         return 0
     def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, frame):
         print("CCC on_playback_audio_frame_before_mixing")
-        return 1
-    
-    # def on_get_audio_frame_position(self, agora_local_user):
-    #     print("CCC on_get_audio_frame_position")
-    #     return 0
+        return 0
+    def on_get_audio_frame_position(self, agora_local_user):
+        print("CCC on_get_audio_frame_position")
+        return 0
 
-    # def on_get_playback_audio_frame_param(self, agora_local_user):
-    #     print("CCC on_get_playback_audio_frame_param")
-    #     return 0
-    # def on_get_record_audio_frame_param(self, agora_local_user):
-    #     print("CCC on_get_record_audio_frame_param")
-    #     return 0
-    # def on_get_mixed_audio_frame_param(self, agora_local_user):
-    #     print("CCC on_get_mixed_audio_frame_param")
-    #     return 0
-    # def on_get_ear_monitoring_audio_frame_param(self, agora_local_user):
-    #     print("CCC on_get_ear_monitoring_audio_frame_param")
-    #     return 0
+
+#pacer class
+class Pacer:
+    def __init__(self,interval):
+        self.last_call_time = time.time()
+        self.interval = interval
+
+    def pace(self):
+        current_time = time.time()
+        elapsed_time = current_time - self.last_call_time
+        if elapsed_time < self.interval:
+            time.sleep(self.interval - elapsed_time)
+            print("sleep time:", (self.interval - elapsed_time)*1000)
+        self.last_call_time = time.time()
+
+
+
+
 
 # 通过传参将参数传进来
 # 例如： python examples/example_send_pcm.py {appid} {token} {channel_id} ./test_data/demo.pcm {userid}
 appid = sys.argv[1]
 token = sys.argv[2]
 channel_id = sys.argv[3]
-aac_file_path = sys.argv[4]
+pcm_file_path = sys.argv[4]
 # check argv len
 if len(sys.argv) > 5:
     uid = sys.argv[5]
 else:
     uid = "0"
-print("appid:", appid, "token:", token, "channel_id:", channel_id, "aac_file_path:", aac_file_path, "uid:", uid)
+print("appid:", appid, "token:", token, "channel_id:", channel_id, "pcm_file_path:", pcm_file_path, "uid:", uid)
 
 #---------------1. Init SDK
 config = AgoraServiceConfig()
 config.enable_audio_processor = 1
-config.enable_audio_device = 1
+config.enable_audio_device = 0
 # config.enable_video = 1
 config.appid = appid
 
 sdk_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 log_folder = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-config.log_path = os.path.join(sdk_dir, 'logs/example_send_pcm', log_folder, 'agorasdk.log')
+filename, _ = os.path.splitext(os.path.basename(__file__))
+config.log_path = os.path.join(sdk_dir, 'logs', filename ,log_folder, 'agorasdk.log')
 
 agora_service = AgoraService()
 agora_service.initialize(config)
 
 #---------------2. Create Connection
-sub_opt = AudioSubscriptionOptions(
-        packet_only = 0,
-        pcm_data_only = 1,
-        bytes_per_sample = 2,
-        number_of_channels = 1,
-        sample_rate_hz = 16000
-)
-
-
 con_config = RTCConnConfig(
     auto_subscribe_audio=1,
     auto_subscribe_video=0,
     client_role_type=1,
     channel_profile=1,
-    # audio_recv_media_packet = 1,
-    # audio_send_media_packet = 1,
-    audio_subs_options = sub_opt,
-    enable_audio_recording_or_playout = 1,
 )
 
 connection = agora_service.create_rtc_connection(con_config)
@@ -142,25 +133,51 @@ connection.connect(token, channel_id, uid)
 
 #---------------3. Create Media Sender
 media_node_factory = agora_service.create_media_node_factory()
-audio_sender = media_node_factory.create_audio_encoded_frame_sender()
-audio_track = agora_service.create_custom_audio_track_encoded(audio_sender, 0)
+pcm_data_sender = media_node_factory.create_audio_pcm_data_sender()
+audio_track = agora_service.create_custom_audio_track_pcm(pcm_data_sender)
 
 local_user = connection.get_local_user()
 localuser_observer = DYSLocalUserObserver()
 local_user.register_local_user_observer(localuser_observer)
 audio_frame_observer = DYSAudioFrameObserver()
 local_user.register_audio_frame_observer(audio_frame_observer)
-local_user.set_playback_audio_frame_before_mixing_parameters(1, 16000)
-# local_user.subscribe_audio("3")
-local_user.subscribe_all_audio()
+
+audio_track.set_max_buffer_audio_frame_number(320*2000)
 
 #---------------4. Send Media Stream
-# audio_track.set_enabled(1)
-# local_user.publish_audio(audio_track)
+audio_track.set_enabled(1)
+local_user.publish_audio(audio_track)
 
-time.sleep(100)
-# local_user.unpublish_audio(audio_track)
-# audio_track.set_enabled(0)
+sendinterval = 0.1
+Pacer = Pacer(sendinterval)
+count = 0
+packnum = int((sendinterval*1000)/10)
+with open(pcm_file_path, "rb") as file:
+
+    while True:
+        if count < 10:
+            packnum = 100
+        frame_buf = bytearray(320*packnum)            
+        success = file.readinto(frame_buf)
+        if not success:
+            break
+        frame = PcmAudioFrame()
+        frame.data = frame_buf
+        frame.timestamp = 0
+        frame.samples_per_channel = 160*packnum
+        frame.bytes_per_sample = 2
+        frame.number_of_channels = 1
+        frame.sample_rate = 16000
+
+        ret = pcm_data_sender.send_audio_pcm_data(frame)
+        count += 1
+        print("count,ret=",count, ret)
+        Pacer.pace()
+           
+#---------------5. Stop Media Sender And Release
+time.sleep(10)
+local_user.unpublish_audio(audio_track)
+audio_track.set_enabled(0)
 connection.unregister_observer()
 connection.disconnect()
 connection.release()
