@@ -25,7 +25,7 @@ AGORA_API_C_HDLL = ctypes.c_void_p
 AGORA_API_C_VOID = None
 AGORA_HANDLE = ctypes.c_void_p
 user_id_t = ctypes.c_char_p
-
+AGORA_API_C_HDL = ctypes.c_void_p
 
 class LastmileProbeOneWayResult(ctypes.Structure):
     _fields_ = [

@@ -122,6 +122,14 @@ agora_local_user_unregister_video_encoded_frame_observer = agora_lib.agora_local
 agora_local_user_unregister_video_encoded_frame_observer.restype = AGORA_API_C_INT
 agora_local_user_unregister_video_encoded_frame_observer.argtypes = [AGORA_HANDLE, ctypes.c_void_p]
 
+agora_video_frame_observer2_create = agora_lib.agora_video_frame_observer2_create
+agora_video_frame_observer2_create.restype = AGORA_API_C_HDL
+agora_video_frame_observer2_create.argtypes = [ctypes.POINTER(VideoFrameObserverInner)]
+
+agora_video_frame_observer2_destroy = agora_lib.agora_video_frame_observer2_destroy
+agora_video_frame_observer2_destroy.restype = AGORA_API_C_INT
+agora_video_frame_observer2_destroy.argtypes = [AGORA_API_C_HDL]
+
 agora_local_user_register_video_frame_observer = agora_lib.agora_local_user_register_video_frame_observer
 agora_local_user_register_video_frame_observer.restype = AGORA_API_C_INT
 agora_local_user_register_video_frame_observer.argtypes = [AGORA_HANDLE, ctypes.c_void_p]
@@ -349,14 +357,15 @@ class LocalUser:
         return ret
 
     def register_video_frame_observer(self, agora_video_frame_observer2:IVideoFrameObserver):
-        video_frame_observer = VideoFrameObserverInner(agora_video_frame_observer2, self)
-        self.video_frame_observer = video_frame_observer
-        ret = agora_local_user_register_video_frame_observer(self.user_handle, ctypes.byref(video_frame_observer))
+        self.video_frame_observer = VideoFrameObserverInner(agora_video_frame_observer2, self)        
+        self.video_frame_observer_handler = agora_video_frame_observer2_create(self.video_frame_observer)
+        ret = agora_local_user_register_video_frame_observer(self.user_handle, self.video_frame_observer_handler)
         if ret < 0:
             print("Failed to register video frame observer")
         return ret
 
     def unregister_video_frame_observer(self, agora_video_frame_observer2):
+        agora_video_frame_observer2_destroy(self.video_frame_observer_handler)
         ret = agora_local_user_unregister_video_frame_observer(self.user_handle, agora_video_frame_observer2)
         if ret < 0:
             print("Failed to unregister video frame observer")
