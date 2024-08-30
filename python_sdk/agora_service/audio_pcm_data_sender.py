@@ -135,7 +135,7 @@ class AudioEncodedFrameSender:
         size = frame.size
         ownedinfo = frame.to_owned_encoded_audio_frame()
         ret = agora_audio_encoded_frame_sender_send(self.sender_handle, c_date, ctypes.c_uint32(size), ctypes.byref(ownedinfo))
-        if ret < 0:
+        if ret != 1:
             print("Failed to send encoded audio frame")
         return ret
     

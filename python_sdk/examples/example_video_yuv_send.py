@@ -92,6 +92,7 @@ print("appid:", appid, "token:", token, "channel_id:", channel_id, "yuv_file_pat
 config = AgoraServiceConfig()
 config.enable_audio_processor = 1
 config.enable_audio_device = 0
+config.enable_video = 1
 config.appid = appid
 sdk_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 log_folder = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -154,7 +155,7 @@ def send_test():
             print("count,ret=",count, ret)
             Pacer.pace()
 
-for i in range(1):
+for i in range(10):
     send_test()
 
 time.sleep(2)

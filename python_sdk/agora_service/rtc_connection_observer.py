@@ -32,7 +32,7 @@ class IRTCConnectionObserver():
     def on_connection_license_validation_failure(self, agora_rtc_conn, reason):
         pass
 
-    def on_connection_failure(self, agora_rtc_conn, reason):
+    def on_connection_failure(self, agora_rtc_conn, info, reason):
         pass
 
     def on_user_joined(self, agora_rtc_conn, user_id):
@@ -65,7 +65,7 @@ class IRTCConnectionObserver():
     def on_snapshot_taken(self, agora_rtc_conn, uid, file_path, width, height, err_code):
         pass
 
-    def on_error(self, agora_rtc_conn, error_code):
+    def on_error(self, agora_rtc_conn, error_code, msg):
         pass
 
     def on_warning(self, agora_rtc_conn, warn_code):

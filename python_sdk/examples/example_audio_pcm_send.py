@@ -152,28 +152,34 @@ sendinterval = 0.1
 Pacer = Pacer(sendinterval)
 count = 0
 packnum = int((sendinterval*1000)/10)
-with open(pcm_file_path, "rb") as file:
 
-    while True:
-        if count < 10:
-            packnum = 100
-        frame_buf = bytearray(320*packnum)            
-        success = file.readinto(frame_buf)
-        if not success:
-            break
-        frame = PcmAudioFrame()
-        frame.data = frame_buf
-        frame.timestamp = 0
-        frame.samples_per_channel = 160*packnum
-        frame.bytes_per_sample = 2
-        frame.number_of_channels = 1
-        frame.sample_rate = 16000
+def send_test():
+    with open(pcm_file_path, "rb") as file:
+        global count
+        global packnum
+        while True:
+            if count < 10:
+                packnum = 100
+            frame_buf = bytearray(320*packnum)            
+            success = file.readinto(frame_buf)
+            if not success:
+                break
+            frame = PcmAudioFrame()
+            frame.data = frame_buf
+            frame.timestamp = 0
+            frame.samples_per_channel = 160*packnum
+            frame.bytes_per_sample = 2
+            frame.number_of_channels = 1
+            frame.sample_rate = 16000
 
-        ret = pcm_data_sender.send_audio_pcm_data(frame)
-        count += 1
-        print("count,ret=",count, ret)
-        Pacer.pace()
-           
+            ret = pcm_data_sender.send_audio_pcm_data(frame)
+            count += 1
+            print("count,ret=",count, ret)
+            Pacer.pace()
+
+for i in range(100):
+    send_test()
+
 #---------------5. Stop Media Sender And Release
 time.sleep(10)
 local_user.unpublish_audio(audio_track)

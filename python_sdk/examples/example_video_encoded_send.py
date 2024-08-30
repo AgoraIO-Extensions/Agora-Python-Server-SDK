@@ -36,6 +36,8 @@ class DYSConnectionObserver(IRTCConnectionObserver):
     def on_user_joined(self, agora_rtc_conn, user_id):
         print("CCC on_user_joined:", agora_rtc_conn, user_id)
 
+    def on_user_left(self, agora_rtc_conn, user_id, reason):
+        print("CCC on_user_left:", agora_rtc_conn, user_id, reason)
 
 class DYSLocalUserObserver(IRTCLocalUserObserver):
     def __init__(self):
@@ -81,13 +83,13 @@ example_dir = os.path.dirname(os.path.abspath(__file__))
 appid = sys.argv[1]
 token = sys.argv[2]
 channel_id = sys.argv[3]
-yuv_file_path = sys.argv[4]
+encoded_file_path = sys.argv[4]
 # check argv len
 if len(sys.argv) > 5:
     uid = sys.argv[5]
 else:
     uid = "0"
-print("appid:", appid, "token:", token, "channel_id:", channel_id, "yuv_file_path:", yuv_file_path, "uid:", uid)
+print("appid:", appid, "token:", token, "channel_id:", channel_id, "encoded_file_path:", encoded_file_path, "uid:", uid)
 
 
 config = AgoraServiceConfig()
@@ -130,61 +132,89 @@ local_user.publish_video(video_track)
 
 # video_sender.Start()
 
-sendinterval = 1/30
+# sendinterval = 1/25
+# Pacer = Pacer(sendinterval)
+
+# width = 0
+# height = 0
+
+# def send_test():
+#     count = 0
+#     yuv_len = int(width*height*3/2)
+#     frame_buf = bytearray(yuv_len)            
+#     with open(encoded_file_path, "rb") as file:
+#         while True:            
+#             success = file.readinto(frame_buf)
+#             if not success:
+#                 break
+
+#             encoded_video_frame_info = EncodedVideoFrameInfo()
+#             encoded_video_frame_info.codec_type = 2            
+#             encoded_video_frame_info.width = width
+#             encoded_video_frame_info.height = height
+#             encoded_video_frame_info.frames_per_second = 15                        
+#             encoded_video_frame_info.frame_type = 0
+#             encoded_video_frame_info.rotation = 0
+#             encoded_video_frame_info.track_id = 0
+            
+#             ret = video_sender.send_encoded_video_image(frame_buf, len(frame_buf) ,encoded_video_frame_info)        
+#             count += 1
+#             print("count,ret=",count, ret)
+#             Pacer.pace()
+
+
+sendinterval = 1/25
 Pacer = Pacer(sendinterval)
 
-width = 416
-height = 240
+width = 352
+height = 288
 
-def send_test():
+import ffmpeg
+def is_key_frame(nal_unit):
+    # 获取 NAL 单元的类型
+    nal_unit_type = nal_unit[0] & 0x1F
+    return nal_unit_type == 5  # 5 表示关键帧（I帧）
+
+def read_h264_packets(h264_file):
+    process = (
+        ffmpeg
+        .input(h264_file)
+        .output('pipe:', format='h264')
+        .run(capture_stdout=True, capture_stderr=True)
+    )
     count = 0
-    yuv_len = int(width*height*3/2)
-    frame_buf = bytearray(yuv_len)            
-    with open(yuv_file_path, "rb") as file:
-        while True:            
-            success = file.readinto(frame_buf)
-            if not success:
-                break
-            frame = ExternalVideoFrame()
-            frame.buffer = frame_buf
-            frame.type = 1
-            frame.format = 1
-            frame.stride = width
-            frame.height = height
-            frame.timestamp = 0
 
+    output, error = process
 
-        # self.codec_type = codec_type
-        # self.width = width
-        # self.height = height
-        # self.frames_per_second = frames_per_second
-        # self.frame_type = frame_type
-        # self.rotation = rotation
-        # self.track_id = track_id
-        # self.render_time_ms = render_time_ms
-        # self.internal_send_ts = internal_send_ts
-        # self.uid = uid
-
+    # 处理输出数据（每个packet）
+    packets = output.split(b'\n')  # 根据需要分割数据
+    for packet in packets:
+        if packet:  # 过滤掉空行
+            # print(packet)
             encoded_video_frame_info = EncodedVideoFrameInfo()
             encoded_video_frame_info.codec_type = 2            
             encoded_video_frame_info.width = width
             encoded_video_frame_info.height = height
-            encoded_video_frame_info.frames_per_second = 30                        
-            encoded_video_frame_info.frame_type = 0
+            encoded_video_frame_info.frames_per_second = 25                        
+            if is_key_frame(packet):
+                encoded_video_frame_info.frame_type = 3
+            else:
+                encoded_video_frame_info.frame_type = 4            
             encoded_video_frame_info.rotation = 0
-            encoded_video_frame_info.track_id = 0
-            encoded_video_frame_info.render_time_ms = 0
-            encoded_video_frame_info.internal_send_ts = 0
-            encoded_video_frame_info.uid = 0
-            
-
-            ret = video_sender.send_encoded_video_image(frame_buf, len(frame_buf) ,encoded_video_frame_info)        
+            # encoded_video_frame_info.track_id = 0
+            packet = bytearray(packet)            
+            ret = video_sender.send_encoded_video_image(packet, len(packet) ,encoded_video_frame_info)        
             count += 1
             print("count,ret=",count, ret)
             Pacer.pace()
 
-for i in range(1):
-    send_test()
+
+
+
+for i in range(4):
+    # 示例调用
+    read_h264_packets(encoded_file_path)
+
 
 time.sleep(2)
 local_user.unpublish_video(video_track)
