@@ -164,7 +164,7 @@ class RTCConnectionObserverInner(ctypes.Structure):
             conn_info = conn_info_inner._convert_to_rtc_conn_info()
 
         just use: 
-        conn_info = conn_info_inner.contents._convert_to_rtc_conn_info()
+        conn_info = conn_info_inner.contents.()
         
         to 
         """
@@ -194,17 +194,17 @@ class RTCConnectionObserverInner(ctypes.Structure):
         self.conn_observer.on_reconnected(self.conn, conn_info, reason)
 
     def _on_connection_lost(self, agora_rtc_conn, conn_info_inner):
-        print("ConnCB _on_connection_lost:", agora_rtc_conn, conn_info_inner)
+        #print("ConnCB _on_connection_lost:", agora_rtc_conn, conn_info_inner)
         conn_info = conn_info_inner.contents._convert_to_rtc_conn_info()
         self.conn_observer.on_connection_lost(self.conn, conn_info)
 
     def _on_lastmile_quality(self, agora_rtc_conn, quality):
-        print("ConnCB _on_lastmile_quality:", agora_rtc_conn, quality)
+        #print("ConnCB _on_lastmile_quality:", agora_rtc_conn, quality)
         self.conn_observer.on_lastmile_quality(self.conn, quality)
 
     #last_mile_prob_result_ptr: ctypes.POINTER(LastmileProbeResult)) type
     def _on_lastmile_probe_result(self, agora_rtc_conn, last_mile_prob_result_ptr):
-        print("ConnCB _on_lastmile_probe_result:", agora_rtc_conn, last_mile_prob_result_ptr)
+        #print("ConnCB _on_lastmile_probe_result:", agora_rtc_conn, last_mile_prob_result_ptr)
         # result is a pointer to LastmileProbeResult
         # we should dereference the pointer to get the LastmileProbeResult, thus we can access its fields
         last_mile_result = last_mile_prob_result_ptr.contents
@@ -213,20 +213,20 @@ class RTCConnectionObserverInner(ctypes.Structure):
 
     #token: ctypes.char_p
     def _on_token_privilege_will_expire(self, agora_rtc_conn, token):
-        print("ConnCB _on_token_privilege_will_expire:", agora_rtc_conn, token)
+        #print("ConnCB _on_token_privilege_will_expire:", agora_rtc_conn, token)
         token_str = token.decode('utf-8') #decode will generate a new object
         self.conn_observer.on_token_privilege_will_expire(self.conn, token_str)
 
     def _on_token_privilege_did_expire(self, agora_rtc_conn):
-        print("ConnCB _on_token_privilege_did_expire:", agora_rtc_conn)
+        #print("ConnCB _on_token_privilege_did_expire:", agora_rtc_conn)
         self.conn_observer.on_token_privilege_did_expire(self.conn)
 
     def _on_connection_license_validation_failure(self, agora_rtc_conn, reason):
-        print("ConnCB _on_connection_license_validation_failure:", agora_rtc_conn, reason)
+        #print("ConnCB _on_connection_license_validation_failure:", agora_rtc_conn, reason)
         self.conn_observer.on_connection_license_validation_failure(self.conn, reason)
 
     def _on_connection_failure(self, agora_rtc_conn, conn_info_inner, reason):
-        print("ConnCB _on_connection_failure:", agora_rtc_conn, conn_info_inner, reason)
+        #print("ConnCB _on_connection_failure:", agora_rtc_conn, conn_info_inner, reason)
         conn_info = conn_info_inner.contents._convert_to_rtc_conn_info()
         self.conn_observer.on_connection_failure(self.conn, conn_info, reason)
     #userid: ctyps.char_p   
@@ -241,7 +241,7 @@ class RTCConnectionObserverInner(ctypes.Structure):
         self.conn_observer.on_user_left(self.conn, userid_str, reason)
     #stats: ctypes.POINTER(RTCStats)
     def _on_transport_stats(self, agora_rtc_conn, stats):
-        print("ConnCB _on_transport_stats:", agora_rtc_conn, stats)
+        #print("ConnCB _on_transport_stats:", agora_rtc_conn, stats)
         #stats is a pointer to RTCStats
         #should dereference the pointer to get the RTCStats, thus we can access its fields
         rtc_stats = stats.contents
@@ -255,15 +255,15 @@ class RTCConnectionObserverInner(ctypes.Structure):
         self.conn_observer.on_transport_stats(self.conn, rtc_stats)
     #old_role/new_role: ctypes.int
     def _on_change_role_success(self, agora_rtc_conn, old_role, new_role):
-        print("ConnCB _on_change_role_success:", agora_rtc_conn, old_role, new_role)
+        #print("ConnCB _on_change_role_success:", agora_rtc_conn, old_role, new_role)
         self.conn_observer.on_change_role_success(self.conn, old_role, new_role)
 
     def _on_change_role_failure(self, agora_rtc_conn, reason, cur_role):
-        print("ConnCB _on_change_role_failure:", agora_rtc_conn, reason, cur_role)
+        #print("ConnCB _on_change_role_failure:", agora_rtc_conn, reason, cur_role)
         self.conn_observer.on_change_role_failure(self.conn, reason, cur_role)
 
     def _on_user_network_quality(self, agora_rtc_conn, user_id, tx_quality, rx_quality):
-        print("ConnCB _on_user_network_quality:", agora_rtc_conn, user_id, tx_quality, rx_quality)
+        #print("ConnCB _on_user_network_quality:", agora_rtc_conn, user_id, tx_quality, rx_quality)
         #user_id: ctypes.char_p
         #tx_quality: ctypes.int
         #rx_quality: ctypes.int
@@ -271,51 +271,51 @@ class RTCConnectionObserverInner(ctypes.Structure):
         self.conn_observer.on_user_network_quality(self.conn, userid_str, tx_quality, rx_quality)
 
     def _on_network_type_changed(self, agora_rtc_conn, network_type):
-        print("ConnCB _on_network_type_changed:", agora_rtc_conn, network_type)
+        #print("ConnCB _on_network_type_changed:", agora_rtc_conn, network_type)
         #network_type: ctypes.int
         self.conn_observer.on_network_type_changed(self.conn, network_type)
 
     def _on_api_call_executed(self, agora_rtc_conn, error, api_type, api_params):
-        print("ConnCB _on_api_call_executed:", agora_rtc_conn, error, api_type, api_params)
+        #print("ConnCB _on_api_call_executed:", agora_rtc_conn, error, api_type, api_params)
         #error: ctypes.int; api_type: ctypes.char_p; api_params: ctypes.char_p
         _api_type_str = api_type.decode('utf-8')
         _api_param_str = api_params.decode('utf-8')
         self.conn_observer.on_api_call_executed(self.conn, error, _api_type_str, _api_param_str)
 
     def _on_content_inspect_result(self, agora_rtc_conn, result):
-        print("ConnCB _on_content_inspect_result:", agora_rtc_conn, result)
+        #print("ConnCB _on_content_inspect_result:", agora_rtc_conn, result)
         #result: ctypes.int
         self.conn_observer.on_content_inspect_result(self.conn, result)
 
     def _on_snapshot_taken(self, agora_rtc_conn, channel, uid, filepath, width, height, errCode):
-        print("ConnCB _on_snapshot_taken:", agora_rtc_conn, channel, uid, filepath, width, height, errCode)
+        #print("ConnCB _on_snapshot_taken:", agora_rtc_conn, channel, uid, filepath, width, height, errCode)
         #channel: ctypes.c_char_p; uid: ctypes.c_uint32; filepath: ctypes.c_char_p; width: ctypes.c_int32; height: ctypes.c_int32; errCode: ctypes.c_int32
         _channel_str = channel.decode('utf-8')
         _file_path_str = filepath.decode('utf-8')
         self.conn_observer.on_snapshot_taken(self.conn, _channel_str, uid, _file_path_str, width, height, errCode)
 
     def _on_error(self, agora_rtc_conn, error_code, error_msg):
-        print("ConnCB _on_error:", agora_rtc_conn, error_code, error_msg)
+        #print("ConnCB _on_error:", agora_rtc_conn, error_code, error_msg)
         _error_msg_str = error_msg.decode('utf-8')
         self.conn_observer.on_error(self.conn, error_code, _error_msg_str)
 
     def _on_warning(self, agora_rtc_conn, warn_code, warn_msg):
-        print("ConnCB _on_warning:", agora_rtc_conn, warn_code, warn_msg)
+        #print("ConnCB _on_warning:", agora_rtc_conn, warn_code, warn_msg)
         _warn_msg_str = warn_msg.decode('utf-8')
         self.conn_observer.on_warning(self.conn, warn_code, _warn_msg_str)
 
     def _on_channel_media_relay_state_changed(self, agora_rtc_conn, state, code):
-        print("ConnCB _on_channel_media_relay_state_changed:", agora_rtc_conn, state, code)
+        #print("ConnCB _on_channel_media_relay_state_changed:", agora_rtc_conn, state, code)
         self.conn_observer.on_channel_media_relay_state_changed(self.conn, state, code)
 
     def _on_local_user_registered(self, agora_rtc_conn, uid, user_account):
-        print("ConnCB _on_local_user_registered:", agora_rtc_conn, uid, user_account)
+        #print("ConnCB _on_local_user_registered:", agora_rtc_conn, uid, user_account)
         #uid: ctype.int, user_account: ctype.c_char_p
         _user_account_str = user_account.decode('utf-8')
         self.conn_observer.on_local_user_registered(self.conn, uid, _user_account_str)
 
     def _on_user_account_updated(self, agora_rtc_conn, uid, user_account):
-        print("ConnCB _on_user_account_updated:", agora_rtc_conn, uid, user_account)
+        #print("ConnCB _on_user_account_updated:", agora_rtc_conn, uid, user_account)
         _user_account_str = user_account.decode('utf-8')
         self.conn_observer.on_user_account_updated(self.conn, uid, _user_account_str)
 
@@ -325,11 +325,11 @@ class RTCConnectionObserverInner(ctypes.Structure):
         self.conn_observer.on_stream_message_error(self.conn, _user_id_str, stream_id, code, missed, cached)
 
     def _on_encryption_error(self, agora_rtc_conn, error_type):
-        print("ConnCB _on_encryption_error:", agora_rtc_conn, error_type)
+        #print("ConnCB _on_encryption_error:", agora_rtc_conn, error_type)
         self.conn_observer.on_encryption_error(self.conn, error_type)
 
     #request_id: ctypes.c_char_p; success/reason: ctypes.int
     def _on_upload_log_result(self, agora_rtc_conn, request_id, success, reason):
-        print("ConnCB _on_upload_log_result:", agora_rtc_conn, request_id, success, reason)
+        #print("ConnCB _on_upload_log_result:", agora_rtc_conn, request_id, success, reason)
         _request_id_str = request_id.decode("utf-8")
         self.conn_observer.on_upload_log_result(self.conn, _request_id_str, success, reason)

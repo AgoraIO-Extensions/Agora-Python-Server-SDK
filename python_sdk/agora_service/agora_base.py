@@ -361,3 +361,35 @@ class VideoTrackInfo(ctypes.Structure):
         self.encoded_frame_only = 0
         self.source_type = 0
         self.observation_position = 0
+
+class RAW_AUDIO_FRAME_OP_MODE_TYPE(ctypes.c_int):
+    RAW_AUDIO_FRAME_OP_MODE_READ_ONLY = 0
+    RAW_AUDIO_FRAME_OP_MODE_READ_WRITE = 2
+
+class AUDIO_FRAME_POSITION(ctypes.c_int):
+    AUDIO_FRAME_POSITION_PLAYBACK = 0x0001
+    AUDIO_FRAME_POSITION_RECORD = 0x0002
+    AUDIO_FRAME_POSITION_MIXED = 0x0004
+    AUDIO_FRAME_POSITION_BEFORE_MIXING = 0x0008
+
+class AudioFrame:
+    def __init__(self) -> None:
+        self.type = 0
+        self.samples_per_channel = 0
+        self.bytes_per_sample = 0
+        self.channels = 0
+        self.samples_per_sec = 0
+        self.buffer = None
+        self.render_time_ms = 0
+        self.avsync_type = 0
+    
+
+
+class AudioParams(ctypes.Structure):
+    _fields_ = [
+        ("sample_rate", ctypes.c_int),
+        ("channels", ctypes.c_int),
+        ("mode", ctypes.c_int),
+        ("samples_per_call", ctypes.c_int)
+    ]
+    pass

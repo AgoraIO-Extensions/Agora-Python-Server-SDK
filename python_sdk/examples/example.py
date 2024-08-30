@@ -74,15 +74,15 @@ class BizConnectionObserver(IRTCConnectionObserver):
         pass
 
     def on_user_joined(self, agora_rtc_conn, user_id):
-        print(f"on_user_joined {user_id}")
+        print(f"xxxxxcxxxxon_user_joined {user_id}")
         pass
 
     def on_user_left(self, agora_rtc_conn, user_id, reason):
-        print(f"on_user_left {user_id} {reason}")
+        print(f"------------on_user_left {user_id} {reason}")
         pass
 
     def on_transport_stats(self, agora_rtc_conn, stats:RTCStats):
-        print(f"** trans port stats {stats.duration}, {stats.tx_bytes}, {stats.rx_bytes}, {stats.rx_k_bit_rate}, {stats.tx_k_bit_rate}")
+        #print(f"** trans port stats {stats.duration}, {stats.tx_bytes}, {stats.rx_bytes}, {stats.rx_k_bit_rate}, {stats.tx_k_bit_rate}")
         pass
 
     def on_change_role_success(self, agora_rtc_conn, old_role, new_role):
@@ -94,7 +94,7 @@ class BizConnectionObserver(IRTCConnectionObserver):
         pass
 
     def on_user_network_quality(self, agora_rtc_conn, uid, tx_quality, rx_quality):
-        print(f"on_user_network_quality {uid} {tx_quality} {rx_quality}")
+        #print(f"on_user_network_quality {uid} {tx_quality} {rx_quality}")
         pass
 
     def on_network_type_changed(self, agora_rtc_conn, network_type):
@@ -271,19 +271,19 @@ class BizAudioFrameObserver(IAudioFrameObserver):
 
     def on_record_audio_frame(self, agora_local_user ,channelId, frame):
         print("CCC on_record_audio_frame")
-        return 0
-    def on_playback_audio_frame(self, agora_local_user, channelId, frame):
-        print("CCC on_playback_audio_frame")
-        return 0
+        return 1
+    def on_playback_audio_frame(self, agora_local_user, channelId, frame:AudioFrame):
+        print(f"CCC on_playback_audio_frame, channelId:{channelId}, len: {len(frame.buffer)}")
+        return 1
     def on_ear_monitoring_audio_frame(self, agora_local_user, frame):
         print("CCC on_ear_monitoring_audio_frame")
-        return 0
+        return 1
     def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, frame):
         print("CCC on_playback_audio_frame_before_mixing")
-        return 0
+        return 1
     def on_get_audio_frame_position(self, agora_local_user):
         print("CCC on_get_audio_frame_position")
-        return 0
+        return 1
 
 
 
@@ -405,7 +405,7 @@ print("appid:", appid, "token:", token, "channel_id:", channel_id, "pcm_file_pat
 config = AgoraServiceConfig()
 config.enable_audio_processor = 1
 config.enable_audio_device = 0
-# config.enable_video = 1
+config.enable_video = 1
 config.appid = appid
 sdk_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 log_folder = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -414,12 +414,26 @@ config.log_path = os.path.join(sdk_dir, 'logs/example', log_folder, 'agorasdk.lo
 agora_service = AgoraService()
 agora_service.initialize(config)
 
+sub_opt = AudioSubscriptionOptions(
+        packet_only = 0,
+        pcm_data_only = 1,
+        bytes_per_sample = 2,
+        number_of_channels = 1,
+        sample_rate_hz = 16000
+)
+
+
 con_config = RTCConnConfig(
     auto_subscribe_audio=1,
     auto_subscribe_video=0,
     client_role_type=1,
     channel_profile=1,
+    audio_recv_media_packet = 0,
+    audio_send_media_packet = 0,
+    audio_subs_options = sub_opt,
+    enable_audio_recording_or_playout = 0,
 )
+
 
 
 
@@ -436,16 +450,20 @@ audio_track = agora_service.create_custom_audio_track_pcm(pcm_data_sender)
 
 #step3: localuser
 localuser = connection.get_local_user()
-localuser.register_local_user_observer(observer = BizLocalUserObserver())
-localuser.register_audio_frame_observer(observer = BizAudioFrameObserver())
+local_observer = BizLocalUserObserver()
+#localuser.register_local_user_observer(local_observer)
+audio_observer = BizAudioFrameObserver()
+localuser.register_audio_frame_observer(audio_observer)
+localuser.set_playback_audio_frame_before_mixing_parameters(1, 16000)
 
-ret = localuser.get_user_role()
-localuser.set_user_role(con_config.client_role_type)
+#ret = localuser.get_user_role()
+#localuser.set_user_role(con_config.client_role_type)
 
 
 #step4: pub
 audio_track.set_enabled(1)
 localuser.publish_audio(audio_track)
+localuser.subscribe_all_audio()
 
 
 
