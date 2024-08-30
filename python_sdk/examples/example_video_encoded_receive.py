@@ -79,7 +79,7 @@ class DYSVideoEncodedImageReceiver(IVideoEncodedImageReceiver):
     def on_encoded_video_image_received(self, agora_handle, image_buffer, length, info):
         print("DYSVideoEncodedImageReceiver on_encoded_video_image_received:", agora_handle, image_buffer, length, info)
         return 0
-    
+
 # IVideoEncodedFrameObserver
 class DYSVideoEncodedFrameObserver(IVideoEncodedFrameObserver):
     def __init__(self):
@@ -87,7 +87,7 @@ class DYSVideoEncodedFrameObserver(IVideoEncodedFrameObserver):
 
     def on_encoded_video_frame(self, agora_video_encoded_frame_observer, uid, image_buffer, length, video_encoded_frame_info):
         print("DYSVideoEncodedFrameObserver on_encoded_video_frame:", agora_video_encoded_frame_observer, uid, image_buffer, length, video_encoded_frame_info)
-        return 0
+        return 1
 
 class Pacer:
     def __init__(self,interval):
@@ -158,7 +158,7 @@ local_user.register_local_user_observer(localuser_observer)
 
 video_subscription_options = VideoSubscriptionOptions(
             type = VIDEO_STREAM_TYPE.VIDEO_STREAM_HIGH,
-            encodedFrameOnly = False
+            encodedFrameOnly = 1
 )
 local_user.subscribe_all_video(video_subscription_options)
 

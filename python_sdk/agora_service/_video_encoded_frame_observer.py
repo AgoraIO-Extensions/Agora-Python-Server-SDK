@@ -21,10 +21,10 @@ class VideoEncodedFrameObserverInner(ctypes.Structure):
         self.video_encoded_frame_observer = video_encoded_frame_observer
         self.on_encoded_video_frame = ON_ENCODED_VIDEO_FRAME(self._on_encoded_video_frame)
     
-    def _on_encoded_video_frame(self, uid, image_buffer, length, video_encoded_frame_info):
+    def _on_encoded_video_frame(self, agora_video_encoded_frame_observer ,uid, image_buffer, length, video_encoded_frame_info):
         print("VideoEncodedFrameObserverInnerCB on_encoded_video_frame")
-        self.video_encoded_frame_observer.on_encoded_video_frame(uid, image_buffer, length, video_encoded_frame_info)
-
+        self.video_encoded_frame_observer.on_encoded_video_frame(agora_video_encoded_frame_observer, uid, image_buffer, length, video_encoded_frame_info)
+        return 1
         # if self.on_encoded_video_frame:
         #     return self.on_encoded_video_frame(uid, image_buffer, length, video_encoded_frame_info)
         # return 0

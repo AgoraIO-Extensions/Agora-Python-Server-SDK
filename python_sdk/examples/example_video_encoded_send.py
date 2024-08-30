@@ -130,91 +130,124 @@ video_frame_observer = DYSVideoFrameObserver()
 video_track.set_enabled(1)
 local_user.publish_video(video_track)
 
-# video_sender.Start()
-
-# sendinterval = 1/25
-# Pacer = Pacer(sendinterval)
-
-# width = 0
-# height = 0
-
-# def send_test():
-#     count = 0
-#     yuv_len = int(width*height*3/2)
-#     frame_buf = bytearray(yuv_len)            
-#     with open(encoded_file_path, "rb") as file:
-#         while True:            
-#             success = file.readinto(frame_buf)
-#             if not success:
-#                 break
-
-#             encoded_video_frame_info = EncodedVideoFrameInfo()
-#             encoded_video_frame_info.codec_type = 2            
-#             encoded_video_frame_info.width = width
-#             encoded_video_frame_info.height = height
-#             encoded_video_frame_info.frames_per_second = 15                        
-#             encoded_video_frame_info.frame_type = 0
-#             encoded_video_frame_info.rotation = 0
-#             encoded_video_frame_info.track_id = 0
-            
-#             ret = video_sender.send_encoded_video_image(frame_buf, len(frame_buf) ,encoded_video_frame_info)        
-#             count += 1
-#             print("count,ret=",count, ret)
-#             Pacer.pace()
 
 
-sendinterval = 1/25
-Pacer = Pacer(sendinterval)
+def test1():
 
-width = 352
-height = 288
+    # video_sender.Start()
 
-import ffmpeg
-def is_key_frame(nal_unit):
-    # 获取 NAL 单元的类型
-    nal_unit_type = nal_unit[0] & 0x1F
-    return nal_unit_type == 5  # 5 表示关键帧（I帧）
+    sendinterval = 1/25
+    pacer = Pacer(sendinterval)
 
-def read_h264_packets(h264_file):
-    process = (
-        ffmpeg
-        .input(h264_file)
-        .output('pipe:', format='h264')
-        .run(capture_stdout=True, capture_stderr=True)
-    )
-    count = 0
+    width = 100
+    height = 50
 
-    output, error = process
+    def send_test():
+        count = 0
+        yuv_len = int(width*height*3/2)
+        frame_buf = bytearray(yuv_len)            
+        with open(encoded_file_path, "rb") as file:
+            while True:            
+                success = file.readinto(frame_buf)
+                if not success:
+                    break
 
-    # 处理输出数据（每个packet）
-    packets = output.split(b'\n')  # 根据需要分割数据
-    for packet in packets:
-        if packet:  # 过滤掉空行
-            # print(packet)
-            encoded_video_frame_info = EncodedVideoFrameInfo()
-            encoded_video_frame_info.codec_type = 2            
-            encoded_video_frame_info.width = width
-            encoded_video_frame_info.height = height
-            encoded_video_frame_info.frames_per_second = 25                        
-            if is_key_frame(packet):
+                encoded_video_frame_info = EncodedVideoFrameInfo()
+                encoded_video_frame_info.codec_type = 7            
+                encoded_video_frame_info.width = width
+                encoded_video_frame_info.height = height
+                encoded_video_frame_info.frames_per_second = 15                        
                 encoded_video_frame_info.frame_type = 3
-            else:
-                encoded_video_frame_info.frame_type = 4            
-            encoded_video_frame_info.rotation = 0
-            # encoded_video_frame_info.track_id = 0
-            packet = bytearray(packet)            
-            ret = video_sender.send_encoded_video_image(packet, len(packet) ,encoded_video_frame_info)        
-            count += 1
-            print("count,ret=",count, ret)
-            Pacer.pace()
+                # encoded_video_frame_info.rotation = 0
+                # encoded_video_frame_info.track_id = 0
+                
+                ret = video_sender.send_encoded_video_image(frame_buf, len(frame_buf) ,encoded_video_frame_info)        
+                count += 1
+                print("count,ret=",count, ret)
+                pacer.pace()
+
+
+
+    for i in range(40):
+        # 示例调用
+        # read_h264_packets(encoded_file_path)
+        send_test()
+
+
+def test2():
+
+    sendinterval = 1/25
+    pacer = Pacer(sendinterval)
+
+    width = 352
+    height = 288
+
+    import ffmpeg
+    def is_key_frame(nal_unit):
+        # 获取 NAL 单元的类型
+        nal_unit_type = nal_unit[0] & 0x1F
+        return nal_unit_type == 5  # 5 表示关键帧（I帧）
+
+    def parse_slice_type(nal_unit):
+        # 查找第一个字节，确定 NAL 单元类型
+        nal_unit_type = nal_unit[0] & 0x1F
+        
+        if nal_unit_type in (1, 2):  # 非 I 帧（可能是 B 帧或 P 帧）
+            # 跳过 NAL unit header (1 byte) 和 Slice header (第一个字节)
+            slice_header = nal_unit[1] & 0xE0
+            
+            slice_type = slice_header >> 5  # 提取 Slice 类型
+            if slice_type in (0, 4):  # Slice type 为 0 或 4 表示 B 帧
+                return "B"
+            elif slice_type in (1, 6):  # Slice type 为 1 或 6 表示 P 帧
+                return "P"
+        return "Other"
+
+
+    def read_h264_packets(h264_file):
+        process = (
+            ffmpeg
+            .input(h264_file)
+            .output('pipe:', format='h264')
+            .run(capture_stdout=True, capture_stderr=True)
+        )
+        count = 0
+
+        output, error = process
+
+        # 处理输出数据（每个packet）
+        packets = output.split(b'\n')  # 根据需要分割数据
+        for packet in packets:
+            if packet:  # 过滤掉空行
+                # print(packet)
+                encoded_video_frame_info = EncodedVideoFrameInfo()
+                encoded_video_frame_info.codec_type = 7            
+                encoded_video_frame_info.width = width
+                encoded_video_frame_info.height = height
+                encoded_video_frame_info.frames_per_second = 15                        
+                encoded_video_frame_info.frame_type = 3
+                # if is_key_frame(packet):
+                #     encoded_video_frame_info.frame_type = 3
+                # else:
+                #     encoded_video_frame_info.frame_type = 4            
+                # encoded_video_frame_info.rotation = 0
+                # encoded_video_frame_info.track_id = 0
+                packet = bytearray(packet)            
+                ret = video_sender.send_encoded_video_image(packet, len(packet) ,encoded_video_frame_info)        
+                count += 1
+                print("count,ret=",count, ret)
+                pacer.pace()
 
 
 
 
-for i in range(4):
-    # 示例调用
-    read_h264_packets(encoded_file_path)
+    for i in range(40):
+        # 示例调用
+        read_h264_packets(encoded_file_path)
+        # send_test()
 
+test1()
+# test2()
 
 time.sleep(2)
 local_user.unpublish_video(video_track)
