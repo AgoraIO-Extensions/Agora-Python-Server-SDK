@@ -77,7 +77,7 @@ print("appid:", appid, "token:", token, "channel_id:", channel_id, "uid:", uid)
 config = AgoraServiceConfig()
 config.enable_audio_processor = 1
 config.enable_audio_device = 0
-# config.use_string_uid = 0
+# config.use_string_uid = 1
 # config.enable_video = 1
 config.appid = appid
 sdk_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -105,13 +105,15 @@ local_user = connection.get_local_user()
 localuser_observer = DYSLocalUserObserver()
 local_user.register_local_user_observer(localuser_observer)
 
-# connection.Connect(token, channel_id, uid)
-stream_id = connection.create_data_stream(False, False)
-print("stream_id:", stream_id)
-for i in range(10):
-    print("sendmsg:{} to:{}".format(msg, stream_id))
-    connection.send_stream_message(stream_id, msg + str(i))
-    time.sleep(2)
+# # connection.Connect(token, channel_id, uid)
+# stream_id = connection.create_data_stream(False, False)
+# print("stream_id:", stream_id)
+# for i in range(10):
+#     print("sendmsg:{} to:{}".format(msg, stream_id))
+#     connection.send_stream_message(stream_id, msg)
+#     time.sleep(2)
+
+time.sleep(200)
 
 connection.unregister_observer()
 connection.disconnect()
