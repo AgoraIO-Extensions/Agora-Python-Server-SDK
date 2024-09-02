@@ -43,9 +43,10 @@ class AgoraParameter:
     #return: (ret,strvalue, strsize)
     def get_string(self, key):
         cdata_key = ctypes.c_char_p(key.encode('utf-8'))
-        value_size = ctypes.c_uint32(128)  #default to 128
-        outbuffer = ctypes.create_string_buffer(value_size)
-        ret = agora_parameter_get_string(self.parameter_handle, key, outbuffer, ctypes.byref(value_size))
-        return ret,outbuffer.value,value_size.value
+        value_size = ctypes.c_uint32(512)  #default to 128
+        outbuffer = ctypes.create_string_buffer(value_size.value)
+        ret = agora_parameter_get_string(self.parameter_handle, cdata_key, outbuffer, ctypes.byref(value_size))
+        return ret,outbuffer.value.decode('utf-8')
+
     def release(self):
         pass
