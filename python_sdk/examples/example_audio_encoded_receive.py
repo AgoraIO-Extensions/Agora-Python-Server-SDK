@@ -103,7 +103,7 @@ print("appid:", appid, "token:", token, "channel_id:", channel_id, "aac_file_pat
 #---------------1. Init SDK
 config = AgoraServiceConfig()
 config.enable_audio_processor = 1
-config.enable_audio_device = 1
+config.enable_audio_device = 0
 # config.enable_video = 1
 config.appid = appid
 
@@ -133,7 +133,7 @@ con_config = RTCConnConfig(
     # audio_recv_media_packet = 1,
     # audio_send_media_packet = 1,
     audio_subs_options = sub_opt,
-    enable_audio_recording_or_playout = 1,
+    enable_audio_recording_or_playout = 0,
 )
 
 connection = agora_service.create_rtc_connection(con_config)
@@ -147,11 +147,11 @@ audio_sender = media_node_factory.create_audio_encoded_frame_sender()
 audio_track = agora_service.create_custom_audio_track_encoded(audio_sender, 0)
 
 local_user = connection.get_local_user()
+local_user.set_playback_audio_frame_before_mixing_parameters(1, 16000)
 localuser_observer = DYSLocalUserObserver()
 local_user.register_local_user_observer(localuser_observer)
 audio_frame_observer = DYSAudioFrameObserver()
 local_user.register_audio_frame_observer(audio_frame_observer)
-local_user.set_playback_audio_frame_before_mixing_parameters(1, 16000)
 # local_user.subscribe_audio("3")
 local_user.subscribe_all_audio()
 
