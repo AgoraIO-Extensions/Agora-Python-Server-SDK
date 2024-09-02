@@ -145,7 +145,7 @@ video_sender = connection.GetVideoSender()
 video_frame_observer = VideoFrameObserver2(
     on_frame=ON_FRAME_CALLBACK(on_frame)
 )
-video_sender.register_video_frame_observer(video_frame_observer)
+# video_sender.register_video_frame_observer(video_frame_observer)
 
 video_sender.Start()
 
