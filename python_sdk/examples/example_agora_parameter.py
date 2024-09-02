@@ -146,6 +146,30 @@ print("che.audio.aec.enable:",agora_parameter.get_string("che.audio.aec.enable")
 
 
 
+agora_parameter = connection.get_agora_parameter()
+print("rtc.enable_nasa2:",agora_parameter.get_bool("rtc.enable_nasa2")) 
+print("ret:", agora_parameter.set_parameters("{\"rtc.enable_nasa2\":1}")) 
+print("rtc.enable_nasa2:",agora_parameter.get_bool("rtc.enable_nasa2")) 
+print("ret:", agora_parameter.set_parameters("{\"rtc.enable_nasa2\":0}")) 
+print("rtc.enable_nasa2:",agora_parameter.get_bool("rtc.enable_nasa2")) 
+
+
+agora_parameter = connection.get_agora_parameter()
+print("rtc.enable_nasa2:",agora_parameter.get_bool("rtc.enable_nasa2"))
+print("ret:", agora_parameter.set_bool("rtc.enable_nasa2",0)) 
+print("rtc.enable_nasa2:",agora_parameter.get_bool("rtc.enable_nasa2")) 
+print("ret:", agora_parameter.set_bool("rtc.enable_nasa2",1)) 
+print("rtc.enable_nasa2:",agora_parameter.get_bool("rtc.enable_nasa2")) 
+
+
+agora_parameter = connection.get_agora_parameter()
+print("rtc.test111:",agora_parameter.get_bool("rtc.test111"))
+print("ret:", agora_parameter.set_bool("rtc.test111",0)) 
+print("rtc.test111:",agora_parameter.get_bool("rtc.test111")) 
+print("ret:", agora_parameter.set_bool("rtc.test111",1)) 
+print("rtc.test111:",agora_parameter.get_bool("rtc.test111")) 
+
+
 connection.unregister_observer()
 connection.disconnect()
 connection.release()
