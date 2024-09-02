@@ -134,7 +134,7 @@ class BizConnectionObserver(IRTCConnectionObserver):
         pass
 
     def on_stream_message_error(self, agora_rtc_conn, user_id_str, stream_id, code, missed, cached):
-        print(f"on_stream_message_error {user_id_str} {stream_id} {code} {missed} {cached}")
+        print(f"%%%%%%%%%%&&&&on_stream_message_error {user_id_str} {stream_id} {code} {missed} {cached}")
         pass
 
     def on_encryption_error(self, agora_rtc_conn, error_type):
@@ -279,11 +279,11 @@ class BizAudioFrameObserver(IAudioFrameObserver):
         print("CCC on_ear_monitoring_audio_frame")
         return 1
     def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, frame):
-        print("CCC on_playback_audio_frame_before_mixing")
+        print(f"CCC on_playback_audio_frame_before_mixing, channelId:{channelId}, uid:{uid}, len: {len(frame.buffer)}")
         return 1
     def on_get_audio_frame_position(self, agora_local_user):
         print("CCC on_get_audio_frame_position")
-        return 1
+        return 0
 
 
 
@@ -394,18 +394,30 @@ if len(sys.argv) > 5:
     uid = sys.argv[5]
 else:
     uid = "0"
+
+#send stream or not
+if len(sys.argv) > 7:
+    send_stream = int(sys.argv[7])
+else:
+    send_stream = 0
+if len(sys.argv) > 8:
+    role_type = int(sys.argv[8])
+else:
+    role_type = 2
+
 """
 #check vad sample file
 if len(sys.argv) > 6:
     DoVadTest(sys.argv[6])
 """
-print("appid:", appid, "token:", token, "channel_id:", channel_id, "pcm_file_path:", pcm_file_path, "uid:", uid)
+print("appid:", appid, "token:", token, "channel_id:", channel_id, "pcm_file_path:", pcm_file_path, "uid:", uid, "send_stream:", send_stream)
+
 
 
 config = AgoraServiceConfig()
 config.enable_audio_processor = 1
-config.enable_audio_device = 0
-config.enable_video = 1
+config.enable_audio_device = 1
+config.enable_video = 0
 config.appid = appid
 sdk_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 log_folder = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -414,7 +426,7 @@ config.log_path = os.path.join(sdk_dir, 'logs', filename ,log_folder, 'agorasdk.
 
 agora_service = AgoraService()
 agora_service.initialize(config)
-
+"""
 sub_opt = AudioSubscriptionOptions(
         packet_only = 0,
         pcm_data_only = 1,
@@ -429,10 +441,34 @@ con_config = RTCConnConfig(
     auto_subscribe_video=0,
     client_role_type=1,
     channel_profile=1,
+    # audio_recv_media_packet = 1,
+    # audio_send_media_packet = 1,
+    audio_subs_options = sub_opt,
+    enable_audio_recording_or_playout = 1,
+)
+
+note：  必须audiodevice=1 && record&playback=1
+这个不符合server的预期
+预期应该都是0
+"""
+sub_opt = AudioSubscriptionOptions(
+        packet_only = 0,
+        pcm_data_only = 1,
+        bytes_per_sample = 2,
+        number_of_channels = 1,
+        sample_rate_hz = 16000
+)
+
+
+con_config = RTCConnConfig(
+    auto_subscribe_audio=1,
+    auto_subscribe_video=0,
+    client_role_type=role_type, #1: broadcaster, 2: audience
+    channel_profile=1,
     audio_recv_media_packet = 0,
     audio_send_media_packet = 0,
     audio_subs_options = sub_opt,
-    enable_audio_recording_or_playout = 0,
+    enable_audio_recording_or_playout = 1,
 )
 
 
@@ -465,6 +501,10 @@ localuser.set_playback_audio_frame_before_mixing_parameters(1, 16000)
 audio_track.set_enabled(1)
 localuser.publish_audio(audio_track)
 localuser.subscribe_all_audio()
+
+#stream msg 
+stream_id = connection.create_data_stream(0, 0)
+print(f"streamid: {stream_id}")
 
 
 
@@ -530,6 +570,13 @@ with open(pcm_file_path, "rb") as file:
                 file.seek(0, 0)
             else:
                 cursendtotalpack += needcompensationpack
+
+        #send steam msg
+        if send_stream == 1:
+            time_str = f"这个是LLM返回来的数据，我们用来做测试，通常足够一次返回的tokens。send stream msg,total packs: {cursendtotalpack}, curtime:{curtime}"
+            ret = connection.send_stream_message(stream_id, time_str)
+            print(f"send stream msg ret={ret}, msg={time_str}")
+    
 
         time.sleep(sendinterval)
         #print("goruning = ", g_runing)
