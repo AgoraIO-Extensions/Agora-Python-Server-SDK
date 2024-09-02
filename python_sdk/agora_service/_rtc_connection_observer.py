@@ -169,7 +169,7 @@ class RTCConnectionObserverInner(ctypes.Structure):
         to 
         """
     def _on_connected(self, agora_rtc_conn, conn_info_inner, reason):
-        #print("ConnCB _on_connected:", agora_rtc_conn, conn_info_inner, reason)
+        print("ConnCB _on_connected:", agora_rtc_conn, conn_info_inner, reason)
        
         conn_info = conn_info_inner.contents._convert_to_rtc_conn_info()
         self.conn_observer.on_connected(self.conn, conn_info, reason)

@@ -39,7 +39,7 @@ class IRTCConnectionObserver():
     def on_connection_license_validation_failure(self, agora_rtc_conn, reason):
         pass
 
-    def on_connection_failure(self, agora_rtc_conn, reason):
+    def on_connection_failure(self, agora_rtc_conn, info, reason):
         pass
 
     def on_user_joined(self, agora_rtc_conn, user_id):

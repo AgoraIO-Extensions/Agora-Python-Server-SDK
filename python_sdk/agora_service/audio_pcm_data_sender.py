@@ -134,7 +134,10 @@ class AudioEncodedFrameSender:
         c_date = (ctypes.c_char * len(frame.data)).from_buffer(frame.data)
         size = frame.size
         ownedinfo = frame.to_owned_encoded_audio_frame()
-        return agora_audio_encoded_frame_sender_send(self.sender_handle, c_date, ctypes.c_uint32(size), ctypes.POINTER(ownedinfo))
+        ret = agora_audio_encoded_frame_sender_send(self.sender_handle, c_date, ctypes.c_uint32(size), ctypes.byref(ownedinfo))
+        if ret != 1:
+            print("Failed to send encoded audio frame")
+        return ret
     
     def release(self):
         # agora_local_audio_track_destroy(self.sender_handle)

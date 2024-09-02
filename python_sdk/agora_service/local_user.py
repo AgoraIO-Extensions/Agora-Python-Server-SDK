@@ -8,8 +8,11 @@ from .local_user_observer import IRTCLocalUserObserver
 from ._local_user_observer import RTCLocalUserObserverInner
 from ._audio_frame_observer import AudioFrameObserverInner
 from .audio_frame_observer import IAudioFrameObserver
-from ._video_frame_observer import VideoFrameObserverInner
+from ._video_frame_observer import VideoFrameObserverInner, VideoEncodedImageReceiverInner
 from .video_frame_observer import IVideoFrameObserver
+# from .video_encoded_image_receiver import IVideoEncodedImageReceiver
+from .video_encoded_frame_observer import IVideoEncodedFrameObserver
+from ._video_encoded_frame_observer import VideoEncodedFrameObserverInner
 
 agora_local_user_set_user_role = agora_lib.agora_local_user_set_user_role
 agora_local_user_set_user_role.restype = ctypes.c_int
@@ -49,7 +52,7 @@ agora_local_user_unpublish_video.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
 
 agora_local_user_subscribe_audio = agora_lib.agora_local_user_subscribe_audio
 agora_local_user_subscribe_audio.restype = AGORA_API_C_INT
-agora_local_user_subscribe_audio.argtypes = [AGORA_HANDLE, ctypes.c_uint]
+agora_local_user_subscribe_audio.argtypes = [AGORA_HANDLE, user_id_t]
 
 agora_local_user_subscribe_all_audio = agora_lib.agora_local_user_subscribe_all_audio
 agora_local_user_subscribe_all_audio.restype = AGORA_API_C_INT
@@ -115,6 +118,32 @@ agora_local_user_unregister_audio_frame_observer.argtypes = [AGORA_HANDLE]
 # agora_local_user_unregister_audio_spectrum_observer.restype = AGORA_API_C_INT
 # agora_local_user_unregister_audio_spectrum_observer.argtypes = [AGORA_HANDLE, ctypes.c_void_p]
 
+# AGORA_API_C_HDL agora_video_encoded_image_receiver_create(video_encoded_frame_observer* receiver);
+
+
+agora_video_encoded_image_receiver_create = agora_lib.agora_video_encoded_image_receiver_create
+agora_video_encoded_image_receiver_create.restype = AGORA_API_C_HDL
+agora_video_encoded_image_receiver_create.argtypes = [ctypes.POINTER(VideoEncodedImageReceiverInner)]
+
+# AGORA_API_C_VOID agora_video_encoded_image_receiver_destroy(AGORA_HANDLE agora_video_encoded_image_receiver);
+
+agora_video_encoded_image_receiver_destroy = agora_lib.agora_video_encoded_image_receiver_destroy
+agora_video_encoded_image_receiver_destroy.restype = AGORA_API_C_VOID
+agora_video_encoded_image_receiver_destroy.argtypes = [AGORA_HANDLE]
+
+
+# AGORA_API_C_HDL agora_video_encoded_frame_observer_create(video_encoded_frame_observer* observer);
+agora_video_encoded_frame_observer_create = agora_lib.agora_video_encoded_frame_observer_create
+agora_video_encoded_frame_observer_create.restype = AGORA_API_C_HDL
+agora_video_encoded_frame_observer_create.argtypes = [ctypes.POINTER(VideoEncodedFrameObserverInner)]
+
+
+# AGORA_API_C_VOID agora_video_encoded_frame_observer_destroy(AGORA_HANDLE agora_video_encoded_frame_observer);
+agora_video_encoded_frame_observer_destroy = agora_lib.agora_video_encoded_frame_observer_destroy
+agora_video_encoded_frame_observer_destroy.restype = AGORA_API_C_VOID
+agora_video_encoded_frame_observer_destroy.argtypes = [AGORA_HANDLE]
+
+
 agora_local_user_register_video_encoded_frame_observer = agora_lib.agora_local_user_register_video_encoded_frame_observer
 agora_local_user_register_video_encoded_frame_observer.restype = AGORA_API_C_INT
 agora_local_user_register_video_encoded_frame_observer.argtypes = [AGORA_HANDLE, ctypes.c_void_p]
@@ -122,6 +151,14 @@ agora_local_user_register_video_encoded_frame_observer.argtypes = [AGORA_HANDLE,
 agora_local_user_unregister_video_encoded_frame_observer = agora_lib.agora_local_user_unregister_video_encoded_frame_observer
 agora_local_user_unregister_video_encoded_frame_observer.restype = AGORA_API_C_INT
 agora_local_user_unregister_video_encoded_frame_observer.argtypes = [AGORA_HANDLE, ctypes.c_void_p]
+
+agora_video_frame_observer2_create = agora_lib.agora_video_frame_observer2_create
+agora_video_frame_observer2_create.restype = AGORA_API_C_HDL
+agora_video_frame_observer2_create.argtypes = [ctypes.POINTER(VideoFrameObserverInner)]
+
+agora_video_frame_observer2_destroy = agora_lib.agora_video_frame_observer2_destroy
+agora_video_frame_observer2_destroy.restype = AGORA_API_C_INT
+agora_video_frame_observer2_destroy.argtypes = [AGORA_API_C_HDL]
 
 agora_local_user_register_video_frame_observer = agora_lib.agora_local_user_register_video_frame_observer
 agora_local_user_register_video_frame_observer.restype = AGORA_API_C_INT
@@ -266,7 +303,7 @@ class LocalUser:
         return ret
 
     def subscribe_audio(self, user_id):
-        ret = agora_local_user_subscribe_audio(self.user_handle, user_id)
+        ret = agora_local_user_subscribe_audio(self.user_handle,ctypes.c_char_p(user_id.encode()) )
         if ret < 0:
             print("Failed to subscribe audio")
         return ret
@@ -371,14 +408,18 @@ class LocalUser:
     #         print("Failed to unregister audio spectrum observer")
     #     return ret
 
-    def register_video_encoded_frame_observer(self, agora_video_encoded_frame_observer):
+    # def register_video_encoded_frame_observer(self, agora_video_encoded_frame_observer:IVideoEncodedImageReceiver):
+    def register_video_encoded_frame_observer(self, agora_video_encoded_frame_observer:IVideoEncodedFrameObserver):        
         #TO-DO: Inner
-        self.agora_video_encoded_frame_observer = agora_video_encoded_frame_observer
-        ret = agora_local_user_register_video_encoded_frame_observer(self.user_handle, agora_video_encoded_frame_observer)
+        # self.video_encoded_frame_observer = VideoEncodedImageReceiverInner(agora_video_encoded_frame_observer)
+        self.video_encoded_frame_observer = VideoEncodedFrameObserverInner(agora_video_encoded_frame_observer)
+        # self.video_encoded_frame_observer_handler = agora_video_encoded_image_receiver_create(self.video_encoded_frame_observer)
+        self.video_encoded_frame_observer_handler = agora_video_encoded_frame_observer_create(self.video_encoded_frame_observer)
+        ret = agora_local_user_register_video_encoded_frame_observer(self.user_handle, self.video_encoded_frame_observer_handler)
         if ret < 0:
             print("Failed to register video encoded frame observer")
         return ret
-
+    
     def unregister_video_encoded_frame_observer(self, agora_video_encoded_frame_observer):
         ret = agora_local_user_unregister_video_encoded_frame_observer(self.user_handle, agora_video_encoded_frame_observer)
         if ret < 0:
@@ -386,14 +427,15 @@ class LocalUser:
         return ret
 
     def register_video_frame_observer(self, agora_video_frame_observer2:IVideoFrameObserver):
-        video_frame_observer = VideoFrameObserverInner(agora_video_frame_observer2, self)
-        self.video_frame_observer = video_frame_observer
-        ret = agora_local_user_register_video_frame_observer(self.user_handle, ctypes.byref(video_frame_observer))
+        self.video_frame_observer = VideoFrameObserverInner(agora_video_frame_observer2, self)        
+        self.video_frame_observer_handler = agora_video_frame_observer2_create(self.video_frame_observer)
+        ret = agora_local_user_register_video_frame_observer(self.user_handle, self.video_frame_observer_handler)
         if ret < 0:
             print("Failed to register video frame observer")
         return ret
 
     def unregister_video_frame_observer(self, agora_video_frame_observer2):
+        agora_video_frame_observer2_destroy(self.video_frame_observer_handler)
         ret = agora_local_user_unregister_video_frame_observer(self.user_handle, agora_video_frame_observer2)
         if ret < 0:
             print("Failed to unregister video frame observer")
@@ -411,7 +453,7 @@ class LocalUser:
             print("Failed to subscribe video")
         return ret
 
-    def subscribe_all_video(self, options):
+    def subscribe_all_video(self, options:VideoSubscriptionOptions):
         ret = agora_local_user_subscribe_all_video(self.user_handle, options)
         if ret < 0:
             print("Failed to subscribe all video")

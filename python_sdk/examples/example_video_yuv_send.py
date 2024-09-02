@@ -36,49 +36,6 @@ class DYSConnectionObserver(IRTCConnectionObserver):
     def on_user_joined(self, agora_rtc_conn, user_id):
         print("CCC on_user_joined:", agora_rtc_conn, user_id)
 
-    def on_get_playback_audio_frame_param(self, agora_local_user):
-        # audio_params_instance = AudioParams()
-        # return audio_params_instance
-        return 0
-
-    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, frame):
-        print("CCC on_playback_audio_frame_before_mixing")#, channelId, uid)
-        return 0
-
-    def on_record_audio_frame(self, agora_local_user ,channelId, frame):
-        print("CCC on_record_audio_frame")
-        return 0
-
-    def on_playback_audio_frame(self, agora_local_user, channelId, frame):
-        print("CCC on_playback_audio_frame")
-        return 0
-
-    def on_mixed_audio_frame(self, agora_local_user, channelId, frame):
-        print("CCC on_mixed_audio_frame")
-        return 0
-
-    def on_ear_monitoring_audio_frame(self, agora_local_user, frame):
-        print("CCC on_ear_monitoring_audio_frame")
-        return 0
-
-    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, frame):
-        print("CCC on_playback_audio_frame_before_mixing")
-        return 0
-
-    def on_get_audio_frame_position(self, agora_local_user):
-        print("CCC on_get_audio_frame_position")
-        return 0
-
-    def on_stream_message(self, local_user, user_id, stream_id, data, length):
-        print("CCC on_stream_message:", user_id, stream_id, data, length)
-        return 0
-
-    def on_user_info_updated(self, local_user, user_id, msg, val):
-        print("CCC on_user_info_updated:", user_id, msg, val)
-        return 0
-
-
-
 
 class DYSLocalUserObserver(IRTCLocalUserObserver):
     def __init__(self):
@@ -91,32 +48,6 @@ class DYSLocalUserObserver(IRTCLocalUserObserver):
     def on_user_info_updated(self, local_user, user_id, msg, val):
         print("CCC on_user_info_updated:", user_id, msg, val)
         return 0
-
-
-    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, frame):
-        # print("on_playback_audio_frame_before_mixing")#, channelId, uid)
-        return 0
-
-    def on_record_audio_frame(self, agora_local_user ,channelId, frame):
-        print("on_record_audio_frame")
-        return 0
-
-    def on_playback_audio_frame(self, agora_local_user, channelId, frame):
-        print("on_playback_audio_frame")
-        return 0
-
-    def on_mixed_audio_frame(self, agora_local_user, channelId, frame):
-        print("on_mixed_audio_frame")
-        return 0
-
-    def on_ear_monitoring_audio_frame(self, agora_local_user, frame):
-        print("on_ear_monitoring_audio_frame")
-        return 0
-
-    def on_get_audio_frame_position(self, agora_local_user):
-        print("on_get_audio_frame_position")
-        return 0
-
 
 class DYSVideoFrameObserver(IVideoFrameObserver):
     def __init__(self):
@@ -161,10 +92,12 @@ print("appid:", appid, "token:", token, "channel_id:", channel_id, "yuv_file_pat
 config = AgoraServiceConfig()
 config.enable_audio_processor = 1
 config.enable_audio_device = 0
+config.enable_video = 1
 config.appid = appid
 sdk_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 log_folder = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-config.log_path = os.path.join(sdk_dir, 'logs/example_send_yuv', log_folder, 'agorasdk.log')
+filename, _ = os.path.splitext(os.path.basename(__file__))
+config.log_path = os.path.join(sdk_dir, 'logs', filename ,log_folder, 'agorasdk.log')
 
 agora_service = AgoraService()
 agora_service.initialize(config)
@@ -222,7 +155,7 @@ def send_test():
             print("count,ret=",count, ret)
             Pacer.pace()
 
-for i in range(1):
+for i in range(10):
     send_test()
 
 time.sleep(2)

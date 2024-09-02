@@ -382,7 +382,8 @@ class RTCLocalUserObserverInner(ctypes.Structure):
     def _on_user_video_track_subscribed(self, local_user_handle, user_id, video_track_info, remote_video_track_handle):
         print("LocalUserCB _on_user_video_track_subscribed:", local_user_handle, user_id, remote_video_track_handle, video_track_info)
         user_id_str = user_id.decode('utf-8')
-        track_info = video_track_info.contents._to_track_info()
+        # track_info = video_track_info.contents._to_track_info()
+        track_info = video_track_info.contents
         self.local_user_observer.on_user_video_track_subscribed(self.local_user, user_id_str, track_info, remote_video_track_handle)
 
     def _on_user_video_track_state_changed(self, local_user_handle, user_id, remote_video_track_handle, state, reason, elapsed):
