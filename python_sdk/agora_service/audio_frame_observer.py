@@ -9,18 +9,9 @@
 #   audio_params (*on_get_record_audio_frame_param)(AGORA_HANDLE agora_local_user);
 #   audio_params (*on_get_mixed_audio_frame_param)(AGORA_HANDLE agora_local_user);
 #   audio_params (*on_get_ear_monitoring_audio_frame_param)(AGORA_HANDLE agora_local_user);
-import ctypes
-
-class AudioParams(ctypes.Structure):
-    _fields_ = [
-        ("sample_rate", ctypes.c_int),
-        ("channels", ctypes.c_int),
-        ("mode", ctypes.c_int),
-        ("samples_per_call", ctypes.c_int)
-    ]
+from .agora_base import AudioFrame, AudioParams
 
 class IAudioFrameObserver:
-
     #channelid: str
     #frame:AudioFrame
     def on_record_audio_frame(self, agora_local_user, channelId, frame):
@@ -39,9 +30,8 @@ class IAudioFrameObserver:
         return 1
         pass
 
-    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, frame):
+    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, frame:AudioFrame):
         return 1
-        pass
 
     def on_get_audio_frame_position(self, agora_local_user):
         return 1

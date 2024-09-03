@@ -12,10 +12,16 @@ sdk_dir = os.path.dirname(script_dir)
 if sdk_dir not in sys.path:
     sys.path.insert(0, sdk_dir)
 
+source_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# log_folder = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+filename, _ = os.path.splitext(os.path.basename(__file__))
+log_folder = os.path.join(source_dir, 'logs', filename ,datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+log_path = os.path.join(log_folder, 'agorasdk.log')
+
 from agora_service.agora_service import AgoraServiceConfig, AgoraService, AudioSubscriptionOptions, RTCConnConfig
 from agora_service.rtc_connection_observer import IRTCConnectionObserver
 from agora_service.audio_pcm_data_sender import EncodedAudioFrame
-from agora_service.audio_frame_observer import IAudioFrameObserver
+from agora_service.audio_frame_observer import IAudioFrameObserver, AudioFrame
 from agora_service.local_user_observer import IRTCLocalUserObserver
 
 class DYSConnectionObserver(IRTCConnectionObserver):
@@ -66,8 +72,13 @@ class DYSAudioFrameObserver(IAudioFrameObserver):
     def on_ear_monitoring_audio_frame(self, agora_local_user, frame):
         print("CCC on_ear_monitoring_audio_frame")
         return 0
-    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, frame):
-        print("CCC on_playback_audio_frame_before_mixing")
+    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, audio_frame:AudioFrame):
+        print("CCC on_playback_audio_frame_before_mixing", audio_frame.type, audio_frame.samples_per_sec, audio_frame.samples_per_channel, audio_frame.bytes_per_sample, audio_frame.channels)
+
+        
+        file_path = os.path.join(log_folder, 'pcm_file')
+        with open(file_path, "ab") as f:
+            f.write(audio_frame.buffer)
         return 1
     
     # def on_get_audio_frame_position(self, agora_local_user):
@@ -106,11 +117,7 @@ config.enable_audio_processor = 1
 config.enable_audio_device = 0
 # config.enable_video = 1
 config.appid = appid
-
-sdk_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-log_folder = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-filename, _ = os.path.splitext(os.path.basename(__file__))
-config.log_path = os.path.join(sdk_dir, 'logs', filename ,log_folder, 'agorasdk.log')
+config.log_path =log_path
 
 agora_service = AgoraService()
 agora_service.initialize(config)
