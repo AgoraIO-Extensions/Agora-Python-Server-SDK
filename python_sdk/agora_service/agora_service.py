@@ -32,6 +32,15 @@ class AgoraServiceConfig(ctypes.Structure):
         self.log_path = ""
         self.log_size = 0    
         self.appid = ""
+        self.enable_audio_processor = 0
+        self.enable_audio_device = 0
+        self.enable_video = 0
+        self.context = None
+        self.area_code = 0
+        self.channel_profile = 0
+        self.audio_scenario = 0
+        self.use_string_uid = 0
+
 
 agora_service_create = agora_lib.agora_service_create
 agora_service_create.restype = AGORA_HANDLE

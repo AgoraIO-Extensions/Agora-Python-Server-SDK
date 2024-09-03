@@ -8,7 +8,6 @@ if sdk_dir not in sys.path:
     sys.path.insert(0, sdk_dir)
 
 import time
-import ctypes
 import datetime
 from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora_service.rtc_connection import IRTCConnectionObserver
@@ -75,9 +74,9 @@ print("appid:", appid, "token:", token, "channel_id:", channel_id, "uid:", uid)
 
 #---------------1. Init SDK
 config = AgoraServiceConfig()
-config.enable_audio_processor = 1
+config.enable_audio_processor = 0
 config.enable_audio_device = 0
-# config.use_string_uid = 1
+config.use_string_uid = 0
 # config.enable_video = 1
 config.appid = appid
 sdk_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -90,7 +89,7 @@ agora_service.initialize(config)
 
 #---------------2. Create Connection
 con_config = RTCConnConfig(
-    auto_subscribe_audio=1,
+    auto_subscribe_audio=0,
     auto_subscribe_video=0,
     client_role_type=1,
     channel_profile=1,
@@ -104,14 +103,6 @@ connection.connect(token, channel_id, uid)
 local_user = connection.get_local_user()
 localuser_observer = DYSLocalUserObserver()
 local_user.register_local_user_observer(localuser_observer)
-
-# # connection.Connect(token, channel_id, uid)
-# stream_id = connection.create_data_stream(False, False)
-# print("stream_id:", stream_id)
-# for i in range(10):
-#     print("sendmsg:{} to:{}".format(msg, stream_id))
-#     connection.send_stream_message(stream_id, msg)
-#     time.sleep(2)
 
 time.sleep(200)
 

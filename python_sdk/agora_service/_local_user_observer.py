@@ -446,7 +446,7 @@ class RTCLocalUserObserverInner(ctypes.Structure):
         self.local_user_observer.on_user_info_updated(self.local_user, user_id_str, msg, val)
 
     def _on_intra_request_received(self, local_user_handle):
-        print("LocalUserCB _on_intra_request_received:", local_user_handle)
+        # print("LocalUserCB _on_intra_request_received:", local_user_handle)
         self.local_user_observer.on_intra_request_received(self.local_user)
 
     def _on_remote_subscribe_fallback_to_audio_only(self, local_user_handle, user_id, is_fallback):
@@ -456,13 +456,10 @@ class RTCLocalUserObserverInner(ctypes.Structure):
 
     def _on_stream_message(self, local_user_handle, user_id, stream_id, data, size):
         print("LocalUserCB _on_stream_message:", local_user_handle, user_id, stream_id, data, size)
-        user_id_str = user_id.decode('utf-8')\
-        #for data is binary, we can not decode to utf 8  str
+        user_id_str = user_id.decode('utf-8')
         bytes_from_c = ctypes.string_at(data, size)  
-        data_byte_array = bytearray(bytes_from_c)  
-    
-        
-        self.local_user_observer.on_stream_message(self.local_user, user_id_str, stream_id, data_byte_array, size)
+        data_byte_array = bytearray(bytes_from_c)        
+        self.local_user_observer.on_stream_message(self.local_user, user_id_str, stream_id, data_byte_array.decode(), size)
 
     def _on_user_state_changed(self, local_user_handle, user_id, state):
         print("LocalUserCB _on_user_state_changed:", local_user_handle, user_id, state)

@@ -75,9 +75,9 @@ print("appid:", appid, "token:", token, "channel_id:", channel_id, "uid:", uid)
 
 #---------------1. Init SDK
 config = AgoraServiceConfig()
-config.enable_audio_processor = 1
+config.enable_audio_processor = 0
 config.enable_audio_device = 0
-# config.use_string_uid = 0
+config.use_string_uid = 0
 # config.enable_video = 1
 config.appid = appid
 sdk_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -90,7 +90,7 @@ agora_service.initialize(config)
 
 #---------------2. Create Connection
 con_config = RTCConnConfig(
-    auto_subscribe_audio=1,
+    auto_subscribe_audio=0,
     auto_subscribe_video=0,
     client_role_type=1,
     channel_profile=1,
@@ -107,10 +107,12 @@ local_user.register_local_user_observer(localuser_observer)
 
 # connection.Connect(token, channel_id, uid)
 stream_id = connection.create_data_stream(False, False)
+stream_id2 = connection.create_data_stream(False, False)
 print("stream_id:", stream_id)
 for i in range(10):
     print("sendmsg:{} to:{}".format(msg, stream_id))
-    connection.send_stream_message(stream_id, msg + str(i))
+    ret = connection.send_stream_message(stream_id, msg + " channel:" +  str(stream_id) + " idx:" +  str(i))
+    ret = connection.send_stream_message(stream_id2, msg + " channel:" + str(stream_id2) + " idx:" +  str(i))
     time.sleep(2)
 
 connection.unregister_observer()
