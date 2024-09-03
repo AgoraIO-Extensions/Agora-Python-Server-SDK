@@ -89,8 +89,6 @@ agora_service.initialize(config)
 
 #---------------2. Create Connection
 con_config = RTCConnConfig(
-    auto_subscribe_audio=0,
-    auto_subscribe_video=0,
     client_role_type=1,
     channel_profile=1,
 )

@@ -53,9 +53,34 @@ class RTCConnConfig(ctypes.Structure):
         ('channel_profile', ctypes.c_int),
         ('audio_recv_media_packet', ctypes.c_int),
         ('video_recv_media_packet', ctypes.c_int),
-
-        # ('pcm_observer', ctypes.POINTER(AudioFrameObserver)),
     ]    
+
+    def __init__(self, 
+                auto_subscribe_audio = 0, 
+                auto_subscribe_video = 0, 
+                enable_audio_recording_or_playout = 0, 
+                max_send_bitrate = 0,
+                min_port = 0,
+                max_port = 0,
+                audio_subs_options = AudioSubscriptionOptions(),
+                client_role_type = 0,
+                channel_profile = 0,
+                audio_recv_media_packet = 0,
+                video_recv_media_packet = 0,
+                 ) -> None:
+        self.auto_subscribe_audio = auto_subscribe_audio
+        self.auto_subscribe_video = auto_subscribe_video
+        self.enable_audio_recording_or_playout = enable_audio_recording_or_playout
+        self.max_send_bitrate = max_send_bitrate
+        self.min_port = min_port
+        self.max_port = max_port
+        self.audio_subs_options = audio_subs_options
+        self.client_role_type = client_role_type
+        self.channel_profile = channel_profile
+        self.audio_recv_media_packet = audio_recv_media_packet
+        self.video_recv_media_packet = video_recv_media_packet
+  
+
 
 agora_rtc_conn_get_local_user = agora_lib.agora_rtc_conn_get_local_user
 agora_rtc_conn_get_local_user.restype = AGORA_HANDLE

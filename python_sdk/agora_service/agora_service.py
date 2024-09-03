@@ -37,6 +37,7 @@ class AgoraServiceConfig(ctypes.Structure):
         self.enable_video = 0
         self.context = None
         self.area_code = 0
+        # self.channel_profile = ChannelProfileType.CHANNEL_PROFILE_COMMUNICATION
         self.channel_profile = 0
         self.audio_scenario = 0
         self.use_string_uid = 0
