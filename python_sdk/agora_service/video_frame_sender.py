@@ -100,8 +100,8 @@ class OwnedExternalVideoFrame(ctypes.Structure):
 class ExternalVideoFrame:
     def __init__(self)->None:
         self.type = 1
-        self.buffer = None
         self.format = 0
+        self.buffer = None
         self.stride = 0
         self.height = 0
         self.crop_left = 0
@@ -110,15 +110,28 @@ class ExternalVideoFrame:
         self.crop_bottom = 0
         self.rotation = 0
         self.timestamp = 0
+        self.egl_context = None
+        self.egl_type = 0
+        self.texture_id = 0
+        self.matrix = []
+        self.metadata_buffer = bytearray()
+        self.metadata_size = 0
+        self.alpha_buffer = None
 
     def to_owned_external_video_frame(self):
-        cdata = (ctypes.c_uint8 * len(self.buffer)).from_buffer(self.buffer)
+        c_buffer = (ctypes.c_uint8 * len(self.buffer)).from_buffer(self.buffer)
         # 将 ctypes 数组转换为 c_void_p
-        cdata_ptr = ctypes.cast(cdata, ctypes.c_void_p)
+        c_buffer_ptr = ctypes.cast(c_buffer, ctypes.c_void_p)
+
+        c_metadata_buffer = (ctypes.c_uint8 * len(self.metadata_buffer)).from_buffer(self.metadata_buffer)
+        c_metadata_buffer_ptr = ctypes.cast(c_metadata_buffer, ctypes.POINTER(ctypes.c_uint8))
+
+        c_matrix_buffer = (ctypes.c_float * 16)(*self.matrix)
+
         return OwnedExternalVideoFrame(
             self.type,
             self.format,
-            cdata_ptr,
+            c_buffer_ptr,
             self.stride,
             self.height,
             self.crop_left,
@@ -126,7 +139,14 @@ class ExternalVideoFrame:
             self.crop_right,
             self.crop_bottom,
             self.rotation,
-            self.timestamp
+            self.timestamp,
+            self.egl_context,
+            self.egl_type,
+            self.texture_id,
+            c_matrix_buffer,
+            c_metadata_buffer_ptr,
+            self.metadata_size,
+            self.alpha_buffer
         )
 
 agora_video_encoded_image_sender_send = agora_lib.agora_video_encoded_image_sender_send
