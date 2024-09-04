@@ -399,12 +399,11 @@ class AudioParams(ctypes.Structure):
     ]
 
 
-
-
 class ChannelProfileType(Enum):
     CHANNEL_PROFILE_COMMUNICATION = 0
     CHANNEL_PROFILE_LIVE_BROADCASTING = 1
-    # These are deprecated but included for completeness
     CHANNEL_PROFILE_GAME = 2
     CHANNEL_PROFILE_CLOUD_GAMING = 3
     CHANNEL_PROFILE_COMMUNICATION_1v1 = 4
+
+

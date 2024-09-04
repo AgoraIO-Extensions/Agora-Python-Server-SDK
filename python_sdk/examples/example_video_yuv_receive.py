@@ -54,8 +54,8 @@ class DYSVideoFrameObserver(IVideoFrameObserver):
     def __init__(self):
         super(DYSVideoFrameObserver, self).__init__()
 
-    def on_frame(self, video_frame_observer, channel_id, remote_uid, frame):
-        print("DYSVideoFrameObserver on_frame:", video_frame_observer, channel_id, remote_uid, frame)
+    def on_frame(self, video_frame_observer, channel_id, remote_uid, frame:VideoFrame):
+        print("DYSVideoFrameObserver on_frame:", video_frame_observer, channel_id, remote_uid, frame.type, frame.width, frame.height, frame.rotation, frame.render_time_ms, frame.shared_context)
         return 0
 
 class Pacer:

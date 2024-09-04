@@ -3,9 +3,7 @@ from .agora_base import *
 from .local_user import *
 from .video_frame_observer import *
 
-AGORA_HANDLE = ctypes.c_void_p
-
-class VideoFrame(ctypes.Structure):
+class VideoFrameInner(ctypes.Structure):
     _fields_ = [
         ("type", ctypes.c_int),
         ("width", ctypes.c_int),
@@ -25,9 +23,31 @@ class VideoFrame(ctypes.Structure):
         ("texture_id", ctypes.c_int),
         ("matrix", ctypes.c_float * 16),
         ("alpha_buffer", ctypes.POINTER(ctypes.c_uint8))
-    ]
+    ]    
 
-ON_FRAME_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_char_p, user_id_t, ctypes.POINTER(VideoFrame))
+    def to_video_frame(self):
+        video_frame = VideoFrame()
+        video_frame.type = self.type
+        video_frame.width = self.width
+        video_frame.height = self.height
+        video_frame.y_stride = self.y_stride
+        video_frame.u_stride = self.u_stride
+        video_frame.v_stride = self.v_stride
+        video_frame.y_buffer = ctypes.string_at(self.y_buffer, self.y_stride)
+        video_frame.u_buffer = ctypes.string_at(self.u_buffer, self.u_stride)
+        video_frame.v_buffer = ctypes.string_at(self.v_buffer, self.v_stride)
+        video_frame.rotation = self.rotation
+        video_frame.render_time_ms = self.render_time_ms
+        video_frame.avsync_type = self.avsync_type
+        video_frame.metadata_buffer = ctypes.string_at(self.metadata_buffer, self.metadata_size) 
+        video_frame.metadata_size = self.metadata_size
+        video_frame.shared_context = self.shared_context.decode() if self.shared_context else None
+        video_frame.texture_id = self.texture_id
+        video_frame.matrix = self.matrix
+        video_frame.alpha_buffer = self.alpha_buffer
+        return video_frame
+
+ON_FRAME_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_char_p, user_id_t, ctypes.POINTER(VideoFrameInner))
 
 class VideoFrameObserverInner(ctypes.Structure):
     _fields_ = [
@@ -40,11 +60,10 @@ class VideoFrameObserverInner(ctypes.Structure):
         self.on_frame = ON_FRAME_CALLBACK(self._on_frame)
 
 
-    def _on_frame(self, agora_handle, channel_id, user_id, video_frame):
+    def _on_frame(self, agora_handle, channel_id, user_id, video_frame:VideoFrameInner):
         print("VideoFrameObserver _on_frame:", agora_handle, channel_id, user_id, video_frame)
-        self.video_frame_observer.on_frame(agora_handle, channel_id, user_id, video_frame)
+        self.video_frame_observer.on_frame(agora_handle, channel_id.decode() if channel_id else None, user_id.decode(), video_frame.contents.to_video_frame())
     
-
 
 
 class encoded_video_frame_info(ctypes.Structure):
