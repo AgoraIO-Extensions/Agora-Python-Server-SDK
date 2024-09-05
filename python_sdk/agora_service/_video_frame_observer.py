@@ -45,6 +45,7 @@ class VideoFrameInner(ctypes.Structure):
         video_frame.texture_id = self.texture_id
         video_frame.matrix = self.matrix
         video_frame.alpha_buffer = self.alpha_buffer
+        video_frame.metadata = video_frame.metadata_buffer.decode()
         return video_frame
 
 ON_FRAME_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_char_p, user_id_t, ctypes.POINTER(VideoFrameInner))
@@ -61,8 +62,9 @@ class VideoFrameObserverInner(ctypes.Structure):
 
 
     def _on_frame(self, agora_handle, channel_id, user_id, video_frame:VideoFrameInner):
-        print("VideoFrameObserver _on_frame:", agora_handle, channel_id, user_id, video_frame)
-        self.video_frame_observer.on_frame(agora_handle, channel_id.decode() if channel_id else None, user_id.decode(), video_frame.contents.to_video_frame())
+        vf = video_frame.contents
+        print("VideoFrameObserver _on_frame:", agora_handle, channel_id, user_id, vf.metadata_buffer, vf.metadata_size)
+        self.video_frame_observer.on_frame(agora_handle, channel_id.decode() if channel_id else None, user_id.decode(), vf.to_video_frame())
     
 
 

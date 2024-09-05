@@ -150,6 +150,7 @@ def send_test():
             frame.stride = width
             frame.height = height
             frame.timestamp = 0
+            frame.metadata = "hello metadata"
             ret = video_sender.send_video_frame(frame)        
             count += 1
             print("count,ret=",count, ret)

@@ -33,6 +33,7 @@ class VideoFrame():
         self.avsync_type = avsync_type
         self.metadata_buffer = metadata_buffer
         self.metadata_size = metadata_size
+        self.metadata = ""
         self.shared_context = shared_context
         self.texture_id = texture_id
         self.matrix = matrix
