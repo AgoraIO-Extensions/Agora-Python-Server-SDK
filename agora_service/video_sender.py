@@ -101,6 +101,7 @@ class ExternalVideoFrame(ctypes.Structure):
 
     def __init__(self) -> None:
         self.data = None
+        self.metadata = ""
 
 
 
@@ -143,9 +144,13 @@ agora_video_frame_sender_send = agora_lib.agora_video_frame_sender_send
 agora_video_frame_sender_send.restype = AGORA_API_C_INT
 agora_video_frame_sender_send.argtypes = [AGORA_HANDLE, ctypes.POINTER(ExternalVideoFrame)]
 
+agora_video_frame_observer2_create = agora_lib.agora_video_frame_observer2_create
+agora_video_frame_observer2_create.restype = AGORA_API_C_HDL
+agora_video_frame_observer2_create.argtypes = [ctypes.POINTER(VideoFrameObserver2)]
+
 agora_local_user_register_video_frame_observer = agora_lib.agora_local_user_register_video_frame_observer
-# agora_local_user_register_video_frame_observer.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
-agora_local_user_register_video_frame_observer.argtypes = [AGORA_HANDLE, ctypes.POINTER(VideoFrameObserver2)]
+agora_local_user_register_video_frame_observer.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
+# agora_local_user_register_video_frame_observer.argtypes = [AGORA_HANDLE, ctypes.POINTER(VideoFrameObserver2)]
 agora_local_user_register_video_frame_observer.restype = ctypes.c_int
 
 class VideoSender:
@@ -167,9 +172,9 @@ class VideoSender:
         return ret
     
     def register_video_frame_observer(self, agora_video_frame_observer2):
-        # observer_ptr = ctypes.c_void_p(ctypes.addressof(agora_video_frame_observer2))
-        observer_ptr = ctypes.byref(agora_video_frame_observer2)
-        result = agora_local_user_register_video_frame_observer(self.local_user, observer_ptr)
+        self.agora_video_frame_observer2 = agora_video_frame_observer2
+        self.video_frame_observer_handler = agora_video_frame_observer2_create(agora_video_frame_observer2)
+        result = agora_local_user_register_video_frame_observer(self.local_user, self.video_frame_observer_handler)
         if result!= 0:
             raise Exception("Failed to register video frame observer")
 
@@ -177,6 +182,12 @@ class VideoSender:
         c_array = (ctypes.c_ubyte * len(external_video_frame.data)).from_buffer(external_video_frame.data)
         cdata = ctypes.cast(c_array, ctypes.c_void_p)
         external_video_frame.buffer = cdata
+
+        cdata = bytearray(external_video_frame.metadata.encode('utf-8'))
+        c_metadata = (ctypes.c_uint8 * len(cdata)).from_buffer(cdata)
+        external_video_frame.metadata_buffer = c_metadata
+        external_video_frame.metadata_size = len(cdata)
+        print("external_video_frame:",cdata,external_video_frame.metadata_size)
         ret = agora_video_frame_sender_send(self.video_frame_sender, external_video_frame)
         return ret
 

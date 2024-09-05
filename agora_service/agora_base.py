@@ -19,7 +19,7 @@ elif sys.platform == 'linux':
 
 AGORA_HANDLE = ctypes.c_void_p
 AGORA_API_C_INT = ctypes.c_int
-AGORA_API_C_HDLL = ctypes.c_void_p
+AGORA_API_C_HDL = ctypes.c_void_p
 
 class LastmileProbeOneWayResult(ctypes.Structure):
     _fields_ = [

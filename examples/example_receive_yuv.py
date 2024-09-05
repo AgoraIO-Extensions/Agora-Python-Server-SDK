@@ -65,7 +65,9 @@ def on_user_info_updated(local_user, user_id, msg, val):
     return 0
 
 def on_frame(agora_video_frame_observer2, channel_id, remote_uid, frame):
-    print("on_frame")
+    vf = frame.contents
+    metadata_buffer = ctypes.string_at(vf.metadata_buffer, vf.metadata_size) 
+    print("on_frame", ctypes.string_at(frame.contents.metadata_buffer, frame.contents.metadata_size),vf.width , vf.metadata_size ,metadata_buffer.decode(),channel_id.decode(), remote_uid)
     return 0
 
 class Pacer:
@@ -110,8 +112,8 @@ agora_service = AgoraService()
 agora_service.Init(config)
 
 con_config = RTCConnConfig(
-    auto_subscribe_audio=1,
-    auto_subscribe_video=0,
+    auto_subscribe_audio=0,
+    auto_subscribe_video=1,
     client_role_type=1,
     channel_profile=1,
 )
@@ -146,43 +148,10 @@ video_sender = connection.GetVideoSender()
 video_frame_observer = VideoFrameObserver2(
     on_frame=ON_FRAME_CALLBACK(on_frame)
 )
-# video_sender.register_video_frame_observer(video_frame_observer)
+video_sender.register_video_frame_observer(video_frame_observer)
 
-video_sender.Start()
 
-sendinterval = 1/30
-Pacer = Pacer(sendinterval)
-
-width = 416
-height = 240
-
-def send_test():
-    count = 0
-    yuv_len = int(width*height*3/2)
-    frame_buf = bytearray(yuv_len)            
-    with open(yuv_file_path, "rb") as file:
-        while True:            
-            success = file.readinto(frame_buf)
-            if not success:
-                break
-            frame = ExternalVideoFrame()
-            frame.data = frame_buf
-            frame.type = 1
-            frame.format = 1
-            frame.stride = width
-            frame.height = height
-            frame.timestamp = 0
-            frame.metadata = "hello meta"
-            ret = video_sender.SendVideoFrame(frame)        
-            count += 1
-            print("count,ret=",count, ret)
-            Pacer.pace()
-
-for i in range(30):
-    send_test()
-
-time.sleep(2)
-video_sender.Stop()
+time.sleep(200)
 connection.Disconnect()
 connection.Release()
 print("release")
