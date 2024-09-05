@@ -15,7 +15,7 @@ class SampleOptions:
         self.width = None
         self.height = None
         self.bitrate = None
-        self.msg = "hello agora"
+        self.msg = "hello agora python sdk"
 
 
 def parse_args():

@@ -3,7 +3,6 @@ import os
 import sys
 import common.path_utils 
 
-
 import time
 import datetime
 from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
@@ -44,23 +43,6 @@ class DYSLocalUserObserver(IRTCLocalUserObserver):
     def on_user_info_updated(self, local_user, user_id, msg, val):
         print("CCC on_user_info_updated:", user_id, msg, val)
         return 0
-
-#pacer class
-class Pacer:
-    def __init__(self,interval):
-        self.last_call_time = time.time()
-        self.interval = interval
-
-    def pace(self):
-        current_time = time.time()
-        elapsed_time = current_time - self.last_call_time
-        if elapsed_time < self.interval:
-            time.sleep(self.interval - elapsed_time)
-            print("sleep time:", (self.interval - elapsed_time)*1000)
-        self.last_call_time = time.time()
-
-example_dir = os.path.dirname(os.path.abspath(__file__))
-pcm_file_path = os.path.join(example_dir, 'demo.pcm')
 
 #---------------1. Init SDK
 config = AgoraServiceConfig()

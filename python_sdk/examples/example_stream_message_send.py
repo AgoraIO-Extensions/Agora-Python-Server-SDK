@@ -3,7 +3,6 @@ import os
 import sys
 import common.path_utils 
 
-
 import time
 import ctypes
 import datetime
@@ -46,24 +45,6 @@ class DYSLocalUserObserver(IRTCLocalUserObserver):
         print("CCC on_user_info_updated:", user_id, msg, val)
         return 0
 
-#pacer class
-class Pacer:
-    def __init__(self,interval):
-        self.last_call_time = time.time()
-        self.interval = interval
-
-    def pace(self):
-        current_time = time.time()
-        elapsed_time = current_time - self.last_call_time
-        if elapsed_time < self.interval:
-            time.sleep(self.interval - elapsed_time)
-            print("sleep time:", (self.interval - elapsed_time)*1000)
-        self.last_call_time = time.time()
-
-example_dir = os.path.dirname(os.path.abspath(__file__))
-pcm_file_path = os.path.join(example_dir, 'demo.pcm')
-
-
 #---------------1. Init SDK
 config = AgoraServiceConfig()
 config.enable_audio_processor = 0
@@ -100,7 +81,7 @@ local_user.register_local_user_observer(localuser_observer)
 stream_id = connection.create_data_stream(False, False)
 stream_id2 = connection.create_data_stream(False, False)
 print("stream_id:", stream_id)
-for i in range(10):
+for i in range(100):
     print("sendmsg:{} to:{}".format(sample_options.msg, stream_id))
     ret = connection.send_stream_message(stream_id, sample_options.msg + " channel:" +  str(stream_id) + " idx:" +  str(i))
     ret = connection.send_stream_message(stream_id2, sample_options.msg + " channel:" + str(stream_id2) + " idx:" +  str(i))

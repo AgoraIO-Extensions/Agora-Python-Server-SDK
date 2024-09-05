@@ -4,7 +4,6 @@ import time
 import datetime
 import common.path_utils 
 
-
 from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora_service.rtc_connection import *
 from agora_service.media_node_factory import *
@@ -59,22 +58,6 @@ class DYSVideoFrameObserver(IVideoFrameObserver):
         # print("DYSVideoFrameObserver on_frame:", video_frame_observer, channel_id, remote_uid, frame.type, frame.width, frame.height, frame.rotation, frame.render_time_ms, frame.metadata)
         print("DYSVideoFrameObserver on_frame:", channel_id, remote_uid, frame.type, frame.width, frame.height, frame.metadata)
         return 0
-
-class Pacer:
-    def __init__(self,interval):
-        self.last_call_time = time.time()
-        self.interval = interval
-
-    def pace(self):
-        current_time = time.time()
-        elapsed_time = current_time - self.last_call_time
-        if elapsed_time < self.interval:
-            time.sleep(self.interval - elapsed_time)
-            # print("sleep time:", (self.interval - elapsed_time)*1000)
-        self.last_call_time = time.time()
-
-
-example_dir = os.path.dirname(os.path.abspath(__file__))
 
 config = AgoraServiceConfig()
 config.enable_audio_processor = 0

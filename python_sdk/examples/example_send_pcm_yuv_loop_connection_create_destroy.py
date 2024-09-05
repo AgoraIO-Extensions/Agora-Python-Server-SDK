@@ -6,6 +6,7 @@ import sys
 import datetime
 import threading
 import common.path_utils 
+from common.pacer import Pacer
 
 from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora_service.rtc_connection_observer import IRTCConnectionObserver
@@ -71,21 +72,6 @@ class DYSAudioFrameObserver(IAudioFrameObserver):
     def on_get_audio_frame_position(self, agora_local_user):
         print("CCC on_get_audio_frame_position")
         return 0
-
-
-#pacer class
-class Pacer:
-    def __init__(self,interval):
-        self.last_call_time = time.time()
-        self.interval = interval
-
-    def pace(self):
-        current_time = time.time()
-        elapsed_time = current_time - self.last_call_time
-        if elapsed_time < self.interval:
-            time.sleep(self.interval - elapsed_time)
-            print("sleep time:", (self.interval - elapsed_time)*1000)
-        self.last_call_time = time.time()
 
 
 count = 0
