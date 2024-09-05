@@ -2,13 +2,7 @@
 
 import time
 import datetime
-import os
-import sys
-
-script_dir = os.path.dirname(os.path.abspath(__file__))
-sdk_dir = os.path.dirname(script_dir)
-if sdk_dir not in sys.path:
-    sys.path.insert(0, sdk_dir)
+import common.path_utils 
 
 from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig, SenderOptions
 from agora_service.rtc_connection import *
@@ -246,8 +240,8 @@ def test2():
         read_h264_packets(encoded_file_path)
         # send_test()
 
-test1()
-# test2()
+# test1()
+test2()
 
 time.sleep(2)
 local_user.unpublish_video(video_track)

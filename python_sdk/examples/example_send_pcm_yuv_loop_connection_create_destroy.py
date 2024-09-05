@@ -7,11 +7,8 @@ import os
 import sys
 import datetime
 import threading
+import common.path_utils 
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
-sdk_dir = os.path.dirname(script_dir)
-if sdk_dir not in sys.path:
-    sys.path.insert(0, sdk_dir)
 
 from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora_service.rtc_connection_observer import IRTCConnectionObserver

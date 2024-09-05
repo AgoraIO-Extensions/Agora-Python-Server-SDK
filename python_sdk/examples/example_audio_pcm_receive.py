@@ -6,11 +6,8 @@ import time
 import os
 import sys
 import datetime
+import common.path_utils 
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
-sdk_dir = os.path.dirname(script_dir)
-if sdk_dir not in sys.path:
-    sys.path.insert(0, sdk_dir)
 
 source_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # log_folder = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")

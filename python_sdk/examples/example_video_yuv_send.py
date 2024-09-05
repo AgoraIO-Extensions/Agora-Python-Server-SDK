@@ -2,13 +2,7 @@
 
 import time
 import datetime
-import os
-import sys
-
-script_dir = os.path.dirname(os.path.abspath(__file__))
-sdk_dir = os.path.dirname(script_dir)
-if sdk_dir not in sys.path:
-    sys.path.insert(0, sdk_dir)
+import common.path_utils 
 
 from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora_service.rtc_connection import *
