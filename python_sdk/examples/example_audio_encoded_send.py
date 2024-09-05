@@ -15,6 +15,12 @@ from agora_service.audio_pcm_data_sender import EncodedAudioFrame
 from agora_service.audio_frame_observer import IAudioFrameObserver
 from agora_service.local_user_observer import IRTCLocalUserObserver
 
+from common.parse_args import parse_args_example, parse_args
+# 通过传参将参数传进来
+#python python_sdk/examples/example_audio_encoded_send.py --token=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.aac
+sample_options = parse_args_example()
+print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
+
 class DYSConnectionObserver(IRTCConnectionObserver):
     def __init__(self):
         super(DYSConnectionObserver, self).__init__()
@@ -80,25 +86,12 @@ class Pacer:
             print("sleep time:", (self.interval - elapsed_time)*1000)
         self.last_call_time = time.time()
 
-# 通过传参将参数传进来
-# 例如： python examples/example_send_pcm.py {appid} {token} {channel_id} ./test_data/demo.pcm {userid}
-appid = sys.argv[1]
-token = sys.argv[2]
-channel_id = sys.argv[3]
-aac_file_path = sys.argv[4]
-# check argv len
-if len(sys.argv) > 5:
-    uid = sys.argv[5]
-else:
-    uid = "0"
-print("appid:", appid, "token:", token, "channel_id:", channel_id, "aac_file_path:", aac_file_path, "uid:", uid)
-
 #---------------1. Init SDK
 config = AgoraServiceConfig()
 config.enable_audio_processor = 0
 config.enable_audio_device = 0
 # config.enable_video = 1
-config.appid = appid
+config.appid = sample_options.app_id
 
 sdk_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 log_folder = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -119,7 +112,7 @@ con_config = RTCConnConfig(
 connection = agora_service.create_rtc_connection(con_config)
 conn_observer = DYSConnectionObserver()
 connection.register_observer(conn_observer)
-connection.connect(token, channel_id, uid)
+connection.connect(sample_options.token, sample_options.channel_id, sample_options.user_id)
 
 #---------------3. Create Media Sender
 media_node_factory = agora_service.create_media_node_factory()
@@ -146,7 +139,7 @@ def test1():
     count = 0
     # packnum = int((sendinterval*1000)/10)
     packnum = 1
-    with open(aac_file_path, "rb") as file:
+    with open(sample_options.audio_file, "rb") as file:
 
         while True:
             frame_buf = bytearray(320*packnum)            
@@ -323,7 +316,7 @@ def test2(file_path):
     # test1()
     # test2(aac_file_path)
 
-test2(aac_file_path)
+test2(sample_options.audio_file)
 
 # # 打印结果，显示缓冲区的数量
 # print(f"Total number of ADTS frames: {len(buffers)}")

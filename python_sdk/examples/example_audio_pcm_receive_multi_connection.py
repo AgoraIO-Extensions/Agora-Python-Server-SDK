@@ -21,6 +21,12 @@ from agora_service.audio_pcm_data_sender import EncodedAudioFrame
 from agora_service.audio_frame_observer import IAudioFrameObserver, AudioFrame
 from agora_service.local_user_observer import IRTCLocalUserObserver
 
+from common.parse_args import parse_args_example
+# 通过传参将参数传进来
+#python python_sdk/examples/example_audio_pcm_receive_multi_connection.py --token=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.aac
+sample_options = parse_args_example()
+print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
+
 class DYSConnectionObserver(IRTCConnectionObserver):
     def __init__(self):
         super(DYSConnectionObserver, self).__init__()
@@ -93,23 +99,11 @@ class DYSAudioFrameObserver(IAudioFrameObserver):
     #     print("CCC on_get_ear_monitoring_audio_frame_param")
     #     return 0
 
-# 通过传参将参数传进来
-# 例如： python examples/example_send_pcm.py {appid} {token} {channel_id} ./test_data/demo.pcm {userid}
-appid = sys.argv[1]
-token = sys.argv[2]
-channel_id = sys.argv[3]
-aac_file_path = sys.argv[4]
-# check argv len
-if len(sys.argv) > 5:
-    uid = sys.argv[5]
-else:
-    uid = "0"
-print("appid:", appid, "token:", token, "channel_id:", channel_id, "aac_file_path:", aac_file_path, "uid:", uid)
 
 #---------------1. Init SDK
 config = AgoraServiceConfig()
 config.enable_audio_processor = 1
-config.appid = appid
+config.appid = sample_options.app_id
 config.log_path =log_path
 
 agora_service = AgoraService()
@@ -139,12 +133,12 @@ con_config = RTCConnConfig(
 connection = agora_service.create_rtc_connection(con_config)
 conn_observer = DYSConnectionObserver()
 connection.register_observer(conn_observer)
-connection.connect(token, "dys_channel_test1", uid)
+connection.connect(sample_options.token, "dys_channel_test1", sample_options.user_id)
 
 connection2 = agora_service.create_rtc_connection(con_config)
 conn_observer2 = DYSConnectionObserver()
 connection2.register_observer(conn_observer2)
-connection2.connect(token, "dys_channel_test2", uid)
+connection2.connect(sample_options.token, "dys_channel_test2", sample_options.user_id)
 
 
 #---------------3. Create Media Sender

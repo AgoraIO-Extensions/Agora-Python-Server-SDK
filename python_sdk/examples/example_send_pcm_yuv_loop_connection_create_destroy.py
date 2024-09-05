@@ -1,7 +1,5 @@
 #!env python
 
-#coding=utf-8
-
 import time
 import os
 import sys
@@ -9,12 +7,17 @@ import datetime
 import threading
 import common.path_utils 
 
-
 from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora_service.rtc_connection_observer import IRTCConnectionObserver
 from agora_service.audio_pcm_data_sender import PcmAudioFrame
 from agora_service.audio_frame_observer import IAudioFrameObserver
 from agora_service.local_user_observer import IRTCLocalUserObserver
+
+from common.parse_args import parse_args_example
+# 通过传参将参数传进来
+#python python_sdk/examples/example_send_pcm_yuv_loop_connection_create_destroy.py --token=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.pcm --videoFile=./test_data/103_RaceHorses_416x240p30_300.yuv
+sample_options = parse_args_example()
+print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
 
 class DYSConnectionObserver(IRTCConnectionObserver):
     def __init__(self):
@@ -85,22 +88,6 @@ class Pacer:
         self.last_call_time = time.time()
 
 
-
-
-
-# 通过传参将参数传进来
-# 例如： python examples/example_send_pcm.py {appid} {token} {channel_id} ./test_data/demo.pcm {userid}
-appid = sys.argv[1]
-token = sys.argv[2]
-channel_id = sys.argv[3]
-pcm_file_path = sys.argv[4]
-# check argv len
-if len(sys.argv) > 5:
-    uid = sys.argv[5]
-else:
-    uid = "0"
-print("appid:", appid, "token:", token, "channel_id:", channel_id, "pcm_file_path:", pcm_file_path, "uid:", uid)
-
 count = 0
 packnum = 0
 
@@ -113,7 +100,7 @@ def run_test():
     config.enable_audio_processor = 1
     config.enable_audio_device = 0
     # config.enable_video = 1
-    config.appid = appid
+    config.appid = sample_options.app_id
 
     sdk_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     log_folder = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -134,7 +121,7 @@ def run_test():
     connection = agora_service.create_rtc_connection(con_config)
     conn_observer = DYSConnectionObserver()
     connection.register_observer(conn_observer)
-    connection.connect(token, channel_id, uid)
+    connection.connect(sample_options.token, sample_options.channel_id, sample_options.user_id)
 
     #---------------3. Create Media Sender
     media_node_factory = agora_service.create_media_node_factory()
@@ -161,7 +148,7 @@ def run_test():
     def send_test():
         global count
         global packnum
-        with open(pcm_file_path, "rb") as file:
+        with open(sample_options.audio_file, "rb") as file:
             while True:
                 # if count < 10:
                 #     packnum = 100

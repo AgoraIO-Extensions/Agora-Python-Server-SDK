@@ -13,6 +13,12 @@ from agora_service.video_frame_sender import *
 from agora_service.video_frame_observer import *
 from agora_service.local_user_observer import *
 
+from common.parse_args import parse_args_example
+# 通过传参将参数传进来
+#python python_sdk/examples/example_video_encoded_send.py --token=xxx --channelId=xxx --userId=xxx --videoFile=./test_data/send_video.h264
+sample_options = parse_args_example()
+print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
+
 
 class DYSConnectionObserver(IRTCConnectionObserver):
     def __init__(self):
@@ -68,29 +74,13 @@ class Pacer:
             # print("sleep time:", (self.interval - elapsed_time)*1000)
         self.last_call_time = time.time()
 
-
 example_dir = os.path.dirname(os.path.abspath(__file__))
-
-
-# 通过传参将参数传进来
-# 例如： python examples/example.py {appid} {token} {channel_id} ./test_data/103_RaceHorses_416x240p30_300.yuv {userid}
-appid = sys.argv[1]
-token = sys.argv[2]
-channel_id = sys.argv[3]
-encoded_file_path = sys.argv[4]
-# check argv len
-if len(sys.argv) > 5:
-    uid = sys.argv[5]
-else:
-    uid = "0"
-print("appid:", appid, "token:", token, "channel_id:", channel_id, "encoded_file_path:", encoded_file_path, "uid:", uid)
-
 
 config = AgoraServiceConfig()
 config.enable_audio_processor = 0
 config.enable_audio_device = 0
 config.enable_video = 1
-config.appid = appid
+config.appid = sample_options.app_id
 sdk_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 log_folder = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 filename, _ = os.path.splitext(os.path.basename(__file__))
@@ -109,7 +99,7 @@ con_config = RTCConnConfig(
 connection = agora_service.create_rtc_connection(con_config)
 conn_observer = DYSConnectionObserver()
 connection.register_observer(conn_observer)
-connection.connect(token, channel_id, uid)
+connection.connect(sample_options.token, sample_options.channel_id, sample_options.user_id)
 
 media_node_factory = agora_service.create_media_node_factory()
 video_sender = media_node_factory.create_video_encoded_image_sender()
@@ -140,7 +130,7 @@ def test1():
         count = 0
         yuv_len = int(width*height*3/2)
         frame_buf = bytearray(yuv_len)            
-        with open(encoded_file_path, "rb") as file:
+        with open(sample_options.audio_file, "rb") as file:
             while True:            
                 success = file.readinto(frame_buf)
                 if not success:
@@ -237,7 +227,7 @@ def test2():
 
     for i in range(40):
         # 示例调用
-        read_h264_packets(encoded_file_path)
+        read_h264_packets(sample_options.video_file)
         # send_test()
 
 # test1()
