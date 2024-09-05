@@ -6,7 +6,7 @@ import time
 import os
 import sys
 import datetime
-import common.path_utils 
+from common.path_utils import get_log_path_with_filename 
 
 
 source_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

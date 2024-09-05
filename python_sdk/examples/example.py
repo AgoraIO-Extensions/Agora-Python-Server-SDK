@@ -3,7 +3,7 @@
 import time
 import datetime
 import ctypes
-import common.path_utils 
+from common.path_utils import get_log_path_with_filename 
 
 from agora_service.agora_service import AgoraServiceConfig, AgoraService, AudioSubscriptionOptions, RTCConnConfig
 from agora_service.rtc_connection import *
@@ -413,10 +413,8 @@ config.enable_audio_processor = 1
 config.enable_audio_device = 1
 config.enable_video = 0
 config.appid = appid
-sdk_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-log_folder = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-filename, _ = os.path.splitext(os.path.basename(__file__))
-config.log_path = os.path.join(sdk_dir, 'logs', filename ,log_folder, 'agorasdk.log')
+config.log_path = get_log_path_with_filename(os.path.splitext(__file__)[0])
+
 
 agora_service = AgoraService()
 agora_service.initialize(config)
