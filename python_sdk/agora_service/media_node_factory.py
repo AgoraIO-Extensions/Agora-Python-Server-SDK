@@ -1,5 +1,5 @@
 from .audio_pcm_data_sender import AudioPcmDataSender
-from .audio_pcm_data_sender import AudioEncodedFrameSender
+from .audio_encoded_frame_sender import AudioEncodedFrameSender
 from .video_frame_sender import VideoFrameSender
 from .video_frame_sender import VideoEncodedImageSender
 from .agora_base import *

@@ -5,15 +5,15 @@
 import time
 import os
 from common.path_utils import get_log_path_with_filename 
+from common.parse_args import parse_args_example
 from common.pacer import Pacer
 from observer.connection_observer import DYSConnectionObserver
-from observer.audio_frame_observer import DYSAudioFrameObserver
 from observer.local_user_observer import DYSLocalUserObserver
 
 from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
-from agora_service.audio_pcm_data_sender import EncodedAudioFrame
+from agora_service.audio_encoded_frame_sender import EncodedAudioFrame
+from agora_service.agora_base import *
 
-from common.parse_args import parse_args_example, parse_args
 # 通过传参将参数传进来
 #python python_sdk/examples/example_audio_encoded_send.py --token=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.aac
 sample_options = parse_args_example()
@@ -50,8 +50,8 @@ audio_track = agora_service.create_custom_audio_track_encoded(audio_sender, 1)
 local_user = connection.get_local_user()
 localuser_observer = DYSLocalUserObserver()
 local_user.register_local_user_observer(localuser_observer)
-audio_frame_observer = DYSAudioFrameObserver()
-local_user.register_audio_frame_observer(audio_frame_observer)
+# audio_frame_observer = DYSAudioFrameObserver()
+# local_user.register_audio_frame_observer(audio_frame_observer)
 
 audio_track.set_max_buffer_audio_frame_number(320*2000)
 
@@ -223,10 +223,9 @@ def test2(file_path):
 
             frame = EncodedAudioFrame()
             frame.data = bytearray(buffer)
-            frame.size = adts_data_length
 
             frame.speech = 0
-            frame.codec = 8 #https://doc.shengwang.cn/api-ref/rtc/windows/API/enum_audiocodectype
+            frame.codec = AUDIO_CODEC_TYPE.AUDIO_CODEC_AACLC #https://doc.shengwang.cn/api-ref/rtc/windows/API/enum_audiocodectype
             frame.sample_rate = sampling_rate
             frame.samples_per_channel = 1024
             frame.number_of_channels = channel_configuration

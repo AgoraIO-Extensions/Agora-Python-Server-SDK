@@ -5,8 +5,8 @@ from agora_service.audio_frame_observer import IAudioFrameObserver, AudioFrame
 
 source_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 filename, _ = os.path.splitext(os.path.basename(__file__))
-log_folder = os.path.join(source_dir, 'logs', filename ,datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-
+log_folder = os.path.join(source_dir, 'logs', filename ,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S"))
+os.makedirs(log_folder, exist_ok=True)
 class DYSAudioFrameObserver(IAudioFrameObserver):
     def __init__(self):
         super(DYSAudioFrameObserver, self).__init__()
@@ -27,7 +27,7 @@ class DYSAudioFrameObserver(IAudioFrameObserver):
     
     def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, audio_frame:AudioFrame):
         print("CCC on_playback_audio_frame_before_mixing", audio_frame.type, audio_frame.samples_per_sec, audio_frame.samples_per_channel, audio_frame.bytes_per_sample, audio_frame.channels)        
-        file_path = os.path.join(log_folder, channelId + 'pcm_file')
+        file_path = os.path.join(log_folder, channelId + '_pcm.pcm')
         with open(file_path, "ab") as f:
             f.write(audio_frame.buffer)
         return 1

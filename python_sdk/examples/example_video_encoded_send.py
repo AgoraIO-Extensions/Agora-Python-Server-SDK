@@ -1,6 +1,7 @@
 #coding=utf-8
 
 import time
+import os
 from common.path_utils import get_log_path_with_filename 
 from common.parse_args import parse_args_example
 from common.pacer import Pacer
@@ -19,7 +20,6 @@ config.enable_audio_device = 0
 config.enable_video = 1
 config.appid = sample_options.app_id
 config.log_path = get_log_path_with_filename(os.path.splitext(__file__)[0])
-
 
 agora_service = AgoraService()
 agora_service.initialize(config)

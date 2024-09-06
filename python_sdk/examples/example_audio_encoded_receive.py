@@ -8,7 +8,6 @@ from common.path_utils import get_log_path_with_filename
 
 from agora_service.agora_service import AgoraServiceConfig, AgoraService, AudioSubscriptionOptions, RTCConnConfig
 from observer.connection_observer import DYSConnectionObserver
-from agora_service.audio_pcm_data_sender import EncodedAudioFrame
 from observer.audio_frame_observer import DYSAudioFrameObserver
 from observer.local_user_observer import DYSLocalUserObserver
 
