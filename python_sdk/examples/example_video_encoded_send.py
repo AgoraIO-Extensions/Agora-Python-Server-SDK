@@ -9,6 +9,8 @@ from observer.connection_observer import DYSConnectionObserver
 from observer.local_user_observer import DYSLocalUserObserver
 from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig, SenderOptions
 from agora_service.video_frame_sender import EncodedVideoFrameInfo
+from agora_service.agora_base import *
+
 # 通过传参将参数传进来
 #python python_sdk/examples/example_video_encoded_send.py --token=xxx --channelId=xxx --userId=xxx --videoFile=./test_data/send_video.h264
 sample_options = parse_args_example()
@@ -27,8 +29,8 @@ agora_service.initialize(config)
 con_config = RTCConnConfig(
     auto_subscribe_audio=0,
     auto_subscribe_video=0,
-    client_role_type=1,
-    channel_profile=1,
+    client_role_type=ClientRoleType.CLIENT_ROLE_BROADCASTER,
+    channel_profile=ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
 )
 
 connection = agora_service.create_rtc_connection(con_config)

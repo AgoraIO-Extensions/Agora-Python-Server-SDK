@@ -5,11 +5,13 @@
 import time
 import os
 from common.path_utils import get_log_path_with_filename 
-
-from agora_service.agora_service import AgoraServiceConfig, AgoraService, AudioSubscriptionOptions, RTCConnConfig
 from observer.connection_observer import DYSConnectionObserver
 from observer.audio_frame_observer import DYSAudioFrameObserver
 from observer.local_user_observer import DYSLocalUserObserver
+from agora_service.agora_service import AgoraServiceConfig, AgoraService, AudioSubscriptionOptions, RTCConnConfig
+from agora_service.agora_base import *
+
+
 
 from common.parse_args import parse_args_example
 # 通过传参将参数传进来
@@ -40,8 +42,8 @@ sub_opt = AudioSubscriptionOptions(
 con_config = RTCConnConfig(
     auto_subscribe_audio=1,
     auto_subscribe_video=0,
-    client_role_type=1,
-    channel_profile=1,
+    client_role_type=ClientRoleType.CLIENT_ROLE_BROADCASTER,
+    channel_profile=ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
     # audio_recv_media_packet = 1,
     # audio_send_media_packet = 1,
     audio_subs_options = sub_opt,

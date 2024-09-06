@@ -12,6 +12,7 @@ from observer.audio_frame_observer import DYSAudioFrameObserver
 from observer.local_user_observer import DYSLocalUserObserver
 from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora_service.audio_pcm_data_sender import PcmAudioFrame
+from agora_service.agora_base import *
 
 # 通过传参将参数传进来
 #python python_sdk/examples/example_audio_pcm_send.py --token=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.pcm
@@ -34,8 +35,8 @@ agora_service.initialize(config)
 con_config = RTCConnConfig(
     auto_subscribe_audio=1,
     auto_subscribe_video=0,
-    client_role_type=1,
-    channel_profile=1,
+    client_role_type=ClientRoleType.CLIENT_ROLE_BROADCASTER,
+    channel_profile=ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
 )
 
 connection = agora_service.create_rtc_connection(con_config)

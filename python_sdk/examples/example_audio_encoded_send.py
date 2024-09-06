@@ -128,23 +128,12 @@ def test2(file_path):
             pacer.pace_interval(22.0/1000.0)
 
         print(f"Read {len(buffer)} bytes of data for one ADTS frame.")
-
-# 使用示例
-# parse_aac_and_store_data(aac_file_path)
-
+        
 # for i in range(10):
     # test1()
     # test2(aac_file_path)
 
 test2(sample_options.audio_file)
-
-# # 打印结果，显示缓冲区的数量
-# print(f"Total number of ADTS frames: {len(buffers)}")
-# for i, buffer in enumerate(buffers[:5], 1):  # 仅打印前5个缓冲区的大小
-#     print(f"Buffer {i} size: {len(buffer)} bytes")
-
-# read_aac_file(aac_file_path)           
-#---------------5. Stop Media Sender And Release
 # time.sleep(100)
 local_user.unpublish_audio(audio_track)
 audio_track.set_enabled(0)

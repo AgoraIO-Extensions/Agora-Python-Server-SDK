@@ -9,6 +9,7 @@ from observer.connection_observer import DYSConnectionObserver
 from observer.video_frame_observer import DYSVideoFrameObserver
 from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora_service.video_frame_sender import ExternalVideoFrame
+from agora_service.agora_base import *
 
 # 通过传参将参数传进来
 #python python_sdk/examples/example_video_yuv_send.py --token=xxx --channelId=xxx --userId=xxx --videoFile=./test_data/103_RaceHorses_416x240p30_300.yuv
@@ -29,8 +30,8 @@ agora_service.initialize(config)
 con_config = RTCConnConfig(
     auto_subscribe_audio=1,
     auto_subscribe_video=0,
-    client_role_type=1,
-    channel_profile=1,
+    client_role_type=ClientRoleType.CLIENT_ROLE_BROADCASTER,
+    channel_profile=ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
 )
 
 connection = agora_service.create_rtc_connection(con_config)
