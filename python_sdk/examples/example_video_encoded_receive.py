@@ -1,94 +1,19 @@
 #coding=utf-8
 
 import time
-import datetime
+import os
 from common.path_utils import get_log_path_with_filename 
-
-from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig, SenderOptions
-from agora_service.rtc_connection import *
-from agora_service.media_node_factory import *
-from agora_service.audio_pcm_data_sender import *
-from agora_service.audio_frame_observer import *
-from agora_service.video_frame_sender import *
-from agora_service.video_frame_observer import *
-from agora_service.local_user_observer import *
-from agora_service.remote_video_track import RemoteVideoTrack
-from agora_service.video_encoded_image_receiver import IVideoEncodedImageReceiver
-from agora_service.video_encoded_frame_observer import IVideoEncodedFrameObserver
-
 from common.parse_args import parse_args_example
+from observer.connection_observer import DYSConnectionObserver
+from observer.local_user_observer import DYSLocalUserObserver
+from observer.video_encoded_frame_observer import DYSVideoEncodedFrameObserver
+from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig, SenderOptions
+from agora_service.agora_base import VideoSubscriptionOptions, VIDEO_STREAM_TYPE
+
 # 通过传参将参数传进来
 #python python_sdk/examples/example_video_encoded_receive.py --token=xxx --channelId=xxx --userId=xxx
 sample_options = parse_args_example()
 print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
-
-class DYSConnectionObserver(IRTCConnectionObserver):
-    def __init__(self):
-        super(DYSConnectionObserver, self).__init__()
-
-    def on_connected(self, agora_rtc_conn, conn_info, reason):
-        print("CCC Connected:", agora_rtc_conn, conn_info, reason)
-
-    def on_disconnected(self, agora_rtc_conn, conn_info, reason):
-        print("CCC Disconnected:", agora_rtc_conn, conn_info, reason)
-
-    def on_connecting(self, agora_rtc_conn, conn_info, reason):
-        print("CCC Connecting:", agora_rtc_conn, conn_info, reason)
-
-    def on_user_joined(self, agora_rtc_conn, user_id):
-        print("CCC on_user_joined:", agora_rtc_conn, user_id)
-
-    def on_user_left(self, agora_rtc_conn, user_id, reason):
-        print("CCC on_user_left:", agora_rtc_conn, user_id, reason)
-
-
-class DYSLocalUserObserver(IRTCLocalUserObserver):
-    def __init__(self):
-        super(DYSLocalUserObserver, self).__init__()
-
-    def on_stream_message(self, local_user, user_id, stream_id, data, length):
-        print("CCC on_stream_message:", user_id, stream_id, data, length)
-        return 0
-
-    def on_user_info_updated(self, local_user, user_id, msg, val):
-        print("CCC on_user_info_updated:", user_id, msg, val)
-        return 0
-
-
-class DYSVideoFrameObserver(IVideoFrameObserver):
-    def __init__(self):
-        super(DYSVideoFrameObserver, self).__init__()
-
-    def on_frame(self, video_frame_observer, channel_id, remote_uid, frame):
-        print("DYSVideoFrameObserver on_frame:", video_frame_observer, channel_id, remote_uid, frame)
-        return 0
-    
-    def on_user_video_track_subscribed(self, agora_local_user, user_id, info, agora_remote_video_track):
-        print("DYSVideoFrameObserver on_user_video_track_subscribed:", agora_local_user, user_id, info, agora_remote_video_track)
-        return 0
-    
-    # def on_user_video_track_subscribed(self, agora_local_user, user_id, agora_remote_video_track:RemoteVideoTrack, video_track_info):
-    #     print("DYSVideoFrameObserver _on_user_video_track_subscribed:", agora_local_user, user_id, agora_remote_video_track, video_track_info)
-        # agora_remote_video_track.register_video_encoded_image_receiver(video_encoded_image_receiver)
-
-
-class DYSVideoEncodedImageReceiver(IVideoEncodedImageReceiver):
-    def __init__(self):
-        super(DYSVideoEncodedImageReceiver, self).__init__()
-
-    def on_encoded_video_image_received(self, agora_handle, image_buffer, length, info):
-        print("DYSVideoEncodedImageReceiver on_encoded_video_image_received:", agora_handle, image_buffer, length, info)
-        return 0
-
-# IVideoEncodedFrameObserver
-class DYSVideoEncodedFrameObserver(IVideoEncodedFrameObserver):
-    def __init__(self):
-        super(DYSVideoEncodedFrameObserver, self).__init__()
-
-    def on_encoded_video_frame(self, agora_video_encoded_frame_observer, uid, image_buffer, length, video_encoded_frame_info):
-        print("DYSVideoEncodedFrameObserver on_encoded_video_frame:", agora_video_encoded_frame_observer, uid, image_buffer, length, video_encoded_frame_info)
-        return 1
-
 
 config = AgoraServiceConfig()
 config.enable_audio_processor = 0

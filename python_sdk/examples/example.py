@@ -4,6 +4,9 @@ import time
 import datetime
 import ctypes
 from common.path_utils import get_log_path_with_filename 
+from observer.connection_observer import DYSConnectionObserver
+from observer.audio_frame_observer import DYSAudioFrameObserver
+from observer.local_user_observer import DYSLocalUserObserver
 
 from agora_service.agora_service import AgoraServiceConfig, AgoraService, AudioSubscriptionOptions, RTCConnConfig
 from agora_service.rtc_connection import *
@@ -16,268 +19,6 @@ from agora_service.local_user import *
 from agora_service.local_user_observer import *
 
 import gc
-
-#conneciton observer: inherit form interface
-class BizConnectionObserver(IRTCConnectionObserver):
-    def __init__(self):
-        super().__init__()
-    def on_connected(self, agora_rtc_conn, conn_info:RTCConnInfo, reason):
-        print(f"-----on_connected {conn_info.channel_id} {conn_info.id} {conn_info.local_user_id} {reason}")
-        pass
-
-    def on_disconnected(self, agora_rtc_conn, conn_info, reason):
-        print(f"on_discoonected {conn_info.channel_id} {conn_info.id} {conn_info.local_user_id} {reason}")
-        pass
-
-    def on_connecting(self, agora_rtc_conn, conn_info, reason):
-        print(f"on_connecting {conn_info.channel_id} {conn_info.id} {conn_info.local_user_id} ")
-        pass
-
-    def on_reconnecting(self, agora_rtc_conn, conn_info, reason):
-        print(f"on_reconnecting {conn_info.channel_id} {conn_info.id} {conn_info.local_user_id} {reason}")
-        pass
-
-    def on_reconnected(self, agora_rtc_conn, conn_info, reason):
-        print(f"on_reconnected {conn_info.channel_id} {conn_info.id} {conn_info.local_user_id} {reason}")
-        pass
-
-    def on_connection_lost(self, agora_rtc_conn, conn_info):
-        print(f"on_connection_lost {conn_info.channel_id} {conn_info.id} {conn_info.local_user_id} ")
-        pass
-
-    def on_lastmile_quality(self, agora_rtc_conn, quality):
-        print(f"on_lastmile_quality {quality}")
-        pass
-
-    def on_lastmile_probe_result(self, agora_rtc_conn, result):
-        #result: LastmileProbeResult
-        print(f"on_lastmile_probe_result {result.state} {result.uplink_report.available_bandwidth} {result.downlink_report.available_bandwidth} {result.rtt}")
-        pass
-
-    def on_token_privilege_will_expire(self, agora_rtc_conn, token):
-        print(f"on_token_privilege_will_expire {token}")
-        pass
-
-    def on_token_privilege_did_expire(self, agora_rtc_conn):
-        pass
-
-    def on_connection_license_validation_failure(self, agora_rtc_conn, reason):
-        pass
-
-    def on_connection_failure(self, agora_rtc_conn, reason):
-        pass
-
-    def on_user_joined(self, agora_rtc_conn, user_id):
-        print(f"xxxxxcxxxxon_user_joined {user_id}")
-        pass
-
-    def on_user_left(self, agora_rtc_conn, user_id, reason):
-        print(f"------------on_user_left {user_id} {reason}")
-        pass
-
-    def on_transport_stats(self, agora_rtc_conn, stats:RTCStats):
-        #print(f"** trans port stats {stats.duration}, {stats.tx_bytes}, {stats.rx_bytes}, {stats.rx_k_bit_rate}, {stats.tx_k_bit_rate}")
-        pass
-
-    def on_change_role_success(self, agora_rtc_conn, old_role, new_role):
-        print(f"on_change_role_success old:{old_role} new:{new_role}")
-        pass
-
-    def on_change_role_failure(self, agora_rtc_conn, reason,cur_role):
-        print(f"on_change_role_failure reason:{reason} cur_role:{cur_role}")
-        pass
-
-    def on_user_network_quality(self, agora_rtc_conn, uid, tx_quality, rx_quality):
-        #print(f"on_user_network_quality {uid} {tx_quality} {rx_quality}")
-        pass
-
-    def on_network_type_changed(self, agora_rtc_conn, network_type):
-        print(f"on_network_type_changed {network_type}")
-        pass
-
-    def on_api_call_executed(self, agora_rtc_conn, error, api_type, api_param):
-        print(f"on_api_call_executed {error} {api_type} {api_param}")
-        pass
-
-    def on_content_inspect_result(self, agora_rtc_conn, result):
-        print(f"on_content_inspect_result {result}")
-        pass
-
-    def on_snapshot_taken(self, agora_rtc_conn, uid, file_path, width, height, err_code):
-        print(f"on_snapshot_taken {uid} {file_path} {width} {height} {err_code}")
-        pass
-
-    def on_error(self, agora_rtc_conn, error_code, error_msg):
-        print(f"on_error {error_code} {error_msg}")
-        pass
-
-    def on_warning(self, agora_rtc_conn, warn_code, warn_msg):
-        print(f"on_warning {warn_code} {warn_msg}")
-        pass
-
-    def on_channel_media_relay_state_changed(self, agora_rtc_conn, state, code):
-        print(f"on_channel_media_relay_state_changed {state} {code}")
-        pass
-
-    def on_local_user_registered(self, agora_rtc_conn, uid, user_account_str):
-        print(f"on_local_user_registered {uid} {user_account_str}")
-        pass
-
-    def on_user_account_updated(self, agora_rtc_conn, uid, user_account_str):
-        print(f"on_user_account_updated {uid} {user_account_str}")
-        pass
-
-    def on_stream_message_error(self, agora_rtc_conn, user_id_str, stream_id, code, missed, cached):
-        print(f"%%%%%%%%%%&&&&on_stream_message_error {user_id_str} {stream_id} {code} {missed} {cached}")
-        pass
-
-    def on_encryption_error(self, agora_rtc_conn, error_type):
-        print(f"on_encryption_error {error_type}")
-        pass
-
-    def on_upload_log_result(self, agora_rtc_conn, request_id_str, success, reason):
-        print(f"on_upload_log_result {request_id_str} {success} {reason}")
-        pass
-    
-class BizLocalUserObserver(IRTCLocalUserObserver):
-    def __init__(self):
-        super().__init__()
-    def on_audio_track_publish_success(self, agora_local_user, agora_local_audio_track):
-        pass
-
-    def on_audio_track_publish_start(self, agora_local_user, agora_local_audio_track):
-        pass
-
-    def on_audio_track_unpublished(self, agora_local_user, agora_local_audio_track):
-        pass
-
-    def on_audio_track_publication_failure(self, agora_local_user, agora_local_audio_track, error):
-        pass
-
-    def on_local_audio_track_state_changed(self, agora_local_user, agora_local_audio_track, state, error):
-        pass
-
-    def on_local_audio_track_statistics(self, agora_local_user, stats):
-        pass
-
-    def on_remote_audio_track_statistics(self, agora_local_user, agora_remote_audio_track, stats):
-        pass
-
-    def on_user_audio_track_subscribed(self, agora_local_user, user_id, agora_remote_audio_track):
-        pass
-
-    def on_user_audio_track_state_changed(self, agora_local_user, user_id, agora_remote_audio_track, state, reason, elapsed):
-        pass
-
-    def on_audio_subscribe_state_changed(self, agora_local_user, channel, user_id, old_state, new_state, elapse_since_last_state):
-        pass
-
-    def on_audio_publish_state_changed(self, agora_local_user, channel, old_state, new_state, elapse_since_last_state):
-        pass
-
-    def on_first_remote_audio_frame(self, agora_local_user, user_id, elapsed):
-        pass
-
-    def on_first_remote_audio_decoded(self, agora_local_user, user_id, elapsed):
-        pass
-
-    def on_video_track_publish_success(self, agora_local_user, agora_local_video_track):
-        pass
-
-    def on_video_track_publish_start(self, agora_local_user, agora_local_video_track):
-        pass
-
-    def on_video_track_unpublished(self, agora_local_user, agora_local_video_track):
-        pass
-
-    def on_video_track_publication_failure(self, agora_local_user, agora_local_video_track, error):
-        pass
-
-    def on_local_video_track_state_changed(self, agora_local_user, agora_local_video_track, state, error):
-        print("on video track published successfully")
-        pass
-
-    def on_local_video_track_statistics(self, agora_local_user, agora_local_video_track, stats):
-        pass
-
-    def on_user_video_track_subscribed(self, agora_local_user, user_id, info, agora_remote_video_track):
-        pass
-
-    def on_user_video_track_state_changed(self, agora_local_user, user_id, agora_remote_video_track, state, reason, elapsed):
-        pass
-
-    def on_remote_video_track_statistics(self, agora_local_user, agora_remote_video_track, stats):
-        pass
-
-    def on_audio_volume_indication(self, agora_local_user, speakers, speaker_number, total_volume):
-        pass
-
-    def on_active_speaker(self, agora_local_user, userId):
-        pass
-
-    def on_remote_video_stream_info_updated(self, agora_local_user, info):
-        pass
-
-    def on_video_subscribe_state_changed(self, agora_local_user, channel, user_id, old_state, new_state, elapse_since_last_state):
-        pass
-
-    def on_video_publish_state_changed(self, agora_local_user, channel, old_state, new_state, elapse_since_last_state):
-        pass
-
-    def on_first_remote_video_frame(self, agora_local_user, user_id, width, height, elapsed):
-        pass
-
-    def on_first_remote_video_decoded(self, agora_local_user, user_id, width, height, elapsed):
-        pass
-
-    def on_first_remote_video_frame_rendered(self, agora_local_user, user_id, width, height, elapsed):
-        pass
-
-    def on_video_size_changed(self, agora_local_user, user_id, width, height, rotation):
-        pass
-
-    def on_user_info_updated(self, agora_local_user, user_id, msg, val):
-        pass
-
-    def on_intra_request_received(self, agora_local_user):
-        pass
-
-    def on_remote_subscribe_fallback_to_audio_only(self, agora_local_user, user_id, is_fallback_or_recover):
-        pass
-
-    def on_stream_message(self, agora_local_user, user_id, stream_id, data, length):
-        print(f"^^^^^^^on_stream_message: {data}, length: {length}")
-        pass
-
-    def on_user_state_changed(self, agora_local_user, user_id, state):
-        pass
-
-
-
-
-class BizAudioFrameObserver(IAudioFrameObserver):
-    def __init__(self):
-        super().__init__()
-
-    # def on_get_playback_audio_frame_param(self, agora_local_user):
-    #     audio_params_instance = AudioParams()
-    #     return audio_params_instance
-
-    def on_record_audio_frame(self, agora_local_user ,channelId, frame):
-        print("CCC on_record_audio_frame")
-        return 1
-    def on_playback_audio_frame(self, agora_local_user, channelId, frame:AudioFrame):
-        print(f"CCC on_playback_audio_frame, channelId:{channelId}, len: {len(frame.buffer)}")
-        return 1
-    def on_ear_monitoring_audio_frame(self, agora_local_user, frame):
-        print("CCC on_ear_monitoring_audio_frame")
-        return 1
-    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, frame):
-        print(f"CCC on_playback_audio_frame_before_mixing, channelId:{channelId}, uid:{uid}, len: {len(frame.buffer)}")
-        return 1
-    def on_get_audio_frame_position(self, agora_local_user):
-        print("CCC on_get_audio_frame_position")
-        return 0
 
 
 
@@ -466,7 +207,7 @@ con_config = RTCConnConfig(
 
 
 connection = agora_service.create_rtc_connection(con_config)
-conn_observer = BizConnectionObserver()
+conn_observer = DYSConnectionObserver()
 connection.register_observer(conn_observer)
 
 
@@ -483,12 +224,12 @@ audio_track = agora_service.create_custom_audio_track_pcm(pcm_data_sender)
 
 #step3: localuser:must regiseter before connect
 localuser = connection.get_local_user()
-local_observer = BizLocalUserObserver()
+local_observer = DYSLocalUserObserver()
 localuser.register_local_user_observer(local_observer)
 
 #note: set_playback_audio_frame_before_mixing_parameters must be call before register_audio_frame_observer
 localuser.set_playback_audio_frame_before_mixing_parameters(1, 16000)
-audio_observer = BizAudioFrameObserver()
+audio_observer = DYSAudioFrameObserver()
 localuser.register_audio_frame_observer(audio_observer)
 
 

@@ -1,62 +1,19 @@
 #coding=utf-8
 
 import time
-import datetime
+import os
 from common.path_utils import get_log_path_with_filename 
+from common.parse_args import parse_args_example
 from common.pacer import Pacer
-
+from observer.connection_observer import DYSConnectionObserver
+from observer.video_frame_observer import DYSVideoFrameObserver
 from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
-from agora_service.rtc_connection import *
-from agora_service.media_node_factory import *
-from agora_service.audio_pcm_data_sender import *
-from agora_service.audio_frame_observer import *
-from agora_service.video_frame_sender import *
-from agora_service.video_frame_observer import *
-from agora_service.local_user_observer import *
+from agora_service.video_frame_sender import ExternalVideoFrame
 
-from common.parse_args import parse_args_example, parse_args
 # 通过传参将参数传进来
 #python python_sdk/examples/example_video_yuv_send.py --token=xxx --channelId=xxx --userId=xxx --videoFile=./test_data/103_RaceHorses_416x240p30_300.yuv
 sample_options = parse_args_example()
 print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "video_file:", sample_options.video_file, "uid:", sample_options.user_id)
-
-
-class DYSConnectionObserver(IRTCConnectionObserver):
-    def __init__(self):
-        super(DYSConnectionObserver, self).__init__()
-
-    def on_connected(self, agora_rtc_conn, conn_info, reason):
-        print("CCC Connected:", agora_rtc_conn, conn_info, reason)
-
-    def on_disconnected(self, agora_rtc_conn, conn_info, reason):
-        print("CCC Disconnected:", agora_rtc_conn, conn_info, reason)
-
-    def on_connecting(self, agora_rtc_conn, conn_info, reason):
-        print("CCC Connecting:", agora_rtc_conn, conn_info, reason)
-
-    def on_user_joined(self, agora_rtc_conn, user_id):
-        print("CCC on_user_joined:", agora_rtc_conn, user_id)
-
-
-class DYSLocalUserObserver(IRTCLocalUserObserver):
-    def __init__(self):
-        super(DYSLocalUserObserver, self).__init__()
-
-    def on_stream_message(self, local_user, user_id, stream_id, data, length):
-        print("CCC on_stream_message:", user_id, stream_id, data, length)
-        return 0
-
-    def on_user_info_updated(self, local_user, user_id, msg, val):
-        print("CCC on_user_info_updated:", user_id, msg, val)
-        return 0
-
-class DYSVideoFrameObserver(IVideoFrameObserver):
-    def __init__(self):
-        super(DYSVideoFrameObserver, self).__init__()
-
-    def on_frame(self, video_frame_observer, channel_id, remote_uid, frame):
-        print("DYSVideoFrameObserver on_frame:", video_frame_observer, channel_id, remote_uid, frame)
-        return 0
 
 config = AgoraServiceConfig()
 config.enable_audio_processor = 1
