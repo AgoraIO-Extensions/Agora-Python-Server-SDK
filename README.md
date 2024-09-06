@@ -52,3 +52,10 @@ python examples/example_send_pcm.py {appid} {token} {channel_id} ../test_data/de
 cd python_sdk
 python examples/example_send_pcm.py {appid} {token} {channel_id} ../test_data/demo.pcm {userid}
 ```
+# Some import call sequence
+# 1. about audio frame observer： 
+# set_playback_audio_frame_before_mixing_parameters MUST be call before register_audio_frame_observer
+sample code:
+localuser.set_playback_audio_frame_before_mixing_parameters(1, 16000)
+audio_observer = BizAudioFrameObserver()
+localuser.register_audio_frame_observer(audio_observer)

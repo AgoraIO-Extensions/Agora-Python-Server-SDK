@@ -335,7 +335,7 @@ class AudioProcessingStats(ctypes.Structure):
         ("delay_ms", ctypes.c_int32)
     ]
 
-class LocalAudioDetailedStats(ctypes.Structure):
+class LocalAudioDetailedStatsInner(ctypes.Structure):
     _fields_ = [
         ("local_ssrc", ctypes.c_uint32),
         ("bytes_sent", ctypes.c_int64),
@@ -353,7 +353,46 @@ class LocalAudioDetailedStats(ctypes.Structure):
         ("typing_noise_detected", ctypes.c_int),
         ("ana_statistics", AnaStats),
         ("apm_statistics", AudioProcessingStats)
-    ]    
+    ]   
+    def _to_local_audio_detailed_stats(self): 
+        stats = LocalAudioDetailedStats()
+        stats.local_ssrc = self.local_ssrc
+        stats.bytes_sent = self.bytes_sent
+        stats.packets_sent = self.packets_sent
+        stats.packets_lost = self.packets_lost
+        stats.fraction_lost = self.fraction_lost
+        stats.codec_name = self.codec_name.decode('utf-8') if self.codec_name else None
+        stats.codec_payload_type = self.codec_payload_type
+        stats.ext_seqnum = self.ext_seqnum
+        stats.jitter_ms = self.jitter_ms
+        stats.rtt_ms = self.rtt_ms
+        stats.audio_level = self.audio_level
+        stats.total_input_energy = self.total_input_energy
+        stats.total_input_duration = self.total_input_duration
+        stats.typing_noise_detected = self.typing_noise_detected
+        stats.ana_statistics = self.ana_statistics
+        stats.apm_statistics = self.apm_statistics
+        return stats
+
+class LocalAudioDetailedStats():
+    def __init__(self) -> None:
+        self.local_ssrc = 0
+        self.bytes_sent = 0
+        self.packets_sent = 0
+        self.packets_lost = 0
+        self.fraction_lost = 0.0
+        self.codec_name = None
+        self.codec_payload_type = 0
+        self.ext_seqnum = 0
+        self.jitter_ms = 0
+        self.rtt_ms = 0
+        self.audio_level = 0
+        self.total_input_energy = 0.0
+        self.total_input_duration = 0.0
+        self.typing_noise_detected = 0
+        self.ana_statistics = AnaStats()
+        self.apm_statistics = AudioProcessingStats()
+        pass
 
 class VideoTrackInfo(ctypes.Structure):
     def __init__(self) -> None:

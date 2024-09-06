@@ -12,7 +12,7 @@ class IRTCConnectionObserver():
     def on_disconnected(self, agora_rtc_conn, conn_info, reason):
         pass
 
-    def on_connecting(self, agora_rtc_conn, conn_info):
+    def on_connecting(self, agora_rtc_conn, conn_info, reason):
         pass
 
     def on_reconnecting(self, agora_rtc_conn, conn_info, reason):

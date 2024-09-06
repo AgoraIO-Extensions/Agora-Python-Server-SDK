@@ -267,7 +267,7 @@ class RTCConnectionObserverInner(ctypes.Structure):
         #user_id: ctypes.char_p
         #tx_quality: ctypes.int
         #rx_quality: ctypes.int
-        userid_str = user_id.decode('utf-8')
+        userid_str = user_id.decode('utf-8') if user_id else ""
         self.conn_observer.on_user_network_quality(self.conn, userid_str, tx_quality, rx_quality)
 
     def _on_network_type_changed(self, agora_rtc_conn, network_type):
@@ -278,8 +278,8 @@ class RTCConnectionObserverInner(ctypes.Structure):
     def _on_api_call_executed(self, agora_rtc_conn, error, api_type, api_params):
         #print("ConnCB _on_api_call_executed:", agora_rtc_conn, error, api_type, api_params)
         #error: ctypes.int; api_type: ctypes.char_p; api_params: ctypes.char_p
-        _api_type_str = api_type.decode('utf-8')
-        _api_param_str = api_params.decode('utf-8')
+        _api_type_str = api_type.decode('utf-8') if api_type else ""
+        _api_param_str = api_params.decode('utf-8') if api_params else ""
         self.conn_observer.on_api_call_executed(self.conn, error, _api_type_str, _api_param_str)
 
     def _on_content_inspect_result(self, agora_rtc_conn, result):
@@ -290,18 +290,18 @@ class RTCConnectionObserverInner(ctypes.Structure):
     def _on_snapshot_taken(self, agora_rtc_conn, channel, uid, filepath, width, height, errCode):
         #print("ConnCB _on_snapshot_taken:", agora_rtc_conn, channel, uid, filepath, width, height, errCode)
         #channel: ctypes.c_char_p; uid: ctypes.c_uint32; filepath: ctypes.c_char_p; width: ctypes.c_int32; height: ctypes.c_int32; errCode: ctypes.c_int32
-        _channel_str = channel.decode('utf-8')
-        _file_path_str = filepath.decode('utf-8')
+        _channel_str = channel.decode('utf-8') if channel else ""
+        _file_path_str = filepath.decode('utf-8') if filepath else ""
         self.conn_observer.on_snapshot_taken(self.conn, _channel_str, uid, _file_path_str, width, height, errCode)
 
     def _on_error(self, agora_rtc_conn, error_code, error_msg):
         #print("ConnCB _on_error:", agora_rtc_conn, error_code, error_msg)
-        _error_msg_str = error_msg.decode('utf-8')
+        _error_msg_str = error_msg.decode('utf-8') if error_msg else ""
         self.conn_observer.on_error(self.conn, error_code, _error_msg_str)
 
     def _on_warning(self, agora_rtc_conn, warn_code, warn_msg):
         #print("ConnCB _on_warning:", agora_rtc_conn, warn_code, warn_msg)
-        _warn_msg_str = warn_msg.decode('utf-8')
+        _warn_msg_str = warn_msg.decode('utf-8') if warn_msg else ""
         self.conn_observer.on_warning(self.conn, warn_code, _warn_msg_str)
 
     def _on_channel_media_relay_state_changed(self, agora_rtc_conn, state, code):
@@ -311,17 +311,17 @@ class RTCConnectionObserverInner(ctypes.Structure):
     def _on_local_user_registered(self, agora_rtc_conn, uid, user_account):
         #print("ConnCB _on_local_user_registered:", agora_rtc_conn, uid, user_account)
         #uid: ctype.int, user_account: ctype.c_char_p
-        _user_account_str = user_account.decode('utf-8')
+        _user_account_str = user_account.decode('utf-8') if user_account else ""
         self.conn_observer.on_local_user_registered(self.conn, uid, _user_account_str)
 
     def _on_user_account_updated(self, agora_rtc_conn, uid, user_account):
         #print("ConnCB _on_user_account_updated:", agora_rtc_conn, uid, user_account)
-        _user_account_str = user_account.decode('utf-8')
+        _user_account_str = user_account.decode('utf-8') if user_account else ""
         self.conn_observer.on_user_account_updated(self.conn, uid, _user_account_str)
 
     def _on_stream_message_error(self, agora_rtc_conn, user_id, stream_id, code, missed, cached):
         print("ConnCB _on_stream_message_error:", agora_rtc_conn, user_id, stream_id, code, missed, cached)
-        _user_id_str = user_id.decode('utf-8')
+        _user_id_str = user_id.decode('utf-8') if user_id else ""
         self.conn_observer.on_stream_message_error(self.conn, _user_id_str, stream_id, code, missed, cached)
 
     def _on_encryption_error(self, agora_rtc_conn, error_type):
@@ -331,5 +331,5 @@ class RTCConnectionObserverInner(ctypes.Structure):
     #request_id: ctypes.c_char_p; success/reason: ctypes.int
     def _on_upload_log_result(self, agora_rtc_conn, request_id, success, reason):
         #print("ConnCB _on_upload_log_result:", agora_rtc_conn, request_id, success, reason)
-        _request_id_str = request_id.decode("utf-8")
+        _request_id_str = request_id.decode("utf-8") if request_id else ""
         self.conn_observer.on_upload_log_result(self.conn, _request_id_str, success, reason)

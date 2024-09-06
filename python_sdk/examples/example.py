@@ -29,7 +29,7 @@ class BizConnectionObserver(IRTCConnectionObserver):
         print(f"on_discoonected {conn_info.channel_id} {conn_info.id} {conn_info.local_user_id} {reason}")
         pass
 
-    def on_connecting(self, agora_rtc_conn, conn_info):
+    def on_connecting(self, agora_rtc_conn, conn_info, reason):
         print(f"on_connecting {conn_info.channel_id} {conn_info.id} {conn_info.local_user_id} ")
         pass
 
@@ -410,7 +410,7 @@ print("appid:", appid, "token:", token, "channel_id:", channel_id, "pcm_file_pat
 
 config = AgoraServiceConfig()
 config.enable_audio_processor = 1
-config.enable_audio_device = 1
+config.enable_audio_device = 0
 config.enable_video = 0
 config.appid = appid
 config.log_path = get_log_path_with_filename(os.path.splitext(__file__)[0])
@@ -458,9 +458,8 @@ con_config = RTCConnConfig(
     client_role_type=role_type, #1: broadcaster, 2: audience
     channel_profile=1,
     audio_recv_media_packet = 0,
-    audio_send_media_packet = 0,
     audio_subs_options = sub_opt,
-    enable_audio_recording_or_playout = 1,
+    enable_audio_recording_or_playout = 0,
 )
 
 
@@ -469,6 +468,11 @@ con_config = RTCConnConfig(
 connection = agora_service.create_rtc_connection(con_config)
 conn_observer = BizConnectionObserver()
 connection.register_observer(conn_observer)
+
+
+
+
+
 connection.connect(token, channel_id, uid)
 
 #step2: 
@@ -477,13 +481,16 @@ pcm_data_sender = media_node_factory.create_audio_pcm_data_sender()
 audio_track = agora_service.create_custom_audio_track_pcm(pcm_data_sender)
 
 
-#step3: localuser
+#step3: localuser:must regiseter before connect
 localuser = connection.get_local_user()
 local_observer = BizLocalUserObserver()
-#localuser.register_local_user_observer(local_observer)
+localuser.register_local_user_observer(local_observer)
+
+#note: set_playback_audio_frame_before_mixing_parameters must be call before register_audio_frame_observer
+localuser.set_playback_audio_frame_before_mixing_parameters(1, 16000)
 audio_observer = BizAudioFrameObserver()
 localuser.register_audio_frame_observer(audio_observer)
-localuser.set_playback_audio_frame_before_mixing_parameters(1, 16000)
+
 
 #ret = localuser.get_user_role()
 #localuser.set_user_role(con_config.client_role_type)
@@ -493,6 +500,11 @@ localuser.set_playback_audio_frame_before_mixing_parameters(1, 16000)
 audio_track.set_enabled(1)
 localuser.publish_audio(audio_track)
 localuser.subscribe_all_audio()
+
+#test
+
+detailed_stat = localuser.get_local_audio_statistics()
+print("detailed_stat:", detailed_stat.local_ssrc, detailed_stat.codec_name)
 
 #stream msg 
 stream_id = connection.create_data_stream(0, 0)
@@ -565,7 +577,7 @@ with open(pcm_file_path, "rb") as file:
 
         #send steam msg
         if send_stream == 1:
-            time_str = f"这个是LLM返回来的数据，我们用来做测试，通常足够一次返回的tokens。send stream msg,total packs: {cursendtotalpack}, curtime:{curtime}"
+            time_str = f"send stream msg,total packs: {cursendtotalpack}, curtime:{curtime}"
             ret = connection.send_stream_message(stream_id, time_str)
             print(f"send stream msg ret={ret}, msg={time_str}")
     
