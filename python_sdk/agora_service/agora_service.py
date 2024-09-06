@@ -72,7 +72,7 @@ agora_service_create_custom_audio_track_encoded.restype = AGORA_HANDLE
 
 agora_rtc_conn_create = agora_lib.agora_rtc_conn_create
 agora_rtc_conn_create.restype = AGORA_HANDLE
-agora_rtc_conn_create.argtypes = [AGORA_HANDLE, ctypes.POINTER(RTCConnConfig)]
+agora_rtc_conn_create.argtypes = [AGORA_HANDLE, ctypes.POINTER(RTCConnConfigInner)]
 
 agora_service_create_custom_video_track_frame = agora_lib.agora_service_create_custom_video_track_frame
 agora_service_create_custom_video_track_frame.restype = AGORA_HANDLE
@@ -138,11 +138,11 @@ class AgoraService:
         return MediaNodeFactory(media_node_handle)
     
 
-    def create_rtc_connection(self, con_config):       
+    def create_rtc_connection(self, con_config: RTCConnConfig):       
         if not self.inited:
             print("AgoraService is not initialized. Please call initialize() first.")
             return None
-        rtc_conn_handle = agora_rtc_conn_create(self.service_handle, ctypes.byref(con_config))
+        rtc_conn_handle = agora_rtc_conn_create(self.service_handle, ctypes.byref(con_config._to_inner()))
         if not rtc_conn_handle:
             raise Exception("Failed to create RTC connection")
         return RTCConnection(rtc_conn_handle)

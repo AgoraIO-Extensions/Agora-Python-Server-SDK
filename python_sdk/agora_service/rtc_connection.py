@@ -40,7 +40,49 @@ class AudioSubscriptionOptions(ctypes.Structure):
 
 
 # 定义 _rtc_conn_config 结构体
-class RTCConnConfig(ctypes.Structure):
+class RTCConnConfig():
+    def __init__(self, 
+                auto_subscribe_audio = 0, 
+                auto_subscribe_video = 0, 
+                enable_audio_recording_or_playout = 0, 
+                max_send_bitrate = 0,
+                min_port = 0,
+                max_port = 0,
+                audio_subs_options = AudioSubscriptionOptions(),
+                client_role_type = ClientRoleType.CLIENT_ROLE_BROADCASTER,
+                channel_profile:ChannelProfileType = ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
+                audio_recv_media_packet = 0,
+                video_recv_media_packet = 0,
+                 ) -> None:
+        self.auto_subscribe_audio = auto_subscribe_audio
+        self.auto_subscribe_video = auto_subscribe_video
+        self.enable_audio_recording_or_playout = enable_audio_recording_or_playout
+        self.max_send_bitrate = max_send_bitrate
+        self.min_port = min_port
+        self.max_port = max_port
+        self.audio_subs_options = audio_subs_options
+        self.client_role_type = client_role_type
+        self.channel_profile = channel_profile
+        self.audio_recv_media_packet = audio_recv_media_packet
+        self.video_recv_media_packet = video_recv_media_packet
+
+    def _to_inner(self):
+        return RTCConnConfigInner(
+            self.auto_subscribe_audio,
+            self.auto_subscribe_video,
+            self.enable_audio_recording_or_playout,
+            self.max_send_bitrate,
+            self.min_port,
+            self.max_port,
+            self.audio_subs_options,
+            self.client_role_type.value,
+            self.channel_profile.value,
+            self.audio_recv_media_packet,
+            self.video_recv_media_packet
+        )
+  
+
+class RTCConnConfigInner(ctypes.Structure):
     _fields_ = [
         ('auto_subscribe_audio', ctypes.c_int),
         ('auto_subscribe_video', ctypes.c_int),
@@ -63,8 +105,8 @@ class RTCConnConfig(ctypes.Structure):
                 min_port = 0,
                 max_port = 0,
                 audio_subs_options = AudioSubscriptionOptions(),
-                client_role_type = 0,
-                channel_profile = 0,
+                client_role_type = ClientRoleType.CLIENT_ROLE_BROADCASTER.value,
+                channel_profile:ChannelProfileType = ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING.value,
                 audio_recv_media_packet = 0,
                 video_recv_media_packet = 0,
                  ) -> None:
@@ -79,7 +121,6 @@ class RTCConnConfig(ctypes.Structure):
         self.channel_profile = channel_profile
         self.audio_recv_media_packet = audio_recv_media_packet
         self.video_recv_media_packet = video_recv_media_packet
-  
 
 
 agora_rtc_conn_get_local_user = agora_lib.agora_rtc_conn_get_local_user
