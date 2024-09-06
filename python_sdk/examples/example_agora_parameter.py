@@ -17,9 +17,6 @@ print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id
 
 #---------------1. Init SDK
 config = AgoraServiceConfig()
-config.enable_audio_processor = 1
-config.enable_audio_device = 0
-# config.enable_video = 1
 config.appid = sample_options.app_id
 config.log_path = get_log_path_with_filename(os.path.splitext(__file__)[0])
 
@@ -28,8 +25,6 @@ agora_service.initialize(config)
 
 #---------------2. Create Connection
 con_config = RTCConnConfig(
-    auto_subscribe_audio=1,
-    auto_subscribe_video=0,
     client_role_type=ClientRoleType.CLIENT_ROLE_BROADCASTER,
     channel_profile=ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
 )

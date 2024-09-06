@@ -32,7 +32,7 @@ class AgoraServiceConfig(ctypes.Structure):
         self.log_path = ""
         self.log_size = 0    
         self.appid = ""
-        self.enable_audio_processor = 0
+        self.enable_audio_processor = 1
         self.enable_audio_device = 0
         self.enable_video = 0
         self.context = None

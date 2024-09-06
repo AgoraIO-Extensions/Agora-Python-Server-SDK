@@ -27,7 +27,7 @@ class RTCConnInfo():
 
 
 
-# 定义 audio_subscription_options 结构体
+#https://doc.shengwang.cn/api-ref/rtc-server-sdk/java/classio_1_1agora_1_1rtc_1_1_audio_subscription_options#a68f2125d480ca76271e8f569b01a0898
 class AudioSubscriptionOptions(ctypes.Structure):
     _fields_ = [
         ('packet_only', ctypes.c_int),
@@ -36,7 +36,18 @@ class AudioSubscriptionOptions(ctypes.Structure):
         ('number_of_channels', ctypes.c_uint32),
         ('sample_rate_hz', ctypes.c_uint32),
     ]
-
+    def __init__(
+            self, 
+            packet_only = 0, 
+            pcm_data_only = 0,
+            bytes_per_sample = 0,
+            number_of_channels = 0,
+            sample_rate_hz = 0) -> None:
+        self.packet_only = packet_only
+        self.pcm_data_only = pcm_data_only
+        self.bytes_per_sample = bytes_per_sample
+        self.number_of_channels = number_of_channels
+        self.sample_rate_hz = sample_rate_hz
 
 
 # 定义 _rtc_conn_config 结构体

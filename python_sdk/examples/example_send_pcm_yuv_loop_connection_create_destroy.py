@@ -27,9 +27,6 @@ def run_test():
 
     #---------------1. Init SDK
     config = AgoraServiceConfig()
-    config.enable_audio_processor = 1
-    config.enable_audio_device = 0
-    # config.enable_video = 1
     config.appid = sample_options.app_id
     config.log_path = get_log_path_with_filename(os.path.splitext(__file__)[0])
 

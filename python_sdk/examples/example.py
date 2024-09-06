@@ -150,9 +150,6 @@ print("appid:", appid, "token:", token, "channel_id:", channel_id, "pcm_file_pat
 
 
 config = AgoraServiceConfig()
-config.enable_audio_processor = 1
-config.enable_audio_device = 0
-config.enable_video = 0
 config.appid = appid
 config.log_path = get_log_path_with_filename(os.path.splitext(__file__)[0])
 

@@ -20,7 +20,6 @@ print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id
 
 #---------------1. Init SDK
 config = AgoraServiceConfig()
-config.enable_audio_processor = 1
 config.appid = sample_options.app_id
 config.log_path = get_log_path_with_filename(os.path.splitext(__file__)[0])
 
