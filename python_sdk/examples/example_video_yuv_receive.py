@@ -12,17 +12,15 @@ from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCCon
 from agora_service.agora_base import *
 
 # 通过传参将参数传进来
-#python python_sdk/examples/example_video_yuv_receive.py --token=xxx --channelId=xxx --userId=xxx
+#python python_sdk/examples/example_video_yuv_receive.py --appId=xxx --channelId=xxx --userId=xxx
 sample_options = parse_args_example()
 print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
 
 
 
 config = AgoraServiceConfig()
-config.enable_audio_processor = 0
-config.enable_audio_device = 0
-config.enable_video = 1
 config.appid = sample_options.app_id
+config.enable_video = 1
 config.log_path = get_log_path_with_filename(os.path.splitext(__file__)[0])
 
 
@@ -30,7 +28,6 @@ agora_service = AgoraService()
 agora_service.initialize(config)
 
 con_config = RTCConnConfig(
-    auto_subscribe_audio=0,
     auto_subscribe_video=1,
     client_role_type=ClientRoleType.CLIENT_ROLE_BROADCASTER,
     channel_profile=ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,

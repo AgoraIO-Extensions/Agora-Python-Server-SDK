@@ -14,7 +14,7 @@ from agora_service.audio_pcm_data_sender import PcmAudioFrame
 from agora_service.agora_base import *
 
 # 通过传参将参数传进来
-#python python_sdk/examples/example_send_pcm_yuv_loop_connection_create_destroy.py --token=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.pcm --videoFile=./test_data/103_RaceHorses_416x240p30_300.yuv
+#python python_sdk/examples/example_send_pcm_yuv_loop_connection_create_destroy.py --appId=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.pcm --videoFile=./test_data/103_RaceHorses_416x240p30_300.yuv
 sample_options = parse_args_example()
 print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
 
@@ -30,14 +30,11 @@ def run_test():
     config.appid = sample_options.app_id
     config.log_path = get_log_path_with_filename(os.path.splitext(__file__)[0])
 
-
     agora_service = AgoraService()
     agora_service.initialize(config)
 
     #---------------2. Create Connection
     con_config = RTCConnConfig(
-        auto_subscribe_audio=1,
-        auto_subscribe_video=0,
         client_role_type=ClientRoleType.CLIENT_ROLE_BROADCASTER,
         channel_profile=ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
     )

@@ -14,7 +14,7 @@ from agora_service.audio_encoded_frame_sender import EncodedAudioFrame
 from agora_service.agora_base import *
 
 # 通过传参将参数传进来
-#python python_sdk/examples/example_audio_pcm_receive_multi_connection.py --token=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.aac
+#python python_sdk/examples/example_audio_pcm_receive_multi_connection.py --appId=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.aac
 sample_options = parse_args_example()
 print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
 
@@ -27,24 +27,10 @@ agora_service = AgoraService()
 agora_service.initialize(config)
 
 #---------------2. Create Connection
-sub_opt = AudioSubscriptionOptions(
-        packet_only = 0,
-        pcm_data_only = 1,
-        bytes_per_sample = 2,
-        number_of_channels = 1,
-        sample_rate_hz = 16000
-)
-
 
 con_config = RTCConnConfig(
-    auto_subscribe_audio=1,
-    auto_subscribe_video=0,
     client_role_type=ClientRoleType.CLIENT_ROLE_BROADCASTER,
     channel_profile=ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
-    # audio_recv_media_packet = 1,
-    # audio_send_media_packet = 1,
-    audio_subs_options = sub_opt,
-    enable_audio_recording_or_playout = 0,
 )
 
 connection = agora_service.create_rtc_connection(con_config)

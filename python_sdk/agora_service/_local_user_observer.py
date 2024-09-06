@@ -2,7 +2,7 @@ import ctypes
 from .agora_base import *
 from .local_user import *
 from .local_user_observer import *
-
+from .remote_video_track import RemoteVideoTrack
 uid_t = ctypes.c_uint
 track_id_t = ctypes.c_uint
 

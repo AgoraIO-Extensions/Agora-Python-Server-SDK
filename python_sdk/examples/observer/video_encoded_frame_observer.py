@@ -10,7 +10,8 @@ class DYSVideoEncodedFrameObserver(IVideoEncodedFrameObserver):
         super(DYSVideoEncodedFrameObserver, self).__init__()
 
     def on_encoded_video_frame(self, agora_video_encoded_frame_observer, uid, image_buffer, length, video_encoded_frame_info):
-        print("DYSVideoEncodedFrameObserver on_encoded_video_frame:", agora_video_encoded_frame_observer, uid, image_buffer, length, video_encoded_frame_info)
+        # print("DYSVideoEncodedFrameObserver on_encoded_video_frame:", agora_video_encoded_frame_observer, uid, image_buffer, length, video_encoded_frame_info)
+        print("DYSVideoEncodedFrameObserver on_encoded_video_frame:", agora_video_encoded_frame_observer, uid, length, video_encoded_frame_info)
         return 1
     
 class DYSVideoEncodedImageReceiver(IVideoEncodedImageReceiver):

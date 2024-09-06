@@ -9,7 +9,7 @@ from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCCon
 from agora_service.agora_base import *
 
 # 通过传参将参数传进来
-#python python_sdk/examples/example_stream_message_send.py --token=xxx --channelId=xxx --userId=xxx --message="hello agora"
+#python python_sdk/examples/example_stream_message_send.py --appId=xxx --channelId=xxx --userId=xxx --message="hello agora"
 sample_options = parse_args_example()
 print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
 
@@ -24,8 +24,6 @@ agora_service.initialize(config)
 
 #---------------2. Create Connection
 con_config = RTCConnConfig(
-    auto_subscribe_audio=0,
-    auto_subscribe_video=0,
     client_role_type=ClientRoleType.CLIENT_ROLE_BROADCASTER,
     channel_profile=ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
 )
