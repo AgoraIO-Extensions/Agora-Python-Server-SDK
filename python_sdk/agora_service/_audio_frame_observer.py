@@ -29,8 +29,6 @@ class AudioFrameInner(ctypes.Structure):
         audio_frame.avsync_type = self.avsync_type
         return audio_frame
     
-    pass
-
 
 ON_RECORD_AUDIO_FRAME_CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int, AGORA_HANDLE, ctypes.c_char_p, ctypes.POINTER(AudioFrameInner))
 ON_PLAYBACK_AUDIO_FRAME_CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int, AGORA_HANDLE, ctypes.c_char_p, ctypes.POINTER(AudioFrameInner))

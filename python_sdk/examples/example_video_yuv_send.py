@@ -13,7 +13,7 @@ from agora_service.video_frame_sender import ExternalVideoFrame
 from agora_service.agora_base import *
 
 # 通过传参将参数传进来
-#python python_sdk/examples/example_video_yuv_send.py --appId=xxx --channelId=xxx --userId=xxx --videoFile=./test_data/103_RaceHorses_416x240p30_300.yuv
+#python python_sdk/examples/example_video_yuv_send.py --appId=xxx --channelId=xxx --userId=xxx --videoFile=./test_data/103_RaceHorses_416x240p30_300.yuv --width=416 --height=240 --fps=30 --channelNumber=1
 sample_options = parse_args_example()
 print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "video_file:", sample_options.video_file, "uid:", sample_options.user_id)
 
@@ -42,20 +42,14 @@ def create_conn_and_send(channel_id, uid = 0):
     video_track = agora_service.create_custom_video_track_frame(video_sender)
     local_user = connection.get_local_user()
 
-    # video_sender = connection.GetVideoSender()
-    # video_frame_observer = DYSVideoFrameObserver()
-    # local_user.register_video_frame_observer(video_frame_observer)
-
     video_track.set_enabled(1)
     local_user.publish_video(video_track)
-
-    # video_sender.Start()
 
     sendinterval = 1/30
     pacer = Pacer(sendinterval)
 
-    width = 416
-    height = 240
+    width = sample_options.width
+    height = sample_options.height
 
     def send_test():
         count = 0

@@ -5,13 +5,13 @@ class SampleOptions:
         self.app_id = None
         self.token = None
         self.channel_id = None
-        self.channel_number = 1
+        self.channel_number:int = 1
         self.user_id = 0
         self.audio_file = None
         self.low_delay = False
         self.video_file = None
-        self.sample_rate = None
-        self.num_of_channels = None
+        self.sample_rate:int = None
+        self.num_of_channels:int = None
         self.fps = None
         self.width = None
         self.height = None
