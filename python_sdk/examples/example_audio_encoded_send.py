@@ -129,11 +129,63 @@ def test2(file_path):
 
         print(f"Read {len(buffer)} bytes of data for one ADTS frame.")
         
+
+
+import av
+
+def test3(aac_file):
+    sendinterval = 0.1
+    pacer = Pacer(sendinterval)
+        # 打开 .aac 文件
+    container = av.open(aac_file)
+        # 遍历所有音频流，获取音频流的元数据
+    sample_rate = 48000
+    channels = 1
+    for stream in container.streams:
+        if stream.type == 'audio':
+            sample_rate = stream.sample_rate
+            channels = stream.channels            
+            print(f"Audio stream: sample rate = {sample_rate}, channels = {channels}")
+            break
+
+
+    # 遍历每个 packet
+    for packet in container.demux():
+        if packet.stream.type == 'audio':
+            print(f"Read audio packet with size {packet.size} bytes, PTS {packet.pts}, DTS {packet.dts}")
+
+            frame = EncodedAudioFrame()
+            # frame.data = bytearray(buffer)
+            frame.buffer_ptr = packet.buffer_ptr
+            frame.buffer_size = packet.size
+            frame.speech = 0
+            frame.codec = AUDIO_CODEC_TYPE.AUDIO_CODEC_AACLC #https://doc.shengwang.cn/api-ref/rtc/windows/API/enum_audiocodectype
+            frame.sample_rate = sample_rate
+            frame.samples_per_channel = 1024
+            frame.number_of_channels = channels
+            frame.send_even_if_empty = 1
+
+            ret = audio_sender.send_encoded_audio_frame(frame)
+
+            time_base = packet.stream.time_base
+            duration_in_seconds = packet.duration * time_base
+            pacer.pace_interval(duration_in_seconds)
+            # pacer.pace_interval(22.0/1000.0)
+
+
+            # 假设 send_packet 是你定义的发送函数，可以将 packet 数据发送出去
+            # send_packet(packet)
+
+
 # for i in range(10):
     # test1()
     # test2(aac_file_path)
 
-test2(sample_options.audio_file)
+# test2(sample_options.audio_file)
+
+test3(sample_options.audio_file)
+
+
 # time.sleep(100)
 local_user.unpublish_audio(audio_track)
 audio_track.set_enabled(0)

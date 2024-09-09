@@ -188,12 +188,11 @@ class VideoEncodedImageSender:
         # encoded_video_frame = frame_info.to_owned_encoded_video_frame_info()
         # ret = agora_video_encoded_image_sender_send(self.sender_handle, cdata, size, ctypes.byref(encoded_video_frame))
 
-
         buffer_pointer = ctypes.cast(data, ctypes.POINTER(ctypes.c_uint8))
         encoded_video_frame = frame_info.to_owned_encoded_video_frame_info()
         ret = agora_video_encoded_image_sender_send(self.sender_handle, buffer_pointer, size, ctypes.byref(encoded_video_frame))
         if ret != 1:
             print(f"Failed to send video frame, error code: {ret}")
         return ret
-    
+
     
