@@ -92,7 +92,6 @@ def test1():
 
 
 def test2():
-
     sendinterval = 1/25
     pacer = Pacer(sendinterval)
 
@@ -138,22 +137,22 @@ def test2():
             if packet:  # 过滤掉空行
                 # print(packet)
                 encoded_video_frame_info = EncodedVideoFrameInfo()
-                encoded_video_frame_info.codec_type = 7            
+                encoded_video_frame_info.codec_type = 2            
                 encoded_video_frame_info.width = width
                 encoded_video_frame_info.height = height
-                encoded_video_frame_info.frames_per_second = 15                        
-                encoded_video_frame_info.frame_type = 3
-                # if is_key_frame(packet):
-                #     encoded_video_frame_info.frame_type = 3
-                # else:
-                #     encoded_video_frame_info.frame_type = 4            
+                encoded_video_frame_info.frames_per_second = 25                        
+                # encoded_video_frame_info.frame_type = 3
+                if is_key_frame(packet):
+                    encoded_video_frame_info.frame_type = 3
+                else:
+                    encoded_video_frame_info.frame_type = 4            
                 # encoded_video_frame_info.rotation = 0
                 # encoded_video_frame_info.track_id = 0
                 packet = bytearray(packet)            
                 ret = video_sender.send_encoded_video_image(packet, len(packet) ,encoded_video_frame_info)        
                 count += 1
                 print("count,ret=",count, ret)
-                pacer.pace()
+                pacer.pace_interval(1/30)
 
 
 
@@ -164,9 +163,55 @@ def test2():
         # send_test()
 
 # test1()
-test2()
+# test2()
 
-time.sleep(2)
+
+import av
+def read_and_send_packets(h264_file):
+    sendinterval = 1/25
+    pacer = Pacer(sendinterval)
+    count = 0
+    width = 352
+    height = 288
+
+    # 打开 .264 文件
+    container = av.open(h264_file)
+    # 遍历每个 packet
+    for packet in container.demux():
+        if packet.stream.type == 'video':
+            # 读取到的视频 packet 可以在这里发送出去
+            print(f"Read packet with size {packet.size} bytes, PTS {packet.pts}")
+            is_keyframe = packet.is_keyframe
+            if is_keyframe:
+                print(f"Keyframe packet with size {packet.size} bytes, PTS {packet.pts}")
+            else:
+                print(f"Non-keyframe packet with size {packet.size} bytes, PTS {packet.pts}")
+
+            # 假设 send_packet 是你定义的发送函数，可以将 packet 数据发送出去
+            # send_packet(packet)
+
+            encoded_video_frame_info = EncodedVideoFrameInfo()
+            encoded_video_frame_info.codec_type = 2            
+            encoded_video_frame_info.width = width
+            encoded_video_frame_info.height = height
+            encoded_video_frame_info.frames_per_second = 25                        
+            # encoded_video_frame_info.frame_type = 3
+            if is_keyframe:
+                encoded_video_frame_info.frame_type = 3
+            else:
+                encoded_video_frame_info.frame_type = 4        
+            packet2 = bytearray(packet.buffer_ptr) 
+            packet2 = packet.buffer_ptr         
+            # continue
+            ret = video_sender.send_encoded_video_image(packet2, packet.buffer_size ,encoded_video_frame_info)        
+            count += 1
+            print("count,ret=",count, ret)
+            pacer.pace_interval(1/30)
+
+read_and_send_packets(sample_options.video_file)
+
+
+# time.sleep(2)
 local_user.unpublish_video(video_track)
 video_track.set_enabled(0)
 connection.unregister_observer()
