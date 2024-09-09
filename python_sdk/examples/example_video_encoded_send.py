@@ -200,7 +200,7 @@ def read_and_send_packets(h264_file):
                 encoded_video_frame_info.frame_type = 3
             else:
                 encoded_video_frame_info.frame_type = 4        
-            packet2 = bytearray(packet.buffer_ptr) 
+            # packet2 = bytearray(packet.buffer_ptr) 
             packet2 = packet.buffer_ptr         
             # continue
             ret = video_sender.send_encoded_video_image(packet2, packet.buffer_size ,encoded_video_frame_info)        
