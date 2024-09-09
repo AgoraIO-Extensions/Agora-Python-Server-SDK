@@ -156,8 +156,8 @@ def test3(aac_file):
 
             frame = EncodedAudioFrame()
             # frame.data = bytearray(buffer)
-            frame.buffer_ptr = packet.buffer_ptr
-            frame.buffer_size = packet.size
+            # frame.buffer_ptr = packet.buffer_ptr
+            # frame.buffer_size = packet.size
             frame.speech = 0
             frame.codec = AUDIO_CODEC_TYPE.AUDIO_CODEC_AACLC #https://doc.shengwang.cn/api-ref/rtc/windows/API/enum_audiocodectype
             frame.sample_rate = sample_rate
@@ -165,7 +165,7 @@ def test3(aac_file):
             frame.number_of_channels = channels
             frame.send_even_if_empty = 1
 
-            ret = audio_sender.send_encoded_audio_frame(frame)
+            ret = audio_sender.send_encoded_audio_frame(packet.buffer_ptr, packet.size,frame)
 
             time_base = packet.stream.time_base
             duration_in_seconds = packet.duration * time_base

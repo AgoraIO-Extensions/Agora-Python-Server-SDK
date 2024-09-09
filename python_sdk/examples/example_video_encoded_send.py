@@ -203,7 +203,7 @@ def read_and_send_packets(h264_file):
             # packet2 = bytearray(packet.buffer_ptr) 
             packet2 = packet.buffer_ptr         
             # continue
-            ret = video_sender.send_encoded_video_image(packet2, packet.buffer_size ,encoded_video_frame_info)        
+            ret = video_sender.send_encoded_video_image(packet.buffer_ptr, packet.buffer_size ,encoded_video_frame_info)        
             count += 1
             print("count,ret=",count, ret)
             pacer.pace_interval(1/30)

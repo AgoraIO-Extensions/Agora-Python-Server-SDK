@@ -5,8 +5,8 @@ class EncodedAudioFrame:
     def __init__(
             self, 
             # data: bytearray = None,
-            buffer_ptr: int = 0,
-            buffer_size: int = 0,
+            # buffer_ptr: int = 0,
+            # buffer_size: int = 0,
             capture_timems: int = 0,
             codec: AUDIO_CODEC_TYPE = AUDIO_CODEC_TYPE.AUDIO_CODEC_AACLC, 
             number_of_channels: int = 1,
@@ -16,8 +16,8 @@ class EncodedAudioFrame:
             speech: int = 1
             )->None:
         # self.data = data        
-        self.buffer_ptr = buffer_ptr
-        self.buffer_size = buffer_size
+        # self.buffer_ptr = buffer_ptr
+        # self.buffer_size = buffer_size
         self.capture_timems = capture_timems #int64, 音频帧的 Unix 时间戳（毫秒）
         #int, 音频帧的编码格式; ref: https://doc.shengwang.cn/api-ref/rtc-server-sdk/cpp/namespaceagora_1_1rtc#ac211c1a503d38d504c92b5f006240053
         self.codec = codec
@@ -77,10 +77,8 @@ class AudioEncodedFrameSender:
     #         print("Failed to send encoded audio frame with error code: ", ret)
     #     return ret
     
-    def send_encoded_audio_frame(self, frame:EncodedAudioFrame):
-        # c_date = (ctypes.c_char * len(frame.data)).from_buffer(frame.data)
-        buffer_ptr = ctypes.cast(frame.buffer_ptr, ctypes.POINTER(ctypes.c_void_p))
-        buffer_size = frame.buffer_size
+    def send_encoded_audio_frame(self, buffer_ptr:int, buffer_size:int, frame:EncodedAudioFrame):
+        buffer_ptr = ctypes.cast(buffer_ptr, ctypes.POINTER(ctypes.c_void_p))
         ownedinfo = frame.to_owned_encoded_audio_frame()
         ret = agora_audio_encoded_frame_sender_send(self.sender_handle, buffer_ptr, ctypes.c_uint32(buffer_size), ctypes.byref(ownedinfo))
         if ret < 0:
