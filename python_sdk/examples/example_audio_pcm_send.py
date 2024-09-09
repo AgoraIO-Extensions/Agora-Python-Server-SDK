@@ -1,9 +1,9 @@
 #!env python
 
-#coding=utf-8
-
 import time
 import os
+import threading
+
 from common.path_utils import get_log_path_with_filename 
 from common.pacer import Pacer
 from common.parse_args import parse_args_example
@@ -27,73 +27,90 @@ config.log_path = get_log_path_with_filename(os.path.splitext(__file__)[0])
 agora_service = AgoraService()
 agora_service.initialize(config)
 
-#---------------2. Create Connection
-con_config = RTCConnConfig(
-    client_role_type=ClientRoleType.CLIENT_ROLE_BROADCASTER,
-    channel_profile=ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
-)
+def create_conn_and_send(channel_id, uid = 0):
 
-connection = agora_service.create_rtc_connection(con_config)
-conn_observer = DYSConnectionObserver()
-connection.register_observer(conn_observer)
-connection.connect(sample_options.token, sample_options.channel_id, sample_options.user_id)
+    #---------------2. Create Connection
+    con_config = RTCConnConfig(
+        client_role_type=ClientRoleType.CLIENT_ROLE_BROADCASTER,
+        channel_profile=ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
+    )
+    connection = agora_service.create_rtc_connection(con_config)
+    conn_observer = DYSConnectionObserver()
+    connection.register_observer(conn_observer)
+    connection.connect(sample_options.token, channel_id, uid)
 
-#---------------3. Create Media Sender
-media_node_factory = agora_service.create_media_node_factory()
-pcm_data_sender = media_node_factory.create_audio_pcm_data_sender()
-audio_track = agora_service.create_custom_audio_track_pcm(pcm_data_sender)
+    #---------------3. Create Media Sender
+    media_node_factory = agora_service.create_media_node_factory()
+    pcm_data_sender = media_node_factory.create_audio_pcm_data_sender()
+    audio_track = agora_service.create_custom_audio_track_pcm(pcm_data_sender)
 
-local_user = connection.get_local_user()
-localuser_observer = DYSLocalUserObserver()
-local_user.register_local_user_observer(localuser_observer)
-audio_frame_observer = DYSAudioFrameObserver()
-local_user.register_audio_frame_observer(audio_frame_observer)
+    local_user = connection.get_local_user()
+    localuser_observer = DYSLocalUserObserver()
+    local_user.register_local_user_observer(localuser_observer)
+    audio_frame_observer = DYSAudioFrameObserver()
+    local_user.register_audio_frame_observer(audio_frame_observer)
 
-audio_track.set_max_buffer_audio_frame_number(320*2000)
+    audio_track.set_max_buffer_audio_frame_number(320*2000)
 
-#---------------4. Send Media Stream
-audio_track.set_enabled(1)
-local_user.publish_audio(audio_track)
+    #---------------4. Send Media Stream
+    audio_track.set_enabled(1)
+    local_user.publish_audio(audio_track)
 
-sendinterval = 0.1
-Pacer = Pacer(sendinterval)
-count = 0
-packnum = int((sendinterval*1000)/10)
+    sendinterval = 0.1
+    pacer = Pacer(sendinterval)
+    # count = 0
+    packnum = int((sendinterval*1000)/10)
 
-def send_test():
-    with open(sample_options.audio_file, "rb") as file:
-        global count
-        global packnum
-        while True:
-            if count < 10:
-                packnum = 100
-            frame_buf = bytearray(320*packnum)            
-            success = file.readinto(frame_buf)
-            if not success:
-                break
-            frame = PcmAudioFrame()
-            frame.data = frame_buf
-            frame.timestamp = 0
-            frame.samples_per_channel = 160*packnum
-            frame.bytes_per_sample = 2
-            frame.number_of_channels = 1
-            frame.sample_rate = 16000
+    def send_test():
+        count = 0
+        packnum = int((sendinterval*1000)/10)
+        with open(sample_options.audio_file, "rb") as file:        
+            while True:
+                if count < 10:
+                    packnum = 100
+                frame_buf = bytearray(320*packnum)            
+                success = file.readinto(frame_buf)
+                if not success:
+                    break
+                frame = PcmAudioFrame()
+                frame.data = frame_buf
+                frame.timestamp = 0
+                frame.samples_per_channel = 160*packnum
+                frame.bytes_per_sample = 2
+                frame.number_of_channels = 1
+                frame.sample_rate = 16000
 
-            ret = pcm_data_sender.send_audio_pcm_data(frame)
-            count += 1
-            print("count,ret=",count, ret)
-            Pacer.pace()
+                ret = pcm_data_sender.send_audio_pcm_data(frame)
+                count += 1
+                print("count,ret=",count, ret)
+                pacer.pace()
 
-for i in range(100):
-    send_test()
+    for i in range(1):
+        send_test()
 
-#---------------5. Stop Media Sender And Release
-time.sleep(10)
-local_user.unpublish_audio(audio_track)
-audio_track.set_enabled(0)
-connection.unregister_observer()
-connection.disconnect()
-connection.release()
-print("release")
+    #---------------5. Stop Media Sender And Release
+    time.sleep(2)
+    local_user.unpublish_audio(audio_track)
+    audio_track.set_enabled(0)
+    connection.unregister_observer()
+    connection.disconnect()
+    connection.release()
+    print("connection release")
+
+
+threads = []
+for i in range(int(sample_options.channel_number)):
+    print("channel", i)
+    channel_id = sample_options.channel_id + str(i+1)
+
+    thread = threading.Thread(target=create_conn_and_send, args=(channel_id, sample_options.user_id))
+    thread.start()
+    threads.append(thread)
+
+    
+for t in threads:
+    t.join()
+
+
 agora_service.release()
 print("end")

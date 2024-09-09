@@ -5,6 +5,7 @@ class SampleOptions:
         self.app_id = None
         self.token = None
         self.channel_id = None
+        self.channel_number = 1
         self.user_id = 0
         self.audio_file = None
         self.low_delay = False
@@ -22,6 +23,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Agora SDK Example")
     parser.add_argument("--appId", required=True, help="The token for authentication / must")
     parser.add_argument("--channelId", required=True, help="Channel Id / must")
+    parser.add_argument("--channelNumber", default=1, help="Enter the channel number")
     parser.add_argument("--userId", default="0", help="User Id / default is 0")
     parser.add_argument("--audioFile", required=False, help="The audio file in raw PCM format to be sent")
     parser.add_argument("--lowdelay", action="store_true", help="Enable the low delay")
@@ -43,6 +45,7 @@ def parse_args_example() -> SampleOptions:
     sample_options.app_id = args.appId
     sample_options.token = args.appId    
     sample_options.channel_id = args.channelId
+    sample_options.channel_number = int(args.channelNumber)
     sample_options.audio_file = args.audioFile
     sample_options.user_id = args.userId
     sample_options.low_delay = args.lowdelay
