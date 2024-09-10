@@ -93,7 +93,7 @@ def create_conn_and_send(channel_id, uid = 0):
 
 
 threads = []
-for i in range(int(sample_options.channel_number)):
+for i in range(int(sample_options.connection_number)):
     print("channel", i)
     channel_id = sample_options.channel_id + str(i+1)
 
