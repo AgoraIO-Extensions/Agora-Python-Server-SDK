@@ -180,5 +180,17 @@ class AgoraService:
             return None
         custom_video_track = agora_service_create_custom_video_track_encoded(self.service_handle, video_encoded_frame_sender.sender_handle, ctypes.byref(options))
         return LocalVideoTrack(custom_video_track)
+    
+    def set_log_file(self, log_path: str, log_size: int = 512 * 1024):
+        if not self.inited:
+            print("AgoraService is not initialized. Please call initialize() first.")
+            return -1
+        encoded_log_path = log_path.encode('utf-8')
+        result = agora_service_set_log_file(self.service_handle, ctypes.create_string_buffer(encoded_log_path), log_size)
+        if result == 0:
+            print(f"Log file set successfully: {log_path}")
+        else:
+            print(f"Failed to set log file. Error code: {result}")
+        return result
 
 
