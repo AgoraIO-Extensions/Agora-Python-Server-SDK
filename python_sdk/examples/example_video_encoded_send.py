@@ -176,6 +176,14 @@ def read_and_send_packets(h264_file):
 
     # 打开 .264 文件
     container = av.open(h264_file)
+
+    for stream in container.streams:
+        if stream.type == 'video':
+            width = stream.width
+            height = stream.height
+            print(f"Video stream: width = {width}, height = {height}")
+            break
+
     # 遍历每个 packet
     for packet in container.demux():
         if packet.stream.type == 'video':
