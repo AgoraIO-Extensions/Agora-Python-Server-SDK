@@ -129,7 +129,9 @@ def create_conn_and_send(channel_id, uid = 0):
     send_test()
 
     local_user.unpublish_audio(audio_track)
+    local_user.unpublish_video(video_track)
     audio_track.set_enabled(0)
+    video_track.set_enabled(0)
     connection.unregister_observer()
     connection.disconnect()
     connection.release()
