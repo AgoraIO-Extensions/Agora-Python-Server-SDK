@@ -19,7 +19,9 @@ from agora_service.video_frame_sender import ExternalVideoFrame
 sample_options = parse_args_example()
 print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
 
-
+exit_loop = False
+if sample_options.hours == 0:
+    exit_loop = True
 #---------------1. Init SDK
 config = AgoraServiceConfig()
 config.appid = sample_options.app_id
@@ -126,7 +128,11 @@ def create_conn_and_send(channel_id, uid = 0):
                 push_pcm_data_from_file(audio_file)
                 push_video_data_from_file(video_file)
 
-    send_test()
+    while True:
+        send_test() 
+        if exit_loop:
+            break
+        
 
     local_user.unpublish_audio(audio_track)
     local_user.unpublish_video(video_track)
@@ -146,7 +152,16 @@ for i in range(int(sample_options.connection_number)):
     thread.start()
     threads.append(thread)
 
-    
+
+def time_down():
+    global exit_loop
+    exit_loop = True
+
+t = int(sample_options.hours*3600)
+timer = threading.Timer(t, time_down)
+timer.start()
+
+
 for t in threads:
     t.join()
 

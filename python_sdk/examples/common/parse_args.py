@@ -16,6 +16,7 @@ class SampleOptions:
         self.width = None
         self.height = None
         self.bitrate = None
+        self.hours = 0
         self.msg = "hello agora python sdk"
 
 
@@ -35,6 +36,7 @@ def parse_args():
     parser.add_argument("--height", type=int, help="Image height for the YUV file to be sent")
     parser.add_argument("--bitrate", type=int, help="Target bitrate (bps) for encoding the YUV stream")
     parser.add_argument("--message", help="The message to be sent")
+    parser.add_argument("--hours", default="0", help="The time to run")
 
     return parser.parse_args()
 
@@ -57,5 +59,6 @@ def parse_args_example() -> SampleOptions:
     sample_options.height = args.height
     sample_options.bitrate = args.bitrate
     sample_options.msg = args.message
+    sample_options.hours = args.hours
 
     return sample_options
