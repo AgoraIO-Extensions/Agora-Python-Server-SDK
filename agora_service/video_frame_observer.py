@@ -4,9 +4,6 @@ from .local_user import *
 import ctypes
 import ctypes
 
-AGORA_HANDLE = ctypes.c_void_p
-user_id_t = ctypes.c_uint
-
 class VideoFrame(ctypes.Structure):
     _fields_ = [
         ("type", ctypes.c_int),

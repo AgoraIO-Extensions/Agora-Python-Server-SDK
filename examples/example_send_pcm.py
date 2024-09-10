@@ -54,7 +54,9 @@ def on_ear_monitoring_audio_frame(agora_local_user, frame):
     return 0
 
 def on_playback_audio_frame_before_mixing(agora_local_user, channelId, uid, frame):
-    print("on_playback_audio_frame_before_mixing")
+    print("on_playback_audio_frame_before_mixing", uid)
+    uid2 = int(uid)
+    print(f"on_playback audio_frame_ before mixing:{uid2}")
     return 0
 
 def on_get_audio_frame_position(agora_local_user):

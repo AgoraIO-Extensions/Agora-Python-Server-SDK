@@ -62,7 +62,9 @@ def on_get_audio_frame_position(agora_local_user):
     return 0
 
 def on_stream_message(local_user, user_id, stream_id, data, length):
-    print("on_stream_message:", user_id, stream_id, data, length)
+    uid = int(user_id)
+    print(f"on_playback audio_frame_ before mixing:{uid}")
+    print("on_stream_message:", user_id, stream_id, data, length)    
     return 0
 
 def on_user_info_updated(local_user, user_id, msg, val):
