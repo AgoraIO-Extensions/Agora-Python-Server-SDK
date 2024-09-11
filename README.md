@@ -41,11 +41,11 @@ python examples/example_send_pcm.py {appid} {token} {channel_id} ../test_data/de
 ## Prepare C version of agora rtc sdk
 - make **agora_sdk** directory in the same directory with **python_sdk**
 - download and unzip [agora_sdk.zip](https://download.agora.io/sdk/release/agora_rtc_sdk_mac_20240814_320567.zip) to **agora_sdk**
-- there should be **libagora_rtc_sdk.so** and **include_c** in **agora_sdk** directory
+- there should be **libAgoraRtcKit.dylib** and **include_c** in **agora_sdk** directory
 
 ## run example on mac
 
-- add **libagora_rtc_sdk.dylib** to **/usr/local/lib**
+- add **libAgoraRtcKit.dylib** to **/usr/local/lib**
 - or  `export DYLD_LIBRARY_PATH=/path/to/agora_sdk`
 
 ```
