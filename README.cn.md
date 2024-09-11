@@ -43,7 +43,7 @@ python examples/example_send_pcm.py {appid} {token} {channel_id} ./test_data/dem
 - **agora_sdk** 目录中应有 **libAgoraRtcKit.dylib** 和 **include_c**
 
 ## 在 Mac 上运行示例
-- 将 **libagora_rtc_sdk.dylib** 添加到 **/usr/local/lib**。
+- 将 **libAgoraRtcKit.dylib** 添加到 **/usr/local/lib**。
 - 或者 `export DYLD_LIBRARY_PATH=/path/to/agora_sdk:$DYLD_LIBRARY_PATH`
 
 ```

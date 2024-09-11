@@ -45,7 +45,7 @@ python examples/example_send_pcm.py {appid} {token} {channel_id} ./test_data/dem
 
 ## run example on mac
 
-- add **libagora_rtc_sdk.dylib** to **/usr/local/lib**
+- add **libAgoraRtcKit.dylib** to **/usr/local/lib**
 - or  `export DYLD_LIBRARY_PATH=/path/to/agora_sdk:$DYLD_LIBRARY_PATH`
 
 ```
