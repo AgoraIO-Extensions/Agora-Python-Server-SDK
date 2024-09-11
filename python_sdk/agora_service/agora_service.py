@@ -133,8 +133,8 @@ class AgoraService:
             print("AgoraService is not initialized. Please call initialize() first.")
             return None
         media_node_handle = agora_service_create_media_node_factory(self.service_handle)
-        if not media_node_handle:
-            raise Exception("Failed to create media node factory")
+        if media_node_handle is None:
+            return None
         return MediaNodeFactory(media_node_handle)
     
 
@@ -143,21 +143,19 @@ class AgoraService:
             print("AgoraService is not initialized. Please call initialize() first.")
             return None
         rtc_conn_handle = agora_rtc_conn_create(self.service_handle, ctypes.byref(con_config._to_inner()))
-        if not rtc_conn_handle:
-            raise Exception("Failed to create RTC connection")
+        if rtc_conn_handle is None:
+            return None
         return RTCConnection(rtc_conn_handle)
 
 
-    #感觉没有理顺Track和pcm Sender之间的创建关系？？？？
-    #比如创建Track的时候，需要先创建pcm Sender
     #createCustomAudioTrackPcm	创建一个自定义音频Track。
     def create_custom_audio_track_pcm(self, audio_pcm_data_sender:AudioPcmDataSender):
         if not self.inited:
             print("AgoraService is not initialized. Please call initialize() first.")
             return None
         custom_audio_track = agora_service_create_custom_audio_track_pcm(self.service_handle, audio_pcm_data_sender.sender_handle)
-        if not custom_audio_track:
-            raise Exception("Failed to create custom audio track PCM")
+        if custom_audio_track is None:
+            return None
         return LocalAudioTrack(custom_audio_track)
     #mix_mode: MIX_ENABLED = 0, MIX_DISABLED = 1
     def create_custom_audio_track_encoded(self, audio_encoded_frame_sender:AudioEncodedFrameSender, mix_mode:int):
@@ -165,6 +163,8 @@ class AgoraService:
             print("AgoraService is not initialized. Please call initialize() first.")
             return None
         custom_audio_track = agora_service_create_custom_audio_track_encoded(self.service_handle, audio_encoded_frame_sender.sender_handle, mix_mode)
+        if custom_audio_track is None:
+            return None
         return LocalAudioTrack(custom_audio_track)
     
     def create_custom_video_track_frame(self, video_frame_sender:VideoFrameSender):
@@ -172,6 +172,8 @@ class AgoraService:
             print("AgoraService is not initialized. Please call initialize() first.")
             return None
         custom_video_track = agora_service_create_custom_video_track_frame(self.service_handle, video_frame_sender.sender_handle)
+        if custom_video_track is None:
+            return None
         return LocalVideoTrack(custom_video_track)
     
     def create_custom_video_track_encoded(self, video_encoded_frame_sender:VideoEncodedImageSender, options:SenderOptions):
@@ -179,6 +181,8 @@ class AgoraService:
             print("AgoraService is not initialized. Please call initialize() first.")
             return None
         custom_video_track = agora_service_create_custom_video_track_encoded(self.service_handle, video_encoded_frame_sender.sender_handle, ctypes.byref(options))
+        if custom_video_track is None:
+            return None
         return LocalVideoTrack(custom_video_track)
     
     def set_log_file(self, log_path: str, log_size: int = 512 * 1024):

@@ -142,7 +142,6 @@ agora_rtc_conn_connect = agora_lib.agora_rtc_conn_connect
 agora_rtc_conn_connect.restype = AGORA_API_C_INT
 agora_rtc_conn_connect.argtypes = [AGORA_HANDLE, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
 
-
 agora_rtc_conn_disconnect = agora_lib.agora_rtc_conn_disconnect
 agora_rtc_conn_disconnect.restype = AGORA_API_C_INT
 agora_rtc_conn_disconnect.argtypes = [AGORA_HANDLE]
@@ -296,7 +295,7 @@ class RTCConnection:
     def create_data_stream(self, reliable, ordered)->int:
         stream_id = ctypes.c_int(0)
         ret = agora_rtc_conn_create_data_stream(self.conn_handle, ctypes.byref(stream_id), int(reliable), int(ordered))
-        if ret != 0:
+        if ret < 0:
             print(f"Failed to create data stream. Error code: {ret}")
             return None
         return stream_id.value

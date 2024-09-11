@@ -34,18 +34,28 @@ class MediaNodeFactory():
     #createAudioPcmDataSender	创建一个 PCM 数据发送模块。
     def create_audio_pcm_data_sender(self):
         sender_handle = agora_media_node_factory_create_audio_pcm_data_sender(self.media_node_factory)
+        if sender_handle is None:
+            return None
         return AudioPcmDataSender(sender_handle)
     #createAudioEncodedFrameSender	创建一个已编码音频数据发送模块。
     def create_audio_encoded_frame_sender(self):
         handle = agora_media_node_factory_create_audio_encoded_frame_sender(self.media_node_factory)
+        if handle is None:
+            return None
+        if not handle:
+            return None
         return AudioEncodedFrameSender(handle)
     #createVideoFrameSender 创建一个 YUV 视频帧发送模块。
     def create_video_frame_sender(self):
         handle = agora_media_node_factory_create_video_frame_sender(self.media_node_factory)
+        if handle is None:
+            return None
         return VideoFrameSender(handle)
     #createVideoEncodedImageSender: 创建一个已编码视频发送模块。
     def create_video_encoded_image_sender(self):
         handle = agora_media_node_factory_create_video_encoded_image_sender(self.media_node_factory)
+        if handle is None:
+            return None
         return VideoEncodedImageSender(handle)
     def release(self):
         if self.media_node_factory is not None:
