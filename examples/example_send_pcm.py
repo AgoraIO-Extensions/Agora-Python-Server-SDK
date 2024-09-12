@@ -29,14 +29,6 @@ def on_connecting(agora_rtc_conn, conn_info, reason):
 def on_user_joined(agora_rtc_conn, user_id):
     print("on_user_joined:", agora_rtc_conn, user_id)
 
-# def on_get_playback_audio_frame_param(agora_local_user):
-#     audio_params_instance = AudioParams()
-#     return audio_params_instance
-
-def on_playback_audio_frame_before_mixing(agora_local_user, channelId, uid, frame):
-    print("on_playback_audio_frame_before_mixing")#, channelId, uid)
-    return 0
-
 def on_record_audio_frame(agora_local_user ,channelId, frame):
     print("on_record_audio_frame")
     return 0
