@@ -122,7 +122,7 @@ class LocalAudioStats(ctypes.Structure):
     ]
 
 
-class AUDIO_PROFILE_TYPE(ctypes.c_int):
+class AudioProfileType(ctypes.c_int):
     AUDIO_PROFILE_DEFAULT = 0
     AUDIO_PROFILE_SPEECH_STANDARD = 1
     AUDIO_PROFILE_MUSIC_STANDARD = 2
@@ -134,11 +134,11 @@ class AUDIO_PROFILE_TYPE(ctypes.c_int):
 
 class AudioEncoderConfiguration(ctypes.Structure):
     _fields_ = [
-        ("audioProfile", AUDIO_PROFILE_TYPE)
+        ("audioProfile", AudioProfileType)
     ]
 
     def __init__(self):
-        self.audioProfile = AUDIO_PROFILE_TYPE.AUDIO_PROFILE_DEFAULT
+        self.audioProfile = AudioProfileType.AUDIO_PROFILE_DEFAULT
 
 
 
@@ -296,11 +296,11 @@ class VideoTrackInfo(ctypes.Structure):
         self.source_type = 0
         self.observation_position = 0
 
-class RAW_AUDIO_FRAME_OP_MODE_TYPE(ctypes.c_int):
+class RawAudioFrameOpModeType(ctypes.c_int):
     RAW_AUDIO_FRAME_OP_MODE_READ_ONLY = 0
     RAW_AUDIO_FRAME_OP_MODE_READ_WRITE = 2
 
-class AUDIO_FRAME_POSITION(ctypes.c_int):
+class AudioFramePosition(ctypes.c_int):
     AUDIO_FRAME_POSITION_PLAYBACK = 0x0001
     AUDIO_FRAME_POSITION_RECORD = 0x0002
     AUDIO_FRAME_POSITION_MIXED = 0x0004
@@ -317,8 +317,6 @@ class AudioFrame:
         self.render_time_ms = 0
         self.avsync_type = 0
     
-
-
 class AudioParams(ctypes.Structure):
     _fields_ = [
         ("sample_rate", ctypes.c_int),
@@ -337,7 +335,7 @@ class ClientRoleType(Enum):
     CLIENT_ROLE_AUDIENCE = 2
 
 
-class AUDIO_CODEC_TYPE(Enum):
+class AudioCodecType(Enum):
     AUDIO_CODEC_OPUS = 1
     # AUDIO_CODEC_PCMA = 3
     AUDIO_CODEC_PCMA = 3
@@ -351,3 +349,19 @@ class AUDIO_CODEC_TYPE(Enum):
     AUDIO_CODEC_LPCNET = 12
     AUDIO_CODEC_OPUSMC = 13
 
+class AreaCode(Enum):
+    AREA_CODE_CN = 0x00000001
+    AREA_CODE_NA = 0x00000002
+    AREA_CODE_EU = 0x00000004
+    AREA_CODE_AS = 0x00000008
+    AREA_CODE_JP = 0x00000010
+    AREA_CODE_IN = 0x00000020
+    AREA_CODE_GLOB = 0xFFFFFFFF
+
+class AudioScenarioType(Enum):
+    AUDIO_SCENARIO_DEFAULT = 0
+    AUDIO_SCENARIO_GAME_STREAMING = 3
+    AUDIO_SCENARIO_CHATROOM = 5
+    AUDIO_SCENARIO_CHORUS = 7
+    AUDIO_SCENARIO_MEETING = 8
+    AUDIO_SCENARIO_NUM = 9

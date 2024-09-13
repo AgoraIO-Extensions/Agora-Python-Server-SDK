@@ -18,6 +18,8 @@ print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id
 #---------------1. Init SDK
 config = AgoraServiceConfig()
 config.appid = sample_options.app_id
+config.area_code = AreaCode.AREA_CODE_CN.value | AreaCode.AREA_CODE_JP.value
+print("config.area_code:",config.area_code)
 config.log_path = get_log_path_with_filename(os.path.splitext(__file__)[0])
 
 agora_service = AgoraService()

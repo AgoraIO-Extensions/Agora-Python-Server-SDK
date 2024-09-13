@@ -118,7 +118,7 @@ def test2(file_path):
             frame.data = bytearray(buffer)
 
             frame.speech = 0
-            frame.codec = AUDIO_CODEC_TYPE.AUDIO_CODEC_AACLC #https://doc.shengwang.cn/api-ref/rtc/windows/API/enum_audiocodectype
+            frame.codec = AudioCodecType.AUDIO_CODEC_AACLC #https://doc.shengwang.cn/api-ref/rtc/windows/API/enum_audiocodectype
             frame.sample_rate = sampling_rate
             frame.samples_per_channel = 1024
             frame.number_of_channels = channel_configuration
@@ -159,7 +159,7 @@ def test3(aac_file):
             # frame.buffer_ptr = packet.buffer_ptr
             # frame.buffer_size = packet.size
             frame.speech = 0
-            frame.codec = AUDIO_CODEC_TYPE.AUDIO_CODEC_AACLC #https://doc.shengwang.cn/api-ref/rtc/windows/API/enum_audiocodectype
+            frame.codec = AudioCodecType.AUDIO_CODEC_AACLC #https://doc.shengwang.cn/api-ref/rtc/windows/API/enum_audiocodectype
             frame.sample_rate = sample_rate
             frame.samples_per_channel = 1024
             frame.number_of_channels = channels

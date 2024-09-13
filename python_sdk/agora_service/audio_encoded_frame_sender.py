@@ -8,7 +8,7 @@ class EncodedAudioFrame:
             # buffer_ptr: int = 0,
             # buffer_size: int = 0,
             capture_timems: int = 0,
-            codec: AUDIO_CODEC_TYPE = AUDIO_CODEC_TYPE.AUDIO_CODEC_AACLC, 
+            codec: AudioCodecType = AudioCodecType.AUDIO_CODEC_AACLC, 
             number_of_channels: int = 1,
             sample_rate: int = 16000,
             samples_per_channel: int = 1024,
