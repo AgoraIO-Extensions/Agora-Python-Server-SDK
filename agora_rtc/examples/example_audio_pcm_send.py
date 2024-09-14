@@ -58,7 +58,7 @@ def create_conn_and_send(channel_id, uid = 0):
 
     sendinterval = 0.1
     pacer = Pacer(sendinterval)
-    def send_test():
+    def read_and_send_packets():
         count = 0
         with open(sample_options.audio_file, "rb") as file:        
             while True:
@@ -80,7 +80,7 @@ def create_conn_and_send(channel_id, uid = 0):
                 pacer.pace()
 
     for i in range(1):
-        send_test()
+        read_and_send_packets()
 
     #---------------5. Stop Media Sender And Release
     time.sleep(2)
