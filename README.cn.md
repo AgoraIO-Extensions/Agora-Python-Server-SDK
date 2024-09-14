@@ -26,7 +26,7 @@
 # Linux 调试与开发
 ## 准备 C 版本的 Agora RTC SDK
 - 在与 **agora_rtc/agora/rtc** 目录下创建 **agora_sdk** 目录
-- 下载并解压 agora_sdk.zip 到**agora_sdk** 目录。
+- 下载并解压 [agora_sdk.zip](https://download.agora.io/sdk/release/agora_rtc_sdk_linux_v4.4_20240914_1538_336910.zip) 到**agora_sdk** 目录。
 - **agora_sdk** 目录中应有 **libagora_rtc_sdk.so** 和 **include_c**
 
 ## 在 Linux 上运行示例
@@ -39,7 +39,7 @@ python examples/example_send_pcm.py {appid} {token} {channel_id} ../test_data/de
 # Mac 调试与开发
 ## 准备 C 版本的 Agora RTC SDK
 - 在与 **agora_rtc/agora/rtc** 目录下创建 **agora_sdk** 目录
-- 下载并解压 agora_sdk.zip，到**agora_sdk** 目录。
+- 下载并解压 [agora_sdk.zip](https://download.agora.io/sdk/release/agora_rtc_sdk_mac_v4.4_20240914_1538_336910.zip)，到**agora_sdk** 目录。
 - **agora_sdk** 目录中应有 **libAgoraRtcKit.dylib** 和 **include_c**
 
 ## 在 Mac 上运行示例
