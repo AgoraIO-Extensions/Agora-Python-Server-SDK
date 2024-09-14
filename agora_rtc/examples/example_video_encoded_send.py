@@ -10,8 +10,8 @@ from agora.rtc.video_frame_sender import EncodedVideoFrameInfo
 from agora.rtc.agora_base import *
 import av
 
-# 通过传参将参数传进来
-#python agora_rtc/examples/example_video_encoded_send.py --appId=xxx --channelId=xxx --userId=xxx --videoFile=./test_data/send_video.h264
+# run this example
+# python agora_rtc/examples/example_video_encoded_send.py --appId=xxx --channelId=xxx --userId=xxx --videoFile=./test_data/send_video.h264
 sample_options = parse_args_example()
 print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
 

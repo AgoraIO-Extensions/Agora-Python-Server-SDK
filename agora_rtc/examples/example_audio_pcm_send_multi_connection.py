@@ -16,8 +16,8 @@ from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnCon
 from agora.rtc.audio_pcm_data_sender import PcmAudioFrame
 from agora.rtc.agora_base import *
 
-# 通过传参将参数传进来
-#python agora_rtc/examples/example_audio_pcm_send_multi_connection.py --appId=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.pcm
+# run this example
+# python agora_rtc/examples/example_audio_pcm_send_multi_connection.py --appId=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.pcm
 sample_options = parse_args_example()
 print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
 

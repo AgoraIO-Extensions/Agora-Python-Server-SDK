@@ -14,8 +14,8 @@ from agora.rtc.agora_base import *
 
 
 from common.parse_args import parse_args_example
-# 通过传参将参数传进来
-##python agora_rtc/examples/example_audio_encoded_receive.py --appId=xxx --channelId=xxx --userId=xxx
+# run this example
+## python agora_rtc/examples/example_audio_encoded_receive.py --appId=xxx --channelId=xxx --userId=xxx
 sample_options = parse_args_example()
 print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
 

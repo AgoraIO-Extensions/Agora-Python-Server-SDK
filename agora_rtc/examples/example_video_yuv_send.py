@@ -12,8 +12,8 @@ from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnCon
 from agora.rtc.video_frame_sender import ExternalVideoFrame
 from agora.rtc.agora_base import *
 
-# 通过传参将参数传进来
-#python agora_rtc/examples/example_video_yuv_send.py --appId=xxx --channelId=xxx --userId=xxx --videoFile=./test_data/103_RaceHorses_416x240p30_300.yuv --width=416 --height=240 --fps=30 --connectionNumber=1
+# run this example
+# python agora_rtc/examples/example_video_yuv_send.py --appId=xxx --channelId=xxx --userId=xxx --videoFile=./test_data/103_RaceHorses_416x240p30_300.yuv --width=416 --height=240 --fps=30 --connectionNumber=1
 sample_options = parse_args_example()
 print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "video_file:", sample_options.video_file, "uid:", sample_options.user_id)
 

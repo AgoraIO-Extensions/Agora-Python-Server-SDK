@@ -8,8 +8,8 @@ from observer.local_user_observer import DYSLocalUserObserver
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora.rtc.agora_base import *
 
-# 通过传参将参数传进来
-#python agora_rtc/examples/example_stream_message_send.py --appId=xxx --channelId=xxx --userId=xxx --message="hello agora"
+# run this example
+# python agora_rtc/examples/example_stream_message_send.py --appId=xxx --channelId=xxx --userId=xxx --message="hello agora"
 sample_options = parse_args_example()
 print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
 
