@@ -31,8 +31,7 @@
 
 ## 在 Linux 上运行示例
 ```
-cd agora_rtc
-python examples/example_send_pcm.py {appid} {token} {channel_id} ../test_data/demo.pcm {userid}
+python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.pcm --sampleRate=16000 --numOfChannels=1
 ```
 
 
@@ -40,11 +39,10 @@ python examples/example_send_pcm.py {appid} {token} {channel_id} ../test_data/de
 ## 准备 C 版本的 Agora RTC SDK
 - 在与 **agora_rtc/agora/rtc** 目录下创建 **agora_sdk** 目录
 - 下载并解压 [agora_sdk.zip](https://download.agora.io/sdk/release/agora_rtc_sdk_mac_v4.4_20240914_1538_336910.zip)，到**agora_sdk** 目录。
-- **agora_sdk** 目录中应有 **libAgoraRtcKit.dylib** 和 **include_c**
+- **agora_sdk** 目录中应有 **libAgoraRtcKit.dylib**
 
 ## 在 Mac 上运行示例
 ```
-cd agora_rtc
-python examples/example_send_pcm.py {appid} {token} {channel_id} ../test_data/demo.pcm {userid}
+python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.pcm --sampleRate=16000 --numOfChannels=1
 ```
 
