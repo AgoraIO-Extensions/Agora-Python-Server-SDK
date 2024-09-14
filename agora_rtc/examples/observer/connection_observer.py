@@ -1,6 +1,6 @@
 #!env python
 
-from agora_service.rtc_connection_observer import IRTCConnectionObserver
+from agora.rtc.rtc_connection_observer import IRTCConnectionObserver
 class DYSConnectionObserver(IRTCConnectionObserver):
     def __init__(self):
         super(DYSConnectionObserver, self).__init__()

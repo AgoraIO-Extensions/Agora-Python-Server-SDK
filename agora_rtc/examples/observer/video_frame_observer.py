@@ -1,5 +1,5 @@
 #!env python
-from agora_service.video_frame_observer import IVideoFrameObserver 
+from agora.rtc.video_frame_observer import IVideoFrameObserver 
 
 class DYSVideoFrameObserver(IVideoFrameObserver):
     def __init__(self):

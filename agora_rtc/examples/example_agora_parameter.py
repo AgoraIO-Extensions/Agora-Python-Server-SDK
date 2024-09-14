@@ -5,12 +5,12 @@ import os
 from common.path_utils import get_log_path_with_filename 
 from common.parse_args import parse_args_example
 from observer.connection_observer import DYSConnectionObserver
-from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
-from agora_service.agora_base import *
+from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
+from agora.rtc.agora_base import *
 
 
 # 通过传参将参数传进来
-#python python_sdk/examples/example_agora_parameter.py --appId=xxx --channelId=xxx --userId=xxx
+#python agora_rtc/examples/example_agora_parameter.py --appId=xxx --channelId=xxx --userId=xxx
 sample_options = parse_args_example()
 print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
 

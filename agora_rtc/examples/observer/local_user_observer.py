@@ -1,6 +1,6 @@
 #!env python
 
-from agora_service.local_user_observer import IRTCLocalUserObserver
+from agora.rtc.local_user_observer import IRTCLocalUserObserver
 class DYSLocalUserObserver(IRTCLocalUserObserver):
     def __init__(self):
         super(DYSLocalUserObserver, self).__init__()

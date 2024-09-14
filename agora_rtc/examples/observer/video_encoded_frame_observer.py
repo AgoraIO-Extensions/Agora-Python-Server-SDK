@@ -1,7 +1,7 @@
 #!env python
 
-from agora_service.video_encoded_image_receiver import IVideoEncodedImageReceiver
-from agora_service.video_encoded_frame_observer import IVideoEncodedFrameObserver
+from agora.rtc.video_encoded_image_receiver import IVideoEncodedImageReceiver
+from agora.rtc.video_encoded_frame_observer import IVideoEncodedFrameObserver
 
 
 # IVideoEncodedFrameObserver

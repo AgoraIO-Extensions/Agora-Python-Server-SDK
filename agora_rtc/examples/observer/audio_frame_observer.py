@@ -1,7 +1,7 @@
 #!env python
 import os
 import datetime
-from agora_service.audio_frame_observer import IAudioFrameObserver, AudioFrame
+from agora.rtc.audio_frame_observer import IAudioFrameObserver, AudioFrame
 
 source_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 filename, _ = os.path.splitext(os.path.basename(__file__))

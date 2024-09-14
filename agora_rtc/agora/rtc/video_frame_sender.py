@@ -1,6 +1,6 @@
 import ctypes
 from .agora_base import *
-from agora_service.video_frame_observer import *
+from agora.rtc.video_frame_observer import *
 
 
 class OwnedEncodedVideoFrameInfo(ctypes.Structure):

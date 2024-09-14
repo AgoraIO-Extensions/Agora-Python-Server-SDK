@@ -7,12 +7,12 @@ from common.parse_args import parse_args_example
 from observer.connection_observer import DYSConnectionObserver
 from observer.local_user_observer import DYSLocalUserObserver
 from observer.video_encoded_frame_observer import DYSVideoEncodedFrameObserver
-from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig, SenderOptions
-from agora_service.agora_base import VideoSubscriptionOptions, VIDEO_STREAM_TYPE
-from agora_service.agora_base import *
+from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig, SenderOptions
+from agora.rtc.agora_base import VideoSubscriptionOptions, VIDEO_STREAM_TYPE
+from agora.rtc.agora_base import *
 
 # 通过传参将参数传进来
-#python python_sdk/examples/example_video_encoded_receive.py --appId=xxx --channelId=xxx --userId=xxx
+#python agora_rtc/examples/example_video_encoded_receive.py --appId=xxx --channelId=xxx --userId=xxx
 sample_options = parse_args_example()
 print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
 

@@ -8,12 +8,12 @@ from common.parse_args import parse_args_example
 from common.pacer import Pacer
 from observer.connection_observer import DYSConnectionObserver
 from observer.video_frame_observer import DYSVideoFrameObserver
-from agora_service.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
-from agora_service.video_frame_sender import ExternalVideoFrame
-from agora_service.agora_base import *
+from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
+from agora.rtc.video_frame_sender import ExternalVideoFrame
+from agora.rtc.agora_base import *
 
 # 通过传参将参数传进来
-#python python_sdk/examples/example_video_yuv_send.py --appId=xxx --channelId=xxx --userId=xxx --videoFile=./test_data/103_RaceHorses_416x240p30_300.yuv --width=416 --height=240 --fps=30 --connectionNumber=1
+#python agora_rtc/examples/example_video_yuv_send.py --appId=xxx --channelId=xxx --userId=xxx --videoFile=./test_data/103_RaceHorses_416x240p30_300.yuv --width=416 --height=240 --fps=30 --connectionNumber=1
 sample_options = parse_args_example()
 print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "video_file:", sample_options.video_file, "uid:", sample_options.user_id)
 
