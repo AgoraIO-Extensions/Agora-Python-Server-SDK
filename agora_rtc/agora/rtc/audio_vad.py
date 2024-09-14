@@ -5,8 +5,7 @@ import os
 import sys
 from enum import Enum,IntEnum
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
-sdk_dir = os.path.dirname(os.path.dirname(script_dir))
+sdk_dir = os.path.dirname(os.path.abspath(__file__))
 lib_path = os.path.join(sdk_dir, 'agora_sdk')
 if sys.platform == 'darwin':
     agora_vad_lib_path =os.path.join(lib_path, 'libuap_aed.dylib')
