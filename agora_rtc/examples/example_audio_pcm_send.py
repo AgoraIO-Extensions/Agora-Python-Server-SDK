@@ -50,7 +50,7 @@ def create_conn_and_send(channel_id, uid = 0):
     audio_frame_observer = DYSAudioFrameObserver()
     local_user.register_audio_frame_observer(audio_frame_observer)
 
-    audio_track.set_max_buffer_audio_frame_number(320*2000)
+    # audio_track.set_max_buffer_audio_frame_number(320*2000)
 
     #---------------4. Send Media Stream
     audio_track.set_enabled(1)

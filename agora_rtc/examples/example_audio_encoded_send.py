@@ -45,7 +45,7 @@ audio_track = agora_service.create_custom_audio_track_encoded(audio_sender, 1)
 local_user = connection.get_local_user()
 localuser_observer = DYSLocalUserObserver()
 local_user.register_local_user_observer(localuser_observer)
-audio_track.set_max_buffer_audio_frame_number(320*2000)
+# audio_track.set_max_buffer_audio_frame_number(320*2000)
 
 #---------------4. Send Media Stream
 audio_track.set_enabled(1)

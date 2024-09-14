@@ -45,7 +45,7 @@ def create_conn_and_send(channel_id, uid = 0):
 
     pcm_data_sender = media_node_factory.create_audio_pcm_data_sender()
     audio_track = agora_service.create_custom_audio_track_pcm(pcm_data_sender)
-    audio_track.set_max_buffer_audio_frame_number(320*2000)
+    # audio_track.set_max_buffer_audio_frame_number(320*2000)
     
     video_sender = media_node_factory.create_video_frame_sender()
     video_track = agora_service.create_custom_video_track_frame(video_sender)

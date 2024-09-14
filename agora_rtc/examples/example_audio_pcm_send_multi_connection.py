@@ -55,7 +55,7 @@ localuser_observer = DYSLocalUserObserver()
 local_user.register_local_user_observer(localuser_observer)
 audio_frame_observer = DYSAudioFrameObserver()
 local_user.register_audio_frame_observer(audio_frame_observer)
-audio_track.set_max_buffer_audio_frame_number(320*2000)
+# audio_track.set_max_buffer_audio_frame_number(320*2000)
 
 pcm_data_sender2 = media_node_factory.create_audio_pcm_data_sender()
 audio_track2 = agora_service.create_custom_audio_track_pcm(pcm_data_sender2)

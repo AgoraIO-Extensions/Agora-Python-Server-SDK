@@ -39,13 +39,13 @@ agora_local_audio_track_enable_ear_monitor = agora_lib.agora_local_audio_track_e
 agora_local_audio_track_enable_ear_monitor.restype = ctypes.c_int
 agora_local_audio_track_enable_ear_monitor.argtypes = [AGORA_HANDLE, ctypes.c_int, ctypes.c_int]
 
-agora_local_audio_track_set_max_buffer_audio_frame_number = agora_lib.agora_local_audio_track_set_maxBuffered_audioFrameNumber
-agora_local_audio_track_set_max_buffer_audio_frame_number.restype = None
-agora_local_audio_track_set_max_buffer_audio_frame_number.argtypes = [AGORA_HANDLE, ctypes.c_int]
+# agora_local_audio_track_set_max_buffer_audio_frame_number = agora_lib.agora_local_audio_track_set_max_bufferd_frame_number
+# agora_local_audio_track_set_max_buffer_audio_frame_number.restype = None
+# agora_local_audio_track_set_max_buffer_audio_frame_number.argtypes = [AGORA_HANDLE, ctypes.c_int]
 
-agora_local_audio_track_clear_buffer = agora_lib.agora_local_audio_tarck_clear_sender_buffer
-agora_local_audio_track_clear_buffer.restype = ctypes.c_int
-agora_local_audio_track_clear_buffer.argtypes = [AGORA_HANDLE]
+# agora_local_audio_track_clear_buffer = agora_lib.agora_local_audio_track_clear_sender_buffer
+# agora_local_audio_track_clear_buffer.restype = ctypes.c_int
+# agora_local_audio_track_clear_buffer.argtypes = [AGORA_HANDLE]
 
 
 class LocalAudioTrack:
@@ -102,14 +102,14 @@ class LocalAudioTrack:
             print(f"Failed to enable ear monitor, error code: {ret}")
         return ret
 
-    def set_max_buffer_audio_frame_number(self, num):
-        agora_local_audio_track_set_max_buffer_audio_frame_number(self.track_handle, num)
+    # def set_max_buffer_audio_frame_number(self, num):
+    #     agora_local_audio_track_set_max_buffer_audio_frame_number(self.track_handle, num)
 
-    def clear_buffer(self):
-        ret = agora_local_audio_track_clear_buffer(self.track_handle)
-        if ret != 0:
-            print(f"Failed to clear buffer, error code: {ret}")
-        return ret
+    # def clear_buffer(self):
+    #     ret = agora_local_audio_track_clear_buffer(self.track_handle)
+    #     if ret != 0:
+    #         print(f"Failed to clear buffer, error code: {ret}")
+    #     return ret
 
     def release(self):
         pass
