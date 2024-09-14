@@ -21,41 +21,41 @@
 
 # Test Data
 - download and unzip [test_data.zip](https://download.agora.io/demo/test/test_data_202408221437.zip)
-- make **test_data** directory in the same directory with **python_sdk**
+- make **test_data** directory in the same directory with **agora_rtc**
 
 # Linux debug & develop
 ## Prepare C version of agora rtc sdk
 
-- make **agora_sdk** directory in the same directory with **python_sdk**
+- make **agora_sdk** directory under the directory of **agora_rtc/agora/rtc**
 - download and unzip agora_sdk.zip to **agora_sdk**
 - there should be **libagora_rtc_sdk.so** and **include_c** in **agora_sdk** directory
 
 ## run example on linux
 ```
-export LD_LIBRARY_PATH=/path/to/agora_sdk
-cd python_sdk
+cd agora_rtc
 python examples/example_send_pcm.py {appid} {token} {channel_id} ../test_data/demo.pcm {userid}
 ```
 
 # Mac debug & develop
 ## Prepare C version of agora rtc sdk
-- make **agora_sdk** directory in the same directory with **python_sdk**
+- make **agora_sdk** directory under the directory of **agora_rtc/agora/rtc**
 - download and unzip agora_sdk.zip to **agora_sdk**
 - there should be **libAgoraRtcKit.dylib** and **include_c** in **agora_sdk** directory
 
 ## run example on mac
 
-- add **libAgoraRtcKit.dylib** to **/usr/local/lib**
-- or  `export DYLD_LIBRARY_PATH=/path/to/agora_sdk`
-
 ```
-cd python_sdk
+cd agora_rtc
 python examples/example_send_pcm.py {appid} {token} {channel_id} ../test_data/demo.pcm {userid}
 ```
 # Some import call sequence
-# 1. about audio frame observer： 
-# set_playback_audio_frame_before_mixing_parameters MUST be call before register_audio_frame_observer
+- 1. about audio frame observer： 
+
+set_playback_audio_frame_before_mixing_parameters MUST be call before register_audio_frame_observer
+
 sample code:
+```
 localuser.set_playback_audio_frame_before_mixing_parameters(1, 16000)
 audio_observer = BizAudioFrameObserver()
 localuser.register_audio_frame_observer(audio_observer)
+```

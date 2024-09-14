@@ -21,34 +21,30 @@
 
 # 测试数据
 - 下载并解压 [test_data.zip](https://download.agora.io/demo/test/test_data_202408221437.zip)
-- 在与 **python_sdk** 同一目录下创建 **test_data** 目录
+- 在与 **agora_rtc** 同一目录下创建 **test_data** 目录
 
 # Linux 调试与开发
 ## 准备 C 版本的 Agora RTC SDK
-- 在与 **python_sdk** 同一目录下创建 **agora_sdk** 目录
+- 在与 **agora_rtc/agora/rtc** 目录下创建 **agora_sdk** 目录
 - 下载并解压 agora_sdk.zip 到**agora_sdk** 目录。
 - **agora_sdk** 目录中应有 **libagora_rtc_sdk.so** 和 **include_c**
 
 ## 在 Linux 上运行示例
 ```
-export LD_LIBRARY_PATH=/path/to/agora_sdk
-cd python_sdk
+cd agora_rtc
 python examples/example_send_pcm.py {appid} {token} {channel_id} ../test_data/demo.pcm {userid}
 ```
 
 
 # Mac 调试与开发
 ## 准备 C 版本的 Agora RTC SDK
-- 在与 **python_sdk** 同一目录下创建 **agora_sdk** 目录
+- 在与 **agora_rtc/agora/rtc** 目录下创建 **agora_sdk** 目录
 - 下载并解压 agora_sdk.zip，到**agora_sdk** 目录。
 - **agora_sdk** 目录中应有 **libAgoraRtcKit.dylib** 和 **include_c**
 
 ## 在 Mac 上运行示例
-- 将 **libAgoraRtcKit.dylib** 添加到 **/usr/local/lib**。
-- 或者 `export DYLD_LIBRARY_PATH=/path/to/agora_sdk`
-
 ```
-cd python_sdk
+cd agora_rtc
 python examples/example_send_pcm.py {appid} {token} {channel_id} ../test_data/demo.pcm {userid}
 ```
 
