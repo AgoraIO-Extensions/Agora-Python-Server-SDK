@@ -21,33 +21,17 @@
 
 # Test Data
 - download and unzip [test_data.zip](https://download.agora.io/demo/test/test_data_202409021506.zip)
-- make **test_data** directory in the same directory with **agora_service**
 
-# Linux debug & develop
-## Prepare C version of agora rtc sdk
+# Use Agora-Python-Server-SDK
+## Install 1.1.x version of Agora-Python-Server-SDK
 
-- make **agora_sdk** directory in the same directory with **agora_service**
-- download and unzip [agora_sdk.zip](https://download.agora.io/sdk/release/agora_rtc_sdk_linux_v4.0.1_202409051524_333459.zip
-) to **agora_sdk**
-- there should be **libagora_rtc_sdk.so** and **include_c** in **agora_sdk** directory
-
-## run example on linux
 ```
-export LD_LIBRARY_PATH=/path/to/agora_sdk:$LD_LIBRARY_PATH
-python examples/example_send_pcm.py {appid} {token} {channel_id} ./test_data/demo.pcm {userid}
+pip install 'agora_python_server_sdk>=1.1,<1.2'
 ```
 
-# Mac debug & develop
-## Prepare C version of agora rtc sdk
-- make **agora_sdk** directory in the same directory with **agora_service**
-- download and unzip [agora_sdk.zip](https://download.agora.io/sdk/release/agora_rtc_sdk_mac_20240902_320567.zip) to **agora_sdk**
-- there should be **libAgoraRtcKit.dylib** and **include_c** in **agora_sdk** directory
-
-## run example on mac
-
-- add **libAgoraRtcKit.dylib** to **/usr/local/lib**
-- or  `export DYLD_LIBRARY_PATH=/path/to/agora_sdk:$DYLD_LIBRARY_PATH`
+## run examples
 
 ```
 python examples/example_send_pcm.py {appid} {token} {channel_id} ./test_data/demo.pcm {userid}
 ```
+
