@@ -27,7 +27,7 @@ class DYSAudioFrameObserver(IAudioFrameObserver):
     
     def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, audio_frame:AudioFrame):
         print("CCC on_playback_audio_frame_before_mixing", audio_frame.type, audio_frame.samples_per_sec, audio_frame.samples_per_channel, audio_frame.bytes_per_sample, audio_frame.channels)        
-        file_path = os.path.join(log_folder, channelId + '_pcm.pcm')
+        file_path = os.path.join(log_folder, channelId + "_" + uid + '_pcm.pcm')
         with open(file_path, "ab") as f:
             f.write(audio_frame.buffer)
         return 1

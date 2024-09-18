@@ -7,7 +7,6 @@ from common.path_utils import get_log_path_with_filename
 from common.parse_args import parse_args_example
 from common.pacer import Pacer
 from observer.connection_observer import DYSConnectionObserver
-from observer.video_frame_observer import DYSVideoFrameObserver
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora.rtc.video_frame_sender import ExternalVideoFrame
 from agora.rtc.agora_base import *
@@ -70,10 +69,10 @@ def create_conn_and_send(channel_id, uid = 0):
                 frame.metadata = "hello metadata"
                 ret = video_sender.send_video_frame(frame)        
                 count += 1
-                print("count,ret=",count, ret)
+                # print("count,ret=",count, ret)
                 pacer.pace()
 
-    for i in range(10):
+    for i in range(1):
         send_test()
 
     time.sleep(2)
@@ -86,9 +85,8 @@ def create_conn_and_send(channel_id, uid = 0):
 
 threads = []
 for i in range(int(sample_options.connection_number)):
-    print("channel", i)
     channel_id = sample_options.channel_id + str(i+1)
-
+    print("channel_id:", channel_id)
     thread = threading.Thread(target=create_conn_and_send, args=(channel_id, sample_options.user_id))
     thread.start()
     threads.append(thread)
