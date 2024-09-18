@@ -33,9 +33,9 @@ class VideoFrameInner(ctypes.Structure):
         video_frame.y_stride = self.y_stride
         video_frame.u_stride = self.u_stride
         video_frame.v_stride = self.v_stride
-        video_frame.y_buffer = ctypes.string_at(self.y_buffer, self.y_stride)
-        video_frame.u_buffer = ctypes.string_at(self.u_buffer, self.u_stride)
-        video_frame.v_buffer = ctypes.string_at(self.v_buffer, self.v_stride)
+        video_frame.y_buffer = ctypes.string_at(self.y_buffer, self.y_stride * self.height)
+        video_frame.u_buffer = ctypes.string_at(self.u_buffer, self.u_stride * self.height // 2)
+        video_frame.v_buffer = ctypes.string_at(self.v_buffer, self.v_stride * self.height // 2)
         video_frame.rotation = self.rotation
         video_frame.render_time_ms = self.render_time_ms
         video_frame.avsync_type = self.avsync_type
