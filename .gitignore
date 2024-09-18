@@ -165,7 +165,8 @@ cython_debug/
 .vscode
 
 venv/
-agora_sdk/
+*/agora_sdk/*.dylib
+*/agora_sdk/*.so
 
 crash_context_v1
 agoradns.dat

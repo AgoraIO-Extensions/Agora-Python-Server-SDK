@@ -1,21 +1,10 @@
 import time
 import ctypes
-
 import os
 import sys
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
-sdk_dir = os.path.dirname(os.path.dirname(script_dir))
 
-lib_path = os.path.join(sdk_dir, 'agora_sdk')
-if lib_path not in sys.path:
-    sys.path.append(lib_path)
-
-if sys.platform == 'darwin':
-    agora_lib = ctypes.CDLL('libAgoraRtcKit.dylib')
-elif sys.platform == 'linux':
-    agora_lib = ctypes.CDLL('libagora_rtc_sdk.so')
-
+from . import agora_lib
 
 AGORA_HANDLE = ctypes.c_void_p
 AGORA_API_C_INT = ctypes.c_int
