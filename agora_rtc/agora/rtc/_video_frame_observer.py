@@ -68,36 +68,24 @@ class VideoFrameObserverInner(ctypes.Structure):
     
 
 
-class encoded_video_frame_info(ctypes.Structure):
-    _fields_ = [
-        ("codec_type", ctypes.c_int),
-        ("width", ctypes.c_int),
-        ("height", ctypes.c_int),
-        ("frames_per_second", ctypes.c_int),
-        ("frame_type", ctypes.c_int),
-        ("rotation", ctypes.c_int),
-        ("track_id", ctypes.c_int),
-        ("capture_time_ms", ctypes.c_int64),
-        ("decode_time_ms", ctypes.c_int64),
-        ("uid", ctypes.c_uint),
-        ("stream_type", ctypes.c_int)
-    ]
-
-ON_ENCODED_VIDEO_IMAGE_RECEIVED_CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.c_uint32, ctypes.POINTER(encoded_video_frame_info))
-
-class VideoEncodedImageReceiverInner(ctypes.Structure):
-    _fields_ = [
-        ("on_encoded_video_image_received", ON_ENCODED_VIDEO_IMAGE_RECEIVED_CALLBACK)
-    ]
-
-    def __init__(self, video_encoded_image_receiver:'IVideoEncodedImageReceiver'):
-        self.video_encoded_image_receiver = video_encoded_image_receiver
-        self.on_encoded_video_image_received = ON_ENCODED_VIDEO_IMAGE_RECEIVED_CALLBACK(self._on_encoded_video_image_received)
 
 
-    def _on_encoded_video_image_received(self, agora_handle, image_buffer, length, info):
-        print("VideoFrameObserver _on_frame:", agora_handle, image_buffer, length, info)
-        # self.on_encoded_video_image_received(agora_handle, image_buffer, length, info)
-        self.video_encoded_image_receiver.on_encoded_video_image_received(agora_handle, image_buffer, length, info)
+
+# ON_ENCODED_VIDEO_IMAGE_RECEIVED_CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.c_uint32, ctypes.POINTER(encoded_video_frame_info))
+
+# class VideoEncodedImageReceiverInner(ctypes.Structure):
+#     _fields_ = [
+#         ("on_encoded_video_image_received", ON_ENCODED_VIDEO_IMAGE_RECEIVED_CALLBACK)
+#     ]
+
+#     def __init__(self, video_encoded_image_receiver:'IVideoEncodedImageReceiver'):
+#         self.video_encoded_image_receiver = video_encoded_image_receiver
+#         self.on_encoded_video_image_received = ON_ENCODED_VIDEO_IMAGE_RECEIVED_CALLBACK(self._on_encoded_video_image_received)
+
+
+#     def _on_encoded_video_image_received(self, agora_handle, image_buffer, length, info):
+#         print("VideoFrameObserver _on_frame:", agora_handle, image_buffer, length, info)
+#         # self.on_encoded_video_image_received(agora_handle, image_buffer, length, info)
+#         self.video_encoded_image_receiver.on_encoded_video_image_received(agora_handle, image_buffer, length, info)
 
 

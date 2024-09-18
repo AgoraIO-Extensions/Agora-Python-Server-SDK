@@ -8,7 +8,7 @@ from .local_user_observer import IRTCLocalUserObserver
 from ._local_user_observer import RTCLocalUserObserverInner
 from ._audio_frame_observer import AudioFrameObserverInner
 from .audio_frame_observer import IAudioFrameObserver
-from ._video_frame_observer import VideoFrameObserverInner, VideoEncodedImageReceiverInner
+from ._video_frame_observer import VideoFrameObserverInner
 from .video_frame_observer import IVideoFrameObserver
 # from .video_encoded_image_receiver import IVideoEncodedImageReceiver
 from .video_encoded_frame_observer import IVideoEncodedFrameObserver
@@ -123,9 +123,9 @@ agora_local_user_unregister_audio_frame_observer.argtypes = [AGORA_HANDLE]
 # AGORA_API_C_HDL agora_video_encoded_image_receiver_create(video_encoded_frame_observer* receiver);
 
 
-agora_video_encoded_image_receiver_create = agora_lib.agora_video_encoded_image_receiver_create
-agora_video_encoded_image_receiver_create.restype = AGORA_API_C_HDL
-agora_video_encoded_image_receiver_create.argtypes = [ctypes.POINTER(VideoEncodedImageReceiverInner)]
+# agora_video_encoded_image_receiver_create = agora_lib.agora_video_encoded_image_receiver_create
+# agora_video_encoded_image_receiver_create.restype = AGORA_API_C_HDL
+# agora_video_encoded_image_receiver_create.argtypes = [ctypes.POINTER(VideoEncodedImageReceiverInner)]
 
 # AGORA_API_C_VOID agora_video_encoded_image_receiver_destroy(AGORA_HANDLE agora_video_encoded_image_receiver);
 
