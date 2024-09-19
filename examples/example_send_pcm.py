@@ -151,16 +151,15 @@ audio_pcm_data_sender.SetSendBufferSize(320*2000)# set to 1s
 #---------------4. Send Media Stream
 audio_pcm_data_sender.Start()
 
+count = 0
 sendinterval = 0.1
 Pacer = Pacer(sendinterval)
-count = 0
-packnum = int((sendinterval*1000)/10)
+sample_rate = 16000
+num_of_channels = 1
 with open(pcm_file_path, "rb") as file:
-
     while True:
-        if count < 10:
-            packnum = 100
-        frame_buf = bytearray(320*packnum)            
+        send_size = int(sample_rate*num_of_channels*sendinterval*2)
+        frame_buf = bytearray(send_size)            
         success = file.readinto(frame_buf)
         if not success:
             break
@@ -169,10 +168,10 @@ with open(pcm_file_path, "rb") as file:
         frame = PcmAudioFrame()
         frame.data = frame_buf
         frame.timestamp = 0
-        frame.samples_per_channel = 160*packnum
+        frame.samples_per_channel = int(sample_rate * sendinterval)
         frame.bytes_per_sample = 2
-        frame.number_of_channels = 1
-        frame.sample_rate = 16000
+        frame.number_of_channels = num_of_channels
+        frame.sample_rate = sample_rate
 
         ret = audio_pcm_data_sender.SendPcmData(frame)
         count += 1

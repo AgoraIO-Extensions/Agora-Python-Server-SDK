@@ -167,7 +167,7 @@ cython_debug/
 venv/
 */agora_sdk/*.dylib
 */agora_sdk/*.so
-
+agora_sdk
 crash_context_v1
 agoradns.dat
 xdump_config
@@ -187,3 +187,6 @@ agora_sdk_mac.zip
 agora_sdk_old2/
 
 tmp/
+
+
+agora_cache.db

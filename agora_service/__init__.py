@@ -9,12 +9,17 @@ lib_path = os.path.join(sdk_dir, 'agora_sdk')
 
 print("sdk_dir:", lib_path)
 
-if sys.platform == 'darwin':
-    lib_agora_rtc_path =os.path.join(lib_path, 'libAgoraRtcKit.dylib')
-elif sys.platform == 'linux':
-    lib_agora_rtc_path =os.path.join(lib_path, 'libagora_rtc_sdk.so')
 try:
-    agora_lib = ctypes.CDLL(lib_agora_rtc_path)
+    if sys.platform == 'darwin':
+        lib_agora_rtc_path =os.path.join(lib_path, 'libAgoraRtcKit.dylib')
+        agora_lib = ctypes.CDLL(lib_agora_rtc_path)
+    elif sys.platform == 'linux':        
+        lib_agora_rtc_path =os.path.join(lib_path, 'libagora_rtc_sdk.so')
+        ctypes.CDLL(os.path.join(lib_path, 'libagora-fdkaac.so'))
+        ctypes.CDLL(os.path.join(lib_path, 'libagora-core.so'))
+        ctypes.CDLL(os.path.join(lib_path, 'libagora-soundtouch.so'))
+        ctypes.CDLL(os.path.join(lib_path, 'libagora_uap_aed.so'))
+        agora_lib = ctypes.CDLL(lib_agora_rtc_path)
 except OSError as e:
     print(f"Error loading the library: {e}")
     print(f"Attempted to load from: {lib_agora_rtc_path}")

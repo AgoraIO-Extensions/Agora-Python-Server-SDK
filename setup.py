@@ -46,7 +46,7 @@ class CustomInstallCommand(install):
 
 setup(
     name='agora_python_server_sdk', 
-    version='1.1.0',                 
+    version='1.1.2',                 
     description='A Python SDK for Agora Server',  
     long_description=open('README.md').read(),  
     long_description_content_type='text/markdown',  
