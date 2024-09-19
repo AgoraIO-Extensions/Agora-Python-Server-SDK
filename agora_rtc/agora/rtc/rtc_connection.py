@@ -63,6 +63,7 @@ class RTCConnConfig():
                 client_role_type = ClientRoleType.CLIENT_ROLE_BROADCASTER,
                 channel_profile:ChannelProfileType = ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 audio_recv_media_packet = 0,
+                audio_recv_encoded_frame = 0,
                 video_recv_media_packet = 0,
                  ) -> None:
         self.auto_subscribe_audio = auto_subscribe_audio
@@ -75,6 +76,7 @@ class RTCConnConfig():
         self.client_role_type = client_role_type
         self.channel_profile = channel_profile
         self.audio_recv_media_packet = audio_recv_media_packet
+        self.audio_recv_encoded_frame = audio_recv_encoded_frame
         self.video_recv_media_packet = video_recv_media_packet
 
     def _to_inner(self):
@@ -89,6 +91,7 @@ class RTCConnConfig():
             self.client_role_type.value,
             self.channel_profile.value,
             self.audio_recv_media_packet,
+            self.audio_recv_encoded_frame,
             self.video_recv_media_packet
         )
   
@@ -105,6 +108,7 @@ class RTCConnConfigInner(ctypes.Structure):
         ('client_role_type', ctypes.c_int),
         ('channel_profile', ctypes.c_int),
         ('audio_recv_media_packet', ctypes.c_int),
+        ('audio_recv_encoded_frame', ctypes.c_int),
         ('video_recv_media_packet', ctypes.c_int),
     ]    
 
@@ -119,6 +123,7 @@ class RTCConnConfigInner(ctypes.Structure):
                 client_role_type = ClientRoleType.CLIENT_ROLE_BROADCASTER.value,
                 channel_profile:ChannelProfileType = ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING.value,
                 audio_recv_media_packet = 0,
+                audio_recv_encoded_frame = 0,
                 video_recv_media_packet = 0,
                  ) -> None:
         self.auto_subscribe_audio = auto_subscribe_audio
@@ -131,6 +136,7 @@ class RTCConnConfigInner(ctypes.Structure):
         self.client_role_type = client_role_type
         self.channel_profile = channel_profile
         self.audio_recv_media_packet = audio_recv_media_packet
+        self.audio_recv_encoded_frame = audio_recv_encoded_frame
         self.video_recv_media_packet = video_recv_media_packet
 
 
