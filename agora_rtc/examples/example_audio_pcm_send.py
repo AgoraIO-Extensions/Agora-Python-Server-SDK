@@ -7,6 +7,7 @@ import threading
 from common.path_utils import get_log_path_with_filename 
 from common.pacer import Pacer
 from common.parse_args import parse_args_example
+from common.audio_consumer import AudioStreamConsumer
 from observer.connection_observer import DYSConnectionObserver
 # from observer.audio_frame_observer import DYSAudioFrameObserver
 from observer.local_user_observer import DYSLocalUserObserver
@@ -55,35 +56,51 @@ def create_conn_and_send(channel_id, uid = 0):
     #---------------4. Send Media Stream
     audio_track.set_enabled(1)
     local_user.publish_audio(audio_track)
+    audio_stream_consumer = AudioStreamConsumer(pcm_data_sender)
 
     sendinterval = 0.1
     pacer = Pacer(sendinterval)
+
+    # def read_and_send_packets():
+    #     count = 0
+    #     with open(sample_options.audio_file, "rb") as file:        
+    #         while True:
+    #             send_size = int(sample_options.sample_rate*sample_options.num_of_channels*sendinterval*2)
+    #             frame_buf = bytearray(send_size)            
+    #             success = file.readinto(frame_buf)
+    #             if not success:
+    #                 break
+    #             frame = PcmAudioFrame()
+    #             frame.data = frame_buf
+    #             frame.timestamp = 0
+    #             frame.samples_per_channel = int(sample_options.sample_rate * sendinterval)
+    #             frame.bytes_per_sample = 2
+    #             frame.number_of_channels = sample_options.num_of_channels
+    #             frame.sample_rate = sample_options.sample_rate
+    #             ret = pcm_data_sender.send_audio_pcm_data(frame)
+    #             count += 1
+    #             print("count,ret=",count, ret)
+    #             pacer.pace()
+
     def read_and_send_packets():
-        count = 0
         with open(sample_options.audio_file, "rb") as file:        
             while True:
-                send_size = int(sample_options.sample_rate*sample_options.num_of_channels*sendinterval*2)
+                send_size = int(sample_options.sample_rate*sample_options.num_of_channels*sendinterval*20)
                 frame_buf = bytearray(send_size)            
                 success = file.readinto(frame_buf)
                 if not success:
-                    break
-                frame = PcmAudioFrame()
-                frame.data = frame_buf
-                frame.timestamp = 0
-                frame.samples_per_channel = int(sample_options.sample_rate * sendinterval)
-                frame.bytes_per_sample = 2
-                frame.number_of_channels = sample_options.num_of_channels
-                frame.sample_rate = sample_options.sample_rate
-                ret = pcm_data_sender.send_audio_pcm_data(frame)
-                count += 1
-                print("count,ret=",count, ret)
+                    break                
+                audio_stream_consumer.push_pcm_data(frame_buf)
                 pacer.pace()
+                print("push audio data")
 
     for i in range(1):
         read_and_send_packets()
 
     #---------------5. Stop Media Sender And Release
-    time.sleep(2)
+    time.sleep(25)
+    audio_stream_consumer.clear()
+    audio_stream_consumer.relase()
     local_user.unpublish_audio(audio_track)
     audio_track.set_enabled(0)
     connection.unregister_observer()
