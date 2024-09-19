@@ -8,7 +8,7 @@ from common.path_utils import get_log_path_with_filename
 from common.pacer import Pacer
 from common.parse_args import parse_args_example
 from observer.connection_observer import DYSConnectionObserver
-from observer.audio_frame_observer import DYSAudioFrameObserver
+# from observer.audio_frame_observer import DYSAudioFrameObserver
 from observer.local_user_observer import DYSLocalUserObserver
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora.rtc.audio_pcm_data_sender import PcmAudioFrame
@@ -47,8 +47,8 @@ def create_conn_and_send(channel_id, uid = 0):
     local_user = connection.get_local_user()
     localuser_observer = DYSLocalUserObserver()
     local_user.register_local_user_observer(localuser_observer)
-    audio_frame_observer = DYSAudioFrameObserver()
-    local_user.register_audio_frame_observer(audio_frame_observer)
+    # audio_frame_observer = DYSAudioFrameObserver()
+    # local_user.register_audio_frame_observer(audio_frame_observer)
 
     # audio_track.set_max_buffer_audio_frame_number(320*2000)
 

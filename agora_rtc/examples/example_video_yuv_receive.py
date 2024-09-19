@@ -25,7 +25,7 @@ agora_service = AgoraService()
 agora_service.initialize(config)
 
 
-def create_conn_and_send(channel_id, uid = 0):
+def create_conn_and_recv(channel_id, uid = 0):
         
     con_config = RTCConnConfig(
         auto_subscribe_video=1,
@@ -62,7 +62,7 @@ threads = []
 for i in range(int(sample_options.connection_number)):
     channel_id = sample_options.channel_id + str(i+1)
     print("channel_id:", channel_id)
-    thread = threading.Thread(target=create_conn_and_send, args=(channel_id, sample_options.user_id))
+    thread = threading.Thread(target=create_conn_and_recv, args=(channel_id, sample_options.user_id))
     thread.start()
     threads.append(thread)
 
