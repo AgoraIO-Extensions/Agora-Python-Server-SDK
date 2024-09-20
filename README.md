@@ -21,33 +21,19 @@
 
 # Test Data
 - download and unzip [test_data.zip](https://download.agora.io/demo/test/test_data_202408221437.zip)
-- make **test_data** directory in the same directory with **agora_rtc**
 
-# Linux debug & develop
-## Prepare C version of agora rtc sdk
+# Use Agora-Python-Server-SDK
+```
+pip install agora_python_server_sdk
+```
 
-- make **agora_sdk** directory under the directory of **agora_rtc/agora/rtc**
-- download and unzip [agora_sdk.zip](https://download.agora.io/sdk/release/agora_rtc_sdk_linux_v4.4_20240914_1538_336910.zip) to **agora_sdk**
-- there should be **libagora_rtc_sdk.so** and **include_c** in **agora_sdk** directory
-
-## run example on linux
+## run examples
 ```
 python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.pcm --sampleRate=16000 --numOfChannels=1
 ```
 
-# Mac debug & develop
-## Prepare C version of agora rtc sdk
-- make **agora_sdk** directory under the directory of **agora_rtc/agora/rtc**
-- download and unzip [agora_sdk.zip](https://download.agora.io/sdk/release/agora_rtc_sdk_mac_v4.4_20240914_1538_336910.zip) to **agora_sdk**
-- there should be **libAgoraRtcKit.dylib** in **agora_sdk** directory
-
-## run example on mac
-
-```
-python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.pcm --sampleRate=16000 --numOfChannels=1
-```
 # Some import call sequence
-- 1. about audio frame observer： 
+- about audio frame observer： 
 
 set_playback_audio_frame_before_mixing_parameters MUST be call before register_audio_frame_observer
 
