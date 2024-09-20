@@ -1,17 +1,20 @@
-import time
 import ctypes
-
 import os
 import sys
 from enum import Enum,IntEnum
+from . import lib_path
 
-
-# ctypes to load ved module
-if sys.platform == 'darwin':
-    agoravad_lib = ctypes.CDLL('libuap_aed.dylib')
-elif sys.platform == 'linux':
-    agoravad_lib = ctypes.CDLL('libuap_aed.so')
-
+try:
+	if sys.platform == 'darwin':
+		lib_uap_aed_path =os.path.join(lib_path, 'libuap_aed.dylib')
+		agoravad_lib = ctypes.CDLL(lib_uap_aed_path)
+	elif sys.platform == 'linux':
+		lib_uap_aed_path =os.path.join(lib_path, 'libagora_uap_aed.so')
+		agoravad_lib = ctypes.CDLL(lib_uap_aed_path)
+except OSError as e:
+    print(f"Error loading the library: {e}")
+    print(f"Attempted to load from: {lib_uap_aed_path}")
+    sys.exit(1)
 
 class VAD_STATE(ctypes.c_int):
     VAD_STATE_NONE_SPEAKING = 0

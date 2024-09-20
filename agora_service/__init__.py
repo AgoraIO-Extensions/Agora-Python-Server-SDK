@@ -17,8 +17,6 @@ try:
         lib_agora_rtc_path =os.path.join(lib_path, 'libagora_rtc_sdk.so')
         ctypes.CDLL(os.path.join(lib_path, 'libagora-fdkaac.so'))
         ctypes.CDLL(os.path.join(lib_path, 'libagora-core.so'))
-        ctypes.CDLL(os.path.join(lib_path, 'libagora-soundtouch.so'))
-        ctypes.CDLL(os.path.join(lib_path, 'libagora_uap_aed.so'))
         agora_lib = ctypes.CDLL(lib_agora_rtc_path)
 except OSError as e:
     print(f"Error loading the library: {e}")

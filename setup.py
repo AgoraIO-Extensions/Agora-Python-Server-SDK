@@ -1,7 +1,8 @@
 import os
 import sys
 import zipfile
-import urllib
+# import urllib
+from urllib import request
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 import site
@@ -33,7 +34,8 @@ class CustomInstallCommand(install):
         print("agora_service_path:", agora_service_path)
         if not os.path.exists(zip_path):
             print(f"Downloading {url}...")
-            urllib.request.urlretrieve(url, zip_path)
+            # urllib.request.urlretrieve(url, zip_path)
+            request.urlretrieve(url, zip_path)
 
         if not os.path.exists(libagora_rtc_sdk_path):
             print(f"Extracting {zip_path}...")
@@ -46,7 +48,7 @@ class CustomInstallCommand(install):
 
 setup(
     name='agora_python_server_sdk', 
-    version='1.1.2',                 
+    version='1.1.3',                 
     description='A Python SDK for Agora Server',  
     long_description=open('README.md').read(),  
     long_description_content_type='text/markdown',  
