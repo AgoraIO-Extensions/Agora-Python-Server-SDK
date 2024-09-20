@@ -18,10 +18,10 @@ class CustomInstallCommand(install):
         print("download_and_extract_sdk--------------")
 
         agora_service_path = os.path.join(site.getsitepackages()[0], 'agora', 'rtc')
-        url = "https://download.agora.io/sdk/release/agora_rtc_sdk_linux_v4.0.1_202409051524_333459.zip"
+        url = "https://download.agora.io/sdk/release/agora_rtc_sdk_linux_v4.4_20240914_1538_336910.zip"
         libagora_rtc_sdk_path = os.path.join(agora_service_path, "agora_sdk/libagora_rtc_sdk.so")
         if sys.platform == 'darwin':
-            url = "https://download.agora.io/sdk/release/agora_rtc_sdk_mac_4.0.1_20240913_320567.zip"
+            url = "https://download.agora.io/sdk/release/agora_rtc_sdk_mac_v4.4_20240914_1538_336910.zip"
             libagora_rtc_sdk_path = os.path.join(agora_service_path, "agora_sdk/libAgoraRtcKit.dylib")
 
         sdk_dir = os.path.join(agora_service_path, "agora_sdk")
