@@ -63,7 +63,7 @@ class VideoFrameObserverInner(ctypes.Structure):
 
     def _on_frame(self, agora_handle, channel_id, user_id, video_frame:VideoFrameInner):
         vf = video_frame.contents
-        print("VideoFrameObserver _on_frame:", agora_handle, channel_id, user_id, vf.metadata_buffer, vf.metadata_size)
+        # print("VideoFrameObserver _on_frame:", agora_handle, channel_id, user_id, vf.metadata_buffer, vf.metadata_size)
         self.video_frame_observer.on_frame(agora_handle, channel_id.decode() if channel_id else None, user_id.decode(), vf.to_video_frame())
     
 
