@@ -1,29 +1,14 @@
 import ctypes
 from .agora_base import *
 from .local_user import *
-from .local_user_observer import *
-from .remote_video_track import RemoteVideoTrack
+from .remote_audio_track import RemoteAudioTrack, RemoteAudioTrackStats
+from .remote_video_track import RemoteVideoTrack, RemoteVideoTrackStats
 uid_t = ctypes.c_uint
 track_id_t = ctypes.c_uint
 
 #========localuser observer=====
 
 
-
-class RemoteAudioTrackStats(ctypes.Structure):
-    _fields_ = [
-        ("uid", ctypes.c_uint),
-        ("quality", ctypes.c_int),
-        ("network_transport_delay", ctypes.c_int),
-        ("jitter_buffer_delay", ctypes.c_int),
-        ("audio_loss_rate", ctypes.c_int),
-        ("num_channels", ctypes.c_int),
-        ("received_sample_rate", ctypes.c_int),
-        ("received_bitrate", ctypes.c_int),
-        ("total_frozen_time", ctypes.c_int),
-        ("frozen_rate", ctypes.c_int),
-        ("received_bytes", ctypes.c_int64)
-    ]
 
 class VideoTrackInfoInner(ctypes.Structure):
     _fields_ = [
@@ -50,56 +35,6 @@ class VideoTrackInfoInner(ctypes.Structure):
         track_info.track_id = self.track_id
         track_info.owner_uid = self.owner_uid
         return track_info
-
-    
-
-class LocalVideoTrackStats(ctypes.Structure):
- _fields_ = [
-        ("number_of_streams", ctypes.c_uint64),
-        ("bytes_major_stream", ctypes.c_uint64),
-        ("bytes_minor_stream", ctypes.c_uint64),
-        ("frames_encoded", ctypes.c_uint32),
-        ("ssrc_major_stream", ctypes.c_uint32),
-        ("ssrc_minor_stream", ctypes.c_uint32),
-        ("capture_frame_rate", ctypes.c_int),
-        ("regulated_capture_frame_rate", ctypes.c_int),
-        ("input_frame_rate", ctypes.c_int),
-        ("encode_frame_rate", ctypes.c_int),
-        ("render_frame_rate", ctypes.c_int),
-        ("target_media_bitrate_bps", ctypes.c_int),
-        ("media_bitrate_bps", ctypes.c_int),
-        ("total_bitrate_bps", ctypes.c_int),
-        ("capture_width", ctypes.c_int),
-        ("capture_height", ctypes.c_int),
-        ("regulated_capture_width", ctypes.c_int),
-        ("regulated_capture_height", ctypes.c_int),
-        ("width", ctypes.c_int),
-        ("height", ctypes.c_int),
-        ("encoder_type", ctypes.c_uint32),
-        ("uplink_cost_time_ms", ctypes.c_uint32),
-        ("quality_adapt_indication", ctypes.c_int)
-    ]
-class RemoteVideoTrackStats(ctypes.Structure):
-    _fields_ = [
-        ("uid", ctypes.c_uint),
-        ("delay", ctypes.c_int),
-        ("width", ctypes.c_int),
-        ("height", ctypes.c_int),
-        ("received_bitrate", ctypes.c_int),
-        ("decoder_output_frame_rate", ctypes.c_int),
-        ("renderer_output_frame_rate", ctypes.c_int),
-        ("frame_loss_rate", ctypes.c_int),
-        ("packet_loss_rate", ctypes.c_int),
-        ("rx_stream_type", ctypes.c_int),
-        ("total_frozen_time", ctypes.c_int),
-        ("frozen_rate", ctypes.c_int),
-        ("total_decoded_frames", ctypes.c_uint32),
-        ("av_sync_time_ms", ctypes.c_int),
-        ("downlink_process_time_ms", ctypes.c_uint32),
-        ("frame_render_delay_ms", ctypes.c_uint32),
-        ("totalActiveTime", ctypes.c_uint64),
-        ("publishDuration", ctypes.c_uint64)
-    ]
 
 class AudioVolumeInfo(ctypes.Structure):
     _fields_ = [
