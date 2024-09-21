@@ -415,10 +415,10 @@ class RTCLocalUserObserverInner(ctypes.Structure):
         self.local_user_observer.on_remote_subscribe_fallback_to_audio_only(self.local_user, user_id_str, is_fallback)
 
     def _on_stream_message(self, local_user_handle, user_id, stream_id, data, size):
-        print("LocalUserCB _on_stream_message:", local_user_handle, user_id, stream_id, data, size)
+        # print("LocalUserCB _on_stream_message:", local_user_handle, user_id, stream_id, data, size)
         user_id_str = user_id.decode('utf-8') if user_id else ""
         bytes_from_c = ctypes.string_at(data, size)  
-        data_byte_array = bytearray(bytes_from_c)     
+        data_byte_array = bytearray(bytes_from_c).decode()     
         #note: do not use date_byte_array.decode()  for the stream msg is binary data, not limited to only text
         self.local_user_observer.on_stream_message(self.local_user, user_id_str, stream_id, data_byte_array, size)
 
