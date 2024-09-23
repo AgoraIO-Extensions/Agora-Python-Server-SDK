@@ -273,7 +273,7 @@ class RTCLocalUserObserverInner(ctypes.Structure):
         self.local_user_observer.on_user_audio_track_subscribed(self.local_user, user_id_str, remote_audio_track)
 
     def _on_remote_audio_track_statistics(self, local_user_handle, remote_audio_track_handle, stats):
-        print("LocalUserCB _on_remote_audio_track_statistics:", local_user_handle, remote_audio_track_handle, stats)
+        # print("LocalUserCB _on_remote_audio_track_statistics:", local_user_handle, remote_audio_track_handle, stats)
         audio_stats = stats.contents #RemoteAudioTrackStats
         remote_audio_track = self.local_user.get_remote_audio_map(remote_audio_track_handle)
         self.local_user_observer.on_remote_audio_track_statistics(self.local_user, remote_audio_track, audio_stats)
