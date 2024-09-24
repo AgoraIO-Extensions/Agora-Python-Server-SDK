@@ -1,5 +1,7 @@
 import ctypes
 from .agora_base import *
+import logging
+logger = logging.getLogger(__name__)
 
 
 class RemoteVideoTrackStats(ctypes.Structure):
@@ -85,7 +87,7 @@ class RemoteVideoTrack:
     def get_statistics(self):
         stats_ptr = agora_remote_video_track_get_statistics(self.track_handle)
         if not stats_ptr:
-            print("Failed to get remote video track statistics")
+            logger.error("Failed to get remote video track statistics")
             return None
         stats = stats_ptr.contents
         self.destroy_statistics(stats_ptr)
@@ -100,7 +102,7 @@ class RemoteVideoTrack:
     def get_track_info(self):
         info_ptr = agora_remote_video_track_get_track_info(self.track_handle)
         if not info_ptr:
-            print("Failed to get remote video track info")
+            logger.error("Failed to get remote video track info")
             return None
         info = info_ptr.contents
         self.destroy_track_info(info_ptr)
@@ -112,25 +114,25 @@ class RemoteVideoTrack:
     def register_video_encoded_image_receiver(self, receiver):
         ret = agora_remote_video_track_register_video_encoded_image_receiver(self.track_handle, receiver)
         if ret != 0:
-            print(f"Failed to register video encoded image receiver, error code: {ret}")
+            logger.error(f"Failed to register video encoded image receiver, error code: {ret}")
         return ret
 
     def unregister_video_encoded_image_receiver(self, receiver):
         ret = agora_remote_video_track_unregister_video_encoded_image_receiver(self.track_handle, receiver)
         if ret != 0:
-            print(f"Failed to unregister video encoded image receiver, error code: {ret}")
+            logger.error(f"Failed to unregister video encoded image receiver, error code: {ret}")
         return ret
 
     # def register_media_packet_receiver(self, receiver):
     #     ret = agora_remote_video_track_register_media_packet_receiver(self.track_handle, receiver)
     #     if ret != 0:
-    #         print(f"Failed to register media packet receiver, error code: {ret}")
+    #         logger.error(f"Failed to register media packet receiver, error code: {ret}")
     #     return ret
 
     # def unregister_media_packet_receiver(self, receiver):
     #     ret = agora_remote_video_track_unregister_media_packet_receiver(self.track_handle, receiver)
     #     if ret != 0:
-    #         print(f"Failed to unregister media packet receiver, error code: {ret}")
+    #         logger.error(f"Failed to unregister media packet receiver, error code: {ret}")
     #     return ret
 
     def get_type(self):

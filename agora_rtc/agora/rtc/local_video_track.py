@@ -1,5 +1,7 @@
 import ctypes
 from .agora_base import *
+import logging
+logger = logging.getLogger(__name__)
 
 # Add these function definitions at the module level
 agora_local_video_track_set_enabled = agora_lib.agora_local_video_track_set_enabled
@@ -44,19 +46,19 @@ class LocalVideoTrack:
     def set_video_encoder_configuration(self, config):
         ret = agora_local_video_track_set_video_encoder_config(self.track_handle, ctypes.byref(config))
         if ret != 0:
-            print(f"Failed to set video encoder configuration, error code: {ret}")
+            logger.error(f"Failed to set video encoder configuration, error code: {ret}")
         return ret
 
     def enable_simulcast_stream(self, enabled, config):
         ret = agora_local_video_track_enable_simulcast_stream(self.track_handle, enabled, ctypes.byref(config))
         if ret != 0:
-            print(f"Failed to enable simulcast stream, error code: {ret}")
+            logger.error(f"Failed to enable simulcast stream, error code: {ret}")
         return ret
 
     # def update_simulcast_stream(self, enabled, config):
     #     ret = agora_local_video_track_update_simulcast_stream(self.track_handle, enabled, ctypes.byref(config))
     #     if ret != 0:
-    #         print(f"Failed to update simulcast stream, error code: {ret}")
+    #         logger.error(f"Failed to update simulcast stream, error code: {ret}")
     #     return ret
 
     def get_state(self):
@@ -65,7 +67,7 @@ class LocalVideoTrack:
     def get_statistics(self):
         stats_ptr = agora_local_video_track_get_statistics(self.track_handle)
         if not stats_ptr:
-            print("Failed to get local video track statistics")
+            logger.error("Failed to get local video track statistics")
             return None
         stats = stats_ptr.contents
         return stats

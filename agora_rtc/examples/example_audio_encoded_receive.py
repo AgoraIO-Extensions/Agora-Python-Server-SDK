@@ -10,6 +10,9 @@ from observer.audio_frame_observer import DYSAudioFrameObserver
 from observer.local_user_observer import DYSLocalUserObserver
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, AudioSubscriptionOptions, RTCConnConfig
 from agora.rtc.agora_base import *
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 
@@ -17,7 +20,7 @@ from common.parse_args import parse_args_example
 # run this example
 ## python agora_rtc/examples/example_audio_encoded_receive.py --appId=xxx --channelId=xxx --userId=xxx
 sample_options = parse_args_example()
-print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
+logger.info(f"app_id: {sample_options.app_id}, channel_id: {sample_options.channel_id}, uid: {sample_options.user_id}")
 
 
 #---------------1. Init SDK
@@ -61,6 +64,6 @@ time.sleep(100)
 connection.unregister_observer()
 connection.disconnect()
 connection.release()
-print("release")
+logger.info("release")
 agora_service.release()
-print("end")
+logger.info("end")

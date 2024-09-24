@@ -3,6 +3,8 @@ import threading
 import time
 from agora.rtc.audio_pcm_data_sender import PcmAudioFrame
 from agora.rtc.audio_pcm_data_sender import AudioPcmDataSender
+import logging
+logger = logging.getLogger(__name__)
 
 
 
@@ -34,7 +36,7 @@ class AudioStreamConsumer:
                 wanted_packages = 18
                 self._start_time = cur_time
                 self._consumed_packages = -18
-                print("audio_stream_consumer:new session")
+                logger.info("audio_stream_consumer:new session")
             data_len = len(self._data)
             wanted_packages = min(wanted_packages, data_len//320)
             if self._data and wanted_packages > 0:
@@ -43,7 +45,6 @@ class AudioStreamConsumer:
                 frame_buf = bytearray(frame_size)
                 frame_buf[:] = self._data[:frame_size]
                 self._data = self._data[frame_size:]
-                #print("pop data:", len(frame_buf))
                 #send data
                 frame = PcmAudioFrame()
                 frame.data = frame_buf
@@ -53,9 +54,8 @@ class AudioStreamConsumer:
                 frame.number_of_channels = 1
                 frame.sample_rate = 16000
                 ret = self._pcm_sender.send_audio_pcm_data(frame)
-                #print("second,ret=",wanted_packages, ret)
                 self._consumed_packages += wanted_packages
-                print("audio_stream_consumer:consumed_packages:", self._consumed_packages, wanted_packages)
+                logger.info(f"audio_stream_consumer:consumed_packages:{self._consumed_packages}, wanted_packages:{wanted_packages}")
                 
 
             #restart timer
@@ -65,11 +65,11 @@ class AudioStreamConsumer:
             else:
                 self._event.set()
     def relase(self):
-        print("audio_stream_consumer:release")
+        logger.info("audio_stream_consumer:release")
         self._run = False
         if self._timer and self._timer.is_alive():
             self._timer.cancel()
-            print("audio_stream_consumer:cancel timer")
+            logger.info("audio_stream_consumer:cancel timer")
         else:
             self._event.wait()
         self._timer = None

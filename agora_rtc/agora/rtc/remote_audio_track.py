@@ -1,5 +1,7 @@
 import ctypes
 from .agora_base import *
+import logging
+logger = logging.getLogger(__name__)
 
 
 class RemoteAudioTrackStats(ctypes.Structure):
@@ -42,7 +44,7 @@ class RemoteAudioTrack:
     def get_statistics(self):
         stats_ptr = agora_remote_audio_track_get_statistics(self.track_handle)
         if not stats_ptr:
-            print("Failed to get remote audio track statistics")
+            logger.error("Failed to get remote audio track statistics")
             return None
         stats = stats_ptr.contents
         #NOTE: MUST call c api to release this handle! Otherwise, it will cause memory leak.

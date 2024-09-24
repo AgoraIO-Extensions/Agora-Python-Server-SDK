@@ -10,12 +10,15 @@ from observer.connection_observer import DYSConnectionObserver
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora.rtc.video_frame_sender import ExternalVideoFrame
 from agora.rtc.agora_base import *
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # run this example
 # python agora_rtc/examples/example_video_yuv_send.py --appId=xxx --channelId=xxx --userId=xxx --videoFile=./test_data/103_RaceHorses_416x240p30_300.yuv --width=416 --height=240 --fps=30 --connectionNumber=1
 sample_options = parse_args_example()
-print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "video_file:", sample_options.video_file, "uid:", sample_options.user_id)
-
+logger.info(f"app_id: {sample_options.app_id}, channel_id: {sample_options.channel_id}, uid: {sample_options.user_id}, video_file: {sample_options.video_file}")
+            
 config = AgoraServiceConfig()
 config.enable_video = 1
 config.appid = sample_options.app_id
@@ -69,7 +72,6 @@ def create_conn_and_send(channel_id, uid = 0):
                 frame.metadata = "hello metadata"
                 ret = video_sender.send_video_frame(frame)        
                 count += 1
-                # print("count,ret=",count, ret)
                 pacer.pace()
 
     for i in range(1):
@@ -81,12 +83,12 @@ def create_conn_and_send(channel_id, uid = 0):
     connection.unregister_observer()
     connection.disconnect()
     connection.release()
-    print("release")
+    logger.info("release")
 
 threads = []
 for i in range(int(sample_options.connection_number)):
     channel_id = sample_options.channel_id + str(i+1)
-    print("channel_id:", channel_id)
+    logger.info(f"start: ---------------------- {channel_id}")
     thread = threading.Thread(target=create_conn_and_send, args=(channel_id, sample_options.user_id))
     thread.start()
     threads.append(thread)
@@ -97,4 +99,4 @@ for t in threads:
 
 
 agora_service.release()
-print("end")
+logger.info("end")

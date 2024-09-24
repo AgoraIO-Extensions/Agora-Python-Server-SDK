@@ -16,11 +16,14 @@ from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnCon
 from agora.rtc.audio_pcm_data_sender import PcmAudioFrame
 from agora.rtc.agora_base import *
 from agora.rtc.video_frame_sender import ExternalVideoFrame
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # run this example
 # python agora_rtc/examples/example_send_pcm_yuv.py --appId=xxx --channelId=xxx --userId=xxx --connectionNumber=1 --videoFile=./test_data/103_RaceHorses_416x240p30_300.yuv --width=416 --height=240 --fps=30 --audioFile=./test_data/demo.pcm --sampleRate=16000 --numOfChannels=1
 sample_options = parse_args_example()
-print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
+logger.info(f"app_id: {sample_options.app_id}, channel_id: {sample_options.channel_id}, uid: {sample_options.user_id}")
 
 
 running = True
@@ -28,7 +31,7 @@ exit_loop = False
 def signal_handler(signal, frame):
     global exit_loop
     exit_loop = True
-    print("prsss ctrl+c: ", exit_loop)
+    logger.info(f"prsss ctrl+c: {exit_loop}")
 
 signal.signal(signal.SIGINT, signal_handler)
 
@@ -105,7 +108,7 @@ def create_conn_and_send(channel_id, uid = 0):
         frame.sample_rate = sample_options.sample_rate
         ret = pcm_data_sender.send_audio_pcm_data(frame)
         pcm_count += 1
-        # print("send pcm: count,ret=",pcm_count, ret, send_size, pcm_sendinterval)
+        # logger.info(f"send pcm: count,ret={pcm_count}, {ret}, {send_size}, {pcm_sendinterval}")
         last_pcm_time = time.time()        
         pacer_pcm.pace_interval(0.1)
 
@@ -130,7 +133,7 @@ def create_conn_and_send(channel_id, uid = 0):
         frame.metadata = "hello metadata"
         ret = video_sender.send_video_frame(frame)        
         yuv_count += 1
-        # print("send yuv: count,ret=",yuv_count, ret)
+        # logger.info(f"send yuv: count,ret={yuv_count}, {ret}")
         pacer_yuv.pace_interval(yuv_sendinterval)
 
     def send_test():
@@ -149,7 +152,8 @@ def create_conn_and_send(channel_id, uid = 0):
     connection.unregister_observer()
     connection.disconnect()
     connection.release()
-    print("release")
+    logger.info("release")
+    logger.info("release")
     
 
 
@@ -162,14 +166,15 @@ while exit_loop == False:
     timer = threading.Timer(5+random.uniform(0, 10), time_down)
     timer.start()
 
-    print("start: ----------------------", sample_options.channel_id)
+    logger.info(f"start: ---------------------- {sample_options.channel_id}")
 
     # channel_id = sample_options.channel_id + str(random.uniform(0, 10000))
     # create_conn_and_send(channel_id, "0")    
 
     threads = []
     for i in range(int(sample_options.connection_number)):
-        print("channel", i)
+        logger.info(f"channel {i}")
+
         channel_id = sample_options.channel_id + str(i+1)
         thread = threading.Thread(target=create_conn_and_send, args=(channel_id, sample_options.user_id))
         thread.start()
@@ -179,4 +184,4 @@ while exit_loop == False:
         t.join()
 
 agora_service.release()
-print("end")
+logger.info("end")

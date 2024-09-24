@@ -7,6 +7,8 @@ from ._audio_frame_observer import AudioFrameObserverInner
 from .agora_parameter import AgoraParameter
 from .globals import AgoraHandleInstanceMap
 from ._rtc_connection_observer import RTCConnectionObserverInner
+import logging
+logger = logging.getLogger(__name__)
 
 #rtcconnection info
 """
@@ -262,21 +264,21 @@ class RTCConnection:
     def connect(self, token, chan_id, user_id)->int:
         ret = agora_rtc_conn_connect(self.conn_handle, ctypes.create_string_buffer(token.encode('utf-8')),ctypes.create_string_buffer(chan_id.encode('utf-8')), ctypes.create_string_buffer(user_id.encode('utf-8')))
         if ret < 0:
-            print("agora_rtc_conn_connect error:{}".format(ret))
+            logger.error("agora_rtc_conn_connect error:{}".format(ret))
         return ret
 
     # 与 RTC 频道断开连接。
     def disconnect(self)->int:
         ret = agora_rtc_conn_disconnect(self.conn_handle)
         if ret < 0:
-            print("agora_rtc_conn_disconnect error:{}".format(ret))            
+            logger.error("agora_rtc_conn_disconnect error:{}".format(ret))            
         return ret
 
     # 更新 Token。
     def renew_token(self, token)->int:
         ret = agora_rtc_conn_renew_token(self.conn_handle, token.encode('utf-8'))
         if ret < 0:
-            print("agora_rtc_conn_renew_token error:{}".format(ret))
+            logger.error("agora_rtc_conn_renew_token error:{}".format(ret))
         return ret
 
     # 注册 RTC 连接 observer。
@@ -286,14 +288,14 @@ class RTCConnection:
         self.con_observer_inner = con_observer_inner
         ret = agora_rtc_conn_register_observer(self.conn_handle, con_observer_inner)
         if ret < 0:
-            print("agora_rtc_conn_register_observer error:{}".format(ret))
+            logger.error("agora_rtc_conn_register_observer error:{}".format(ret))
         return ret
 
     # 销毁网络状态 observer。
     def unregister_observer(self)->int:
         ret = agora_rtc_conn_unregister_observer(self.conn_handle)
         if ret < 0:
-            print(f"agora_rtc_conn_unregister_observer error: {ret}")
+            logger.error(f"agora_rtc_conn_unregister_observer error: {ret}")
         self.con_observer = None
         return ret
         
@@ -302,7 +304,7 @@ class RTCConnection:
         stream_id = ctypes.c_int(0)
         ret = agora_rtc_conn_create_data_stream(self.conn_handle, ctypes.byref(stream_id), int(reliable), int(ordered))
         if ret < 0:
-            print(f"Failed to create data stream. Error code: {ret}")
+            logger.error(f"Failed to create data stream. Error code: {ret}")
             return None
         return stream_id.value
 
@@ -317,14 +319,14 @@ class RTCConnection:
             length
         )
         if ret < 0:
-            print(f"Failed to send stream message. Error code: {ret}")
+            logger.error(f"Failed to send stream message. Error code: {ret}")
         return ret
 
     # 获取 AgoraParameter 对象。
     def get_agora_parameter(self):
         agora_parameter = agora_rtc_conn_get_agora_parameter(self.conn_handle)
         if not agora_parameter:
-            print("Failed to get Agora parameter")
+            logger.error("Failed to get Agora parameter")
             return None
         return AgoraParameter(agora_parameter)
 

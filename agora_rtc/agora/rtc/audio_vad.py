@@ -4,6 +4,8 @@ import ctypes
 import os
 import sys
 from enum import Enum,IntEnum
+import logging
+logger = logging.getLogger(__name__)
 
 from . import lib_path
 
@@ -14,8 +16,8 @@ elif sys.platform == 'linux':
 try:
     agora_vad_lib = ctypes.CDLL(agora_vad_lib_path)
 except OSError as e:
-    print(f"Error loading the library: {e}")
-    print(f"Attempted to load from: {agora_vad_lib_path}")
+    logger.error(f"Error loading the library: {e}")
+    logger.error(f"Attempted to load from: {agora_vad_lib_path}")
     sys.exit(1)
 
 

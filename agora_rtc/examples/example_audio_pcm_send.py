@@ -3,6 +3,8 @@
 import time
 import os
 import threading
+import logging
+logger = logging.getLogger(__name__)
 
 from common.path_utils import get_log_path_with_filename 
 from common.pacer import Pacer
@@ -14,11 +16,14 @@ from observer.local_user_observer import DYSLocalUserObserver
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora.rtc.audio_pcm_data_sender import PcmAudioFrame
 from agora.rtc.agora_base import *
+import logging
+logging.basicConfig(level=logging.WARNING)
+logger = logging.getLogger(__name__)
 
 # run this example
 # python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx --userId=xxx --connectionNumber=1 --audioFile=./test_data/demo.pcm --sampleRate=16000 --numOfChannels=1
 sample_options = parse_args_example()
-print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
+logger.info(f"app_id: {sample_options.app_id}, channel_id: {sample_options.channel_id}, uid: {sample_options.user_id}")
 
 #---------------1. Init SDK
 config = AgoraServiceConfig()
@@ -79,7 +84,7 @@ def create_conn_and_send(channel_id, uid = 0):
     #             frame.sample_rate = sample_options.sample_rate
     #             ret = pcm_data_sender.send_audio_pcm_data(frame)
     #             count += 1
-    #             print("count,ret=",count, ret)
+    #             logger.info(f"count,ret={count},{ret}")
     #             pacer.pace()
 
     def read_and_send_packets():
@@ -92,7 +97,7 @@ def create_conn_and_send(channel_id, uid = 0):
                     break                
                 audio_stream_consumer.push_pcm_data(frame_buf)
                 pacer.pace()
-                print("push audio data")
+                logger.info("push audio data")
 
     for i in range(1):
         read_and_send_packets()
@@ -106,12 +111,12 @@ def create_conn_and_send(channel_id, uid = 0):
     connection.unregister_observer()
     connection.disconnect()
     connection.release()
-    print("connection release")
+    logger.info("connection release")
 
 
 threads = []
 for i in range(int(sample_options.connection_number)):
-    print("channel", i)
+    logger.info(f"channel {i}")
     channel_id = sample_options.channel_id + str(i+1)
 
     thread = threading.Thread(target=create_conn_and_send, args=(channel_id, sample_options.user_id))
@@ -124,4 +129,4 @@ for t in threads:
 
 
 agora_service.release()
-print("end")
+logger.info("end")

@@ -1,5 +1,7 @@
 import ctypes
 from .agora_base import *
+import logging
+logger = logging.getLogger(__name__)
 
 class EncodedAudioFrame:
     def __init__(
@@ -74,7 +76,7 @@ class AudioEncodedFrameSender:
     #     ownedinfo = frame.to_owned_encoded_audio_frame()
     #     ret = agora_audio_encoded_frame_sender_send(self.sender_handle, c_date, ctypes.c_uint32(len(frame.data)), ctypes.byref(ownedinfo))
     #     if ret < 0:
-    #         print("Failed to send encoded audio frame with error code: ", ret)
+    #         logger.error(f"Failed to send encoded audio frame with error code: {ret}")
     #     return ret
     
     def send_encoded_audio_frame(self, buffer_ptr:int, buffer_size:int, frame:EncodedAudioFrame):
@@ -82,7 +84,7 @@ class AudioEncodedFrameSender:
         ownedinfo = frame.to_owned_encoded_audio_frame()
         ret = agora_audio_encoded_frame_sender_send(self.sender_handle, buffer_ptr, ctypes.c_uint32(buffer_size), ctypes.byref(ownedinfo))
         if ret < 0:
-            print("Failed to send encoded audio frame with error code: ", ret)
+            logger.error(f"Failed to send encoded audio frame with error code: {ret}")
         return ret
 
     

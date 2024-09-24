@@ -14,11 +14,14 @@ from observer.local_user_observer import DYSLocalUserObserver
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora.rtc.audio_encoded_frame_sender import EncodedAudioFrame
 from agora.rtc.agora_base import *
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # run this example
 # python agora_rtc/examples/example_audio_encoded_send.py --appId=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.aac
 sample_options = parse_args_example()
-print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
+logger.info(f"app_id: {sample_options.app_id}, channel_id: {sample_options.channel_id}, uid: {sample_options.user_id}")
 
 #---------------1. Init SDK
 config = AgoraServiceConfig()
@@ -62,12 +65,12 @@ def test3(aac_file):
         if stream.type == 'audio':
             sample_rate = stream.sample_rate
             channels = stream.channels            
-            print(f"Audio stream: sample rate = {sample_rate}, channels = {channels}")
+            logger.info(f"Audio stream: sample rate = {sample_rate}, channels = {channels}")
             break
 
     for packet in container.demux():
         if packet.stream.type == 'audio':
-            print(f"Read audio packet with size {packet.size} bytes, PTS {packet.pts}, DTS {packet.dts}")
+            logger.info(f"Read audio packet with size {packet.size} bytes, PTS {packet.pts}, DTS {packet.dts}")
 
             frame = EncodedAudioFrame()
             frame.speech = 0
@@ -81,7 +84,7 @@ def test3(aac_file):
             duration_in_seconds = packet.duration * time_base
             pacer.pace_interval(duration_in_seconds)
 
-for i in range(10):
+for i in range(1):
     test3(sample_options.audio_file)
 
 # time.sleep(100)
@@ -90,6 +93,6 @@ audio_track.set_enabled(0)
 connection.unregister_observer()
 connection.disconnect()
 connection.release()
-print("release")
+logger.info("release")
 agora_service.release()
-print("end")
+logger.info("end")

@@ -9,11 +9,14 @@ from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnCon
 from agora.rtc.video_frame_sender import EncodedVideoFrameInfo
 from agora.rtc.agora_base import *
 import av
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # run this example
 # python agora_rtc/examples/example_video_encoded_send.py --appId=xxx --channelId=xxx --userId=xxx --videoFile=./test_data/send_video.h264
 sample_options = parse_args_example()
-print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
+logger.info(f"app_id: {sample_options.app_id}, channel_id: {sample_options.channel_id}, uid: {sample_options.user_id}")
 
 config = AgoraServiceConfig()
 config.enable_video = 1
@@ -53,16 +56,16 @@ def read_and_send_packets(h264_file):
         if stream.type == 'video':
             width = stream.width
             height = stream.height
-            print(f"Video stream: width = {width}, height = {height}")
+            logger.info(f"Video stream: width = {width}, height = {height}")
             break
     for packet in container.demux():
         if packet.stream.type == 'video':
-            print(f"Read packet with size {packet.size} bytes, PTS {packet.pts}")
+            logger.info(f"Read packet with size {packet.size} bytes, PTS {packet.pts}")
             is_keyframe = packet.is_keyframe
             if is_keyframe:
-                print(f"Keyframe packet with size {packet.size} bytes, PTS {packet.pts}")
+                logger.info(f"Keyframe packet with size {packet.size} bytes, PTS {packet.pts}")
             else:
-                print(f"Non-keyframe packet with size {packet.size} bytes, PTS {packet.pts}")
+                logger.info(f"Non-keyframe packet with size {packet.size} bytes, PTS {packet.pts}")
 
             encoded_video_frame_info = EncodedVideoFrameInfo()
             encoded_video_frame_info.codec_type = 2            
@@ -75,7 +78,7 @@ def read_and_send_packets(h264_file):
                 encoded_video_frame_info.frame_type = 4        
             ret = video_sender.send_encoded_video_image(packet.buffer_ptr, packet.buffer_size ,encoded_video_frame_info)        
             count += 1
-            print("count,ret=",count, ret)
+            logger.info(f"count,ret={count}, {ret}")
             pacer.pace_interval(1/30)
 
 for i in range(10):
@@ -87,6 +90,6 @@ video_track.set_enabled(0)
 connection.unregister_observer()
 connection.disconnect()
 connection.release()
-print("release")
+logger.info("release")
 agora_service.release()
-print("end")
+logger.info("end")

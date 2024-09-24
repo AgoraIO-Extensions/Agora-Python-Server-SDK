@@ -1,4 +1,6 @@
 import argparse
+import logging
+logger = logging.getLogger(__name__)
 
 class SampleOptions:
     def __init__(self):
@@ -42,7 +44,7 @@ def parse_args():
 
 def parse_args_example() -> SampleOptions:
     args = parse_args()
-    print("Parsed arguments:", args)
+    logger.info(f"Parsed arguments:{args}")
     sample_options = SampleOptions()
     sample_options.app_id = args.appId
     sample_options.token = args.appId    

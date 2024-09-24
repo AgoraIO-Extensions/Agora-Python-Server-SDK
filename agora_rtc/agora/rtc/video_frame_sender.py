@@ -1,6 +1,8 @@
 import ctypes
 from .agora_base import *
 from agora.rtc.video_frame_observer import *
+import logging
+logger = logging.getLogger(__name__)
 
 
 class OwnedEncodedVideoFrameInfo(ctypes.Structure):
@@ -192,7 +194,7 @@ class VideoEncodedImageSender:
         encoded_video_frame = frame_info.to_owned_encoded_video_frame_info()
         ret = agora_video_encoded_image_sender_send(self.sender_handle, buffer_pointer, buffer_size, ctypes.byref(encoded_video_frame))
         if ret != 1:
-            print(f"Failed to send video frame, error code: {ret}")
+            logger.error(f"Failed to send video frame, error code: {ret}")
         return ret
 
     

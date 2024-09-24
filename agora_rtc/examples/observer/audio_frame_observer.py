@@ -2,6 +2,10 @@
 import os
 import datetime
 from agora.rtc.audio_frame_observer import IAudioFrameObserver, AudioFrame
+import logging
+logger = logging.getLogger(__name__)
+
+
 
 source_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 filename, _ = os.path.splitext(os.path.basename(__file__))
@@ -15,41 +19,41 @@ class DYSAudioFrameObserver(IAudioFrameObserver):
     #     audio_params_instance = AudioParams()
     #     return audio_params_instance
 
-    def on_record_audio_frame(self, agora_local_user ,channelId, frame):
-        print("CCC on_record_audio_frame")
+    def on_record_audio_frame(self, agora_local_user ,channelId, frame):        
+        logger.info(f"on_record_audio_frame")
         return 0
     def on_playback_audio_frame(self, agora_local_user, channelId, frame):
-        print("CCC on_playback_audio_frame")
+        logger.info(f"on_playback_audio_frame")
         return 0
-    def on_ear_monitoring_audio_frame(self, agora_local_user, frame):
-        print("CCC on_ear_monitoring_audio_frame")
+    def on_ear_monitoring_audio_frame(self, agora_local_user, frame):        
+        logger.info(f"on_ear_monitoring_audio_frame")
         return 0
     
     def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, audio_frame:AudioFrame):
-        # print("CCC on_playback_audio_frame_before_mixing", audio_frame.type, audio_frame.samples_per_sec, audio_frame.samples_per_channel, audio_frame.bytes_per_sample, audio_frame.channels)        
+        # logger.info(f"on_playback_audio_frame_before_mixing, channelId={channelId}, uid={uid}, type={audio_frame.type}, samples_per_sec={audio_frame.samples_per_sec}, samples_per_channel={audio_frame.samples_per_channel}, bytes_per_sample={audio_frame.bytes_per_sample}, channels={audio_frame.channels}, len={len(audio_frame.buffer)}")
         file_path = os.path.join(log_folder, channelId + "_" + uid + '.pcm')
-        print("CCC on_playback_audio_frame_before_mixing", file_path, len(audio_frame.buffer))
+        logger.info(f"on_playback_audio_frame_before_mixing, file_path={file_path}, len={len(audio_frame.buffer)}")
         with open(file_path, "ab") as f:
             f.write(audio_frame.buffer)
         return 1
     
 
     def on_get_audio_frame_position(self, agora_local_user):
-        print("CCC on_get_audio_frame_position")
+        logger.info(f"on_get_audio_frame_position")        
         return 0
     # def on_get_audio_frame_position(self, agora_local_user):
-    #     print("CCC on_get_audio_frame_position")
+    #     logger.info("CCC on_get_audio_frame_position")
     #     return 0
 
     # def on_get_playback_audio_frame_param(self, agora_local_user):
-    #     print("CCC on_get_playback_audio_frame_param")
+    #     logger.info("CCC on_get_playback_audio_frame_param")
     #     return 0
     # def on_get_record_audio_frame_param(self, agora_local_user):
-    #     print("CCC on_get_record_audio_frame_param")
+    #     logger.info("CCC on_get_record_audio_frame_param")
     #     return 0
     # def on_get_mixed_audio_frame_param(self, agora_local_user):
-    #     print("CCC on_get_mixed_audio_frame_param")
+    #     logger.info("CCC on_get_mixed_audio_frame_param")
     #     return 0
     # def on_get_ear_monitoring_audio_frame_param(self, agora_local_user):
-    #     print("CCC on_get_ear_monitoring_audio_frame_param")
+    #     logger.info("CCC on_get_ear_monitoring_audio_frame_param")
     #     return 0

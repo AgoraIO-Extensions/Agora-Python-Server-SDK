@@ -3,6 +3,8 @@
 import ctypes
 from .agora_base import *
 from .video_encoded_frame_observer import IVideoEncodedFrameObserver, EncodedVideoFrameInfo
+import logging
+logger = logging.getLogger(__name__)
 
 # typedef struct _video_encoded_frame_observer {
 #   int (*on_encoded_video_frame)(AGORA_HANDLE agora_video_encoded_frame_observer, uid_t uid, const uint8_t* image_buffer, size_t length,
@@ -53,7 +55,7 @@ class VideoEncodedFrameObserverInner(ctypes.Structure):
         self.on_encoded_video_frame = ON_ENCODED_VIDEO_FRAME(self._on_encoded_video_frame)
     
     def _on_encoded_video_frame(self, agora_video_encoded_frame_observer ,uid, image_buffer, length, video_encoded_frame_info):
-        # print("VideoEncodedFrameObserverInnerCB on_encoded_video_frame")
+        # logger.debug("VideoEncodedFrameObserverInnerCB on_encoded_video_frame")
         img_buffer = ctypes.string_at(image_buffer, length)
         vefi = video_encoded_frame_info.contents._to_encoded_video_frame_info()
         self.video_encoded_frame_observer.on_encoded_video_frame(agora_video_encoded_frame_observer, uid, img_buffer, length, vefi)

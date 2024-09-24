@@ -15,11 +15,14 @@ from observer.local_user_observer import DYSLocalUserObserver
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora.rtc.audio_pcm_data_sender import PcmAudioFrame
 from agora.rtc.agora_base import *
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # run this example
 # python agora_rtc/examples/example_audio_pcm_send_multi_connection.py --appId=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.pcm
 sample_options = parse_args_example()
-print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
+logger.info(f"app_id: {sample_options.app_id}, channel_id: {sample_options.channel_id}, uid: {sample_options.user_id}")
 
 #---------------1. Init SDK
 config = AgoraServiceConfig()
@@ -100,7 +103,7 @@ def send_test():
             ret = pcm_data_sender.send_audio_pcm_data(frame)
             ret2 = pcm_data_sender2.send_audio_pcm_data(frame)
             count += 1
-            print("count,ret=",count, ret, ret2)
+            logger.info(f"count,ret={count},{ret},{ret2}")
             Pacer.pace()
 
 # for i in range(100):
@@ -123,6 +126,6 @@ connection2.unregister_observer()
 connection2.disconnect()
 connection2.release()
 
-print("release")
+logger.info("release")
 agora_service.release()
-print("end")
+logger.info("end")

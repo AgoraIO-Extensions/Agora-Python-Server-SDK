@@ -6,6 +6,10 @@ import time
 import os
 import sys
 import threading
+import logging
+logging.basicConfig(level=logging.WARNING)
+logger = logging.getLogger(__name__)
+
 from common.path_utils import get_log_path_with_filename 
 from common.parse_args import parse_args_example
 from observer.connection_observer import DYSConnectionObserver
@@ -18,7 +22,7 @@ from agora.rtc.agora_base import *
 # run this example
 # python agora_rtc/examples/example_audio_pcm_receive.py --appId=xxx --channelId=xxx --userId=xxx
 sample_options = parse_args_example()
-print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
+logger.info(f"app_id: {sample_options.app_id}, channel_id: {sample_options.channel_id}, uid: {sample_options.user_id}")
 
 #---------------1. Init SDK
 config = AgoraServiceConfig()
@@ -63,14 +67,14 @@ def create_conn_and_recv(channel_id, uid = 0):
     connection.unregister_observer()
     connection.disconnect()
     connection.release()
-    print("release")
+    logger.info("release")
 
 
 
 threads = []
 for i in range(int(sample_options.connection_number)):
     channel_id = sample_options.channel_id + str(i+1)
-    print("channel_id:", channel_id)
+    logger.info(f"channel_id: {channel_id}")
     thread = threading.Thread(target=create_conn_and_recv, args=(channel_id, sample_options.user_id))
     thread.start()
     threads.append(thread)
@@ -79,4 +83,4 @@ for t in threads:
     t.join()
 
 agora_service.release()
-print("end")
+logger.info("end")

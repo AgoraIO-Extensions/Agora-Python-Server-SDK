@@ -8,11 +8,14 @@ from observer.local_user_observer import DYSLocalUserObserver
 from observer.connection_observer import DYSConnectionObserver
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora.rtc.agora_base import *
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # run this example
 # python agora_rtc/examples/example_stream_message_receive.py --appId=xxx --channelId=xxx --userId=xxx
 sample_options = parse_args_example()
-print("app_id:", sample_options.app_id, "channel_id:", sample_options.channel_id, "uid:", sample_options.user_id)
+logger.info(f"app_id: {sample_options.app_id}, channel_id: {sample_options.channel_id}, uid: {sample_options.user_id}")
 
 #---------------1. Init SDK
 config = AgoraServiceConfig()
@@ -42,6 +45,6 @@ time.sleep(200)
 connection.unregister_observer()
 connection.disconnect()
 connection.release()
-print("release")
+logger.info("release")
 agora_service.release()
-print("end")
+logger.info("end")

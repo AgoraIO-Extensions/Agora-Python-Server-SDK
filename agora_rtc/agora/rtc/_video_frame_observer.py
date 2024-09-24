@@ -2,6 +2,8 @@ import ctypes
 from .agora_base import *
 from .local_user import *
 from .video_frame_observer import *
+import logging
+logger = logging.getLogger(__name__)
 
 class VideoFrameInner(ctypes.Structure):
     _fields_ = [
@@ -63,7 +65,7 @@ class VideoFrameObserverInner(ctypes.Structure):
 
     def _on_frame(self, agora_handle, channel_id, user_id, video_frame:VideoFrameInner):
         vf = video_frame.contents
-        # print("VideoFrameObserver _on_frame:", agora_handle, channel_id, user_id, vf.metadata_buffer, vf.metadata_size)
+        # logger.debug("VideoFrameObserver _on_frame:", agora_handle, channel_id, user_id, vf.metadata_buffer, vf.metadata_size)
         self.video_frame_observer.on_frame(agora_handle, channel_id.decode() if channel_id else None, user_id.decode(), vf.to_video_frame())
     
 
@@ -84,7 +86,7 @@ class VideoFrameObserverInner(ctypes.Structure):
 
 
 #     def _on_encoded_video_image_received(self, agora_handle, image_buffer, length, info):
-#         print("VideoFrameObserver _on_frame:", agora_handle, image_buffer, length, info)
+#         logger.debug("VideoFrameObserver _on_frame:", agora_handle, image_buffer, length, info)
 #         # self.on_encoded_video_image_received(agora_handle, image_buffer, length, info)
 #         self.video_encoded_image_receiver.on_encoded_video_image_received(agora_handle, image_buffer, length, info)
 
