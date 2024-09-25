@@ -24,7 +24,8 @@ class SampleOptions:
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Agora SDK Example")
-    parser.add_argument("--appId", required=True, help="The token for authentication / must")
+    parser.add_argument("--appId", required=True, help="The appid for authentication / must")
+    parser.add_argument("--token", help="The token for authentication ")
     parser.add_argument("--channelId", required=True, help="Channel Id / must")
     parser.add_argument("--connectionNumber", default=1, help="Enter the channel number")
     parser.add_argument("--userId", default="0", help="User Id / default is 0")
@@ -47,7 +48,10 @@ def parse_args_example() -> SampleOptions:
     logger.info(f"Parsed arguments:{args}")
     sample_options = SampleOptions()
     sample_options.app_id = args.appId
-    sample_options.token = args.appId    
+    if args.token:
+        sample_options.token = args.token
+    else:
+        sample_options.token = args.appId    
     sample_options.channel_id = args.channelId
     sample_options.connection_number = int(args.connectionNumber)
     sample_options.audio_file = args.audioFile
