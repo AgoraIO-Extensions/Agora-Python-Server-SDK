@@ -16,30 +16,27 @@ class CustomInstallCommand(install):
 
     def download_and_extract_sdk(self):
         print("download_and_extract_sdk--------------")
-
         agora_service_path = os.path.join(site.getsitepackages()[0], 'agora', 'rtc')
+        sdk_dir = os.path.join(agora_service_path, "agora_sdk")
+        zip_path = os.path.join(agora_service_path, "agora_rtc_sdk.zip")
+
         url = "https://download.agora.io/sdk/release/agora_rtc_sdk_linux_v4.4_20240914_1538_336910.zip"
-        libagora_rtc_sdk_path = os.path.join(agora_service_path, "agora_sdk/libagora_rtc_sdk.so")
         if sys.platform == 'darwin':
             url = "https://download.agora.io/sdk/release/agora_rtc_sdk_mac_v4.4_20240914_1538_336910.zip"
-            libagora_rtc_sdk_path = os.path.join(agora_service_path, "agora_sdk/libAgoraRtcKit.dylib")
-
-        sdk_dir = os.path.join(agora_service_path, "agora_sdk")
+        
         if os.path.exists(sdk_dir):
             os.system(f"rm -rf {sdk_dir}")        
-        zip_path = os.path.join(agora_service_path, "agora_rtc_sdk.zip")
-        libagora_rtc_sdk_path = os.path.join(agora_service_path, "libagora_rtc_sdk.so")
         os.makedirs(agora_service_path, exist_ok=True)
+        if os.path.exists(zip_path):
+            os.remove(zip_path)
 
         print("agora_service_path:", agora_service_path)
-        if not os.path.exists(zip_path):
-            print(f"Downloading {url}...")
-            request.urlretrieve(url, zip_path)
+        print(f"Downloading {url}...")
+        request.urlretrieve(url, zip_path)
 
-        if not os.path.exists(libagora_rtc_sdk_path):
-            print(f"Extracting {zip_path}...")
-            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                zip_ref.extractall(agora_service_path)
+        print(f"Extracting {zip_path}...")
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(agora_service_path)
 
         if os.path.exists(zip_path):
             os.remove(zip_path)

@@ -7,7 +7,7 @@ import os
 import sys
 import threading
 import logging
-logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 from common.path_utils import get_log_path_with_filename 
