@@ -171,11 +171,6 @@ class LocalVideoTrackStats(ctypes.Structure):
         ("quality_adapt_indication", ctypes.c_int)
     ]
 
-class VideoDimensions(ctypes.Structure):
-    _fields_ = [
-        ("width", ctypes.c_int),
-        ("height", ctypes.c_int)
-    ]
 
 class SimulcastStreamConfig(ctypes.Structure):
     _fields_ = [

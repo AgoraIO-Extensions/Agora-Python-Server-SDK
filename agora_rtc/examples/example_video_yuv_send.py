@@ -42,6 +42,15 @@ def create_conn_and_send(channel_id, uid = 0):
     media_node_factory = agora_service.create_media_node_factory()
     video_sender = media_node_factory.create_video_frame_sender()
     video_track = agora_service.create_custom_video_track_frame(video_sender)
+    video_config = VideoEncoderConfig(
+        frame_rate=sample_options.fps,
+        dimensions = VideoDimensions(
+            width = sample_options.width,
+            height = sample_options.height
+        ),
+    )
+
+    video_track.set_video_encoder_configuration(video_config)
     local_user = connection.get_local_user()
 
     video_track.set_enabled(1)
