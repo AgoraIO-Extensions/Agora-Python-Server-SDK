@@ -70,6 +70,7 @@ def create_conn_and_send(channel_id, uid = 0):
                 frame.height = height
                 frame.timestamp = 0
                 frame.metadata = "hello metadata"
+                logger.info(f"send video frame: frame.width: {frame.stride}, frame.height: {frame.height}, frame.timestamp: {frame.timestamp}, frame.metadata: {frame.metadata}")
                 ret = video_sender.send_video_frame(frame)        
                 count += 1
                 pacer.pace()

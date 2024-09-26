@@ -12,7 +12,7 @@ import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
 def _check_download_and_extract_sdk():
-    agora_service_path = os.path.join(site.getsitepackages()[0], 'agora', 'rtc')
+    agora_service_path = os.path.dirname(os.path.abspath(__file__))
     sdk_dir = os.path.join(agora_service_path, "agora_sdk")
     zip_path = os.path.join(agora_service_path, "agora_rtc_sdk.zip")
 

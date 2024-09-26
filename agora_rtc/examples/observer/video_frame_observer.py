@@ -21,7 +21,7 @@ class DYSVideoFrameObserver(IVideoFrameObserver):
         y_size = frame.y_stride * frame.height
         uv_size = (frame.u_stride * frame.height // 2) 
         
-        logger.info(f"on_frame, file_path={file_path}, y_size={y_size}, uv_size={uv_size}, len_y={len(frame.y_buffer)}, len_u={len(frame.u_buffer)}, len_v={len(frame.v_buffer)}")
+        # logger.info(f"on_frame, file_path={file_path}, y_size={y_size}, uv_size={uv_size}, len_y={len(frame.y_buffer)}, len_u={len(frame.u_buffer)}, len_v={len(frame.v_buffer)}")
         with open(file_path, 'ab') as f:
             f.write(frame.y_buffer[:y_size])
             f.write(frame.u_buffer[:uv_size])
