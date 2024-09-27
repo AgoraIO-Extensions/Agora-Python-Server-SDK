@@ -294,6 +294,11 @@ class AudioFrame:
         self.buffer = None
         self.render_time_ms = 0
         self.avsync_type = 0
+        self.far_field_flag = 0
+        self.rms = 0
+        self.voice_prob = 0
+        self.music_prob = 0
+        self.pitch = 0
     
 class AudioParams(ctypes.Structure):
     _fields_ = [

@@ -123,6 +123,11 @@ agora_service_create_custom_video_track_frame = agora_lib.agora_service_create_c
 agora_service_create_custom_video_track_frame.restype = AGORA_HANDLE
 agora_service_create_custom_video_track_frame.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
 
+agora_service_enable_extension = agora_lib.agora_service_enable_extension
+agora_service_enable_extension.restype = AGORA_API_C_INT
+agora_service_enable_extension.argtypes = [AGORA_HANDLE, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_uint]
+
+
 class SenderOptions(ctypes.Structure):
     _fields_ = [
         ("cc_mode", ctypes.c_int),
@@ -142,6 +147,8 @@ agora_service_create_custom_video_track_encoded.argtypes = [AGORA_HANDLE, AGORA_
 class AgoraService:
     def __init__(self) -> None:
         self.service_handle = agora_service_create()
+       
+        # set tag???
         self.inited = False
 
     def initialize(self, config: AgoraServiceConfig):       
@@ -152,6 +159,15 @@ class AgoraService:
         if result == 0:
             self.inited = True
         logger.debug(f'Initialization result: {result}')
+
+         # to enable plugin
+        provider = "agora.builtin"
+        generator = "agora_audio_label_generator"
+        cprovider = provider.encode('utf-8')
+        cgenerator = generator.encode('utf-8')
+        ctrak = ctypes.c_char_p(None)
+        #agora_service_enable_extension(self.service_handle, "agora.builtin", "agora_audio_label_generator", None, 1)
+        agora_service_enable_extension(self.service_handle, cprovider, cgenerator, ctrak, 1)
 
         if config.log_path:
             log_size = 512 * 1024

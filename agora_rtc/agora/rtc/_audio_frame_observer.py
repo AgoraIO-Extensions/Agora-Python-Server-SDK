@@ -16,7 +16,12 @@ class AudioFrameInner(ctypes.Structure):
         ("samples_per_sec", ctypes.c_int),
         ("buffer", ctypes.c_void_p),
         ("render_time_ms", ctypes.c_int64),
-        ("avsync_type", ctypes.c_int)
+        ("avsync_type", ctypes.c_int),
+        ("far_field_flag", ctypes.c_int),
+        ("rms", ctypes.c_int),
+        ("voice_prob", ctypes.c_int),
+        ("music_prob", ctypes.c_int),
+        ("pitch", ctypes.c_int)
     ]
     def _to_audio_frame(self):
         audio_frame = AudioFrame()
@@ -29,6 +34,12 @@ class AudioFrameInner(ctypes.Structure):
         audio_frame.buffer = bytearray(cdata)
         audio_frame.render_time_ms = self.render_time_ms
         audio_frame.avsync_type = self.avsync_type
+        audio_frame.far_field_flag = self.far_field_flag
+        audio_frame.rms = self.rms
+        audio_frame.voice_prob = self.voice_prob
+        audio_frame.music_prob = self.music_prob
+        audio_frame.pitch = self.pitch
+
         return audio_frame
     
 
@@ -99,7 +110,7 @@ class AudioFrameObserverInner(ctypes.Structure):
         return ret
 
     def _on_playback_audio_frame_before_mixing(self, local_user_handle, channel_id, user_id, audio_frame_inner):
-        logger.debug(f"AudioFrameObserverInner _on_playback_audio_frame_before_mixing: {local_user_handle}, {channel_id}, {user_id}, {audio_frame_inner}")
+        #logger.debug(f"AudioFrameObserverInner _on_playback_audio_frame_before_mixing: {local_user_handle}, {channel_id}, {user_id}, {audio_frame_inner}")
         if channel_id is None:
             channel_id_str = ""
         else:
