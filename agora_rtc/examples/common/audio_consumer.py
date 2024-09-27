@@ -26,17 +26,18 @@ class AudioStreamConsumer:
         with self._lock:
             self._data += data
     def _consume(self):
+        wanted_packages = 0
+        frame_buf = bytearray()
         with self._lock:
             # cal current duration
             cur_time = time.time()*1000
             elapsed_time = cur_time - self._start_time
             wanted_packages = int(elapsed_time/10) - self._consumed_packages
-
             if wanted_packages > 18:  # 180ms, a new session
                 wanted_packages = 18
                 self._start_time = cur_time
                 self._consumed_packages = -18
-                logger.info("audio_stream_consumer:new session")
+                # logger.info("audio_stream_consumer:new session")
             data_len = len(self._data)
             wanted_packages = min(wanted_packages, data_len//320)
             if self._data and wanted_packages > 0:
@@ -45,26 +46,26 @@ class AudioStreamConsumer:
                 frame_buf = bytearray(frame_size)
                 frame_buf[:] = self._data[:frame_size]
                 self._data = self._data[frame_size:]
-                #send data
-                frame = PcmAudioFrame()
-                frame.data = frame_buf
-                frame.timestamp = 0
-                frame.samples_per_channel = 160*wanted_packages
-                frame.bytes_per_sample = 2
-                frame.number_of_channels = 1
-                frame.sample_rate = 16000
-                ret = self._pcm_sender.send_audio_pcm_data(frame)
-                self._consumed_packages += wanted_packages
-                logger.info(f"audio_stream_consumer:consumed_packages:{self._consumed_packages}, wanted_packages:{wanted_packages}")
-                
-
+                self._consumed_packages += wanted_packages                
             #restart timer
             if self._run:
                 self._timer = threading.Timer(self._interval, self._consume)
                 self._timer.start()
             else:
                 self._event.set()
-    def relase(self):
+        
+        if wanted_packages > 0:
+            frame = PcmAudioFrame()
+            frame.data = frame_buf
+            frame.timestamp = 0
+            frame.samples_per_channel = 160*wanted_packages
+            frame.bytes_per_sample = 2
+            frame.number_of_channels = 1
+            frame.sample_rate = 16000
+            self._pcm_sender.send_audio_pcm_data(frame)
+            # logger.info(f"audio_stream_consumer:consumed_packages:{self._consumed_packages}, wanted_packages:{wanted_packages}")
+
+    def release(self):
         logger.info("audio_stream_consumer:release")
         self._run = False
         if self._timer and self._timer.is_alive():

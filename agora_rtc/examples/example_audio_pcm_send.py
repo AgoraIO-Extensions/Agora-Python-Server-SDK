@@ -47,6 +47,7 @@ def create_conn_and_send(channel_id, uid = 0):
 
     #---------------3. Create Media Sender
     media_node_factory = agora_service.create_media_node_factory()
+
     pcm_data_sender = media_node_factory.create_audio_pcm_data_sender()
     audio_track = agora_service.create_custom_audio_track_pcm(pcm_data_sender)
 
@@ -99,13 +100,13 @@ def create_conn_and_send(channel_id, uid = 0):
                 pacer.pace()
                 logger.info("push audio data")
 
-    for i in range(1):
+    for i in range(10):
         read_and_send_packets()
 
     #---------------5. Stop Media Sender And Release
     time.sleep(25)
     audio_stream_consumer.clear()
-    audio_stream_consumer.relase()
+    audio_stream_consumer.release()
     local_user.unpublish_audio(audio_track)
     audio_track.set_enabled(0)
     connection.unregister_observer()
