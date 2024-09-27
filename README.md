@@ -20,7 +20,7 @@
   - Python 3.8 and above
 
 # Test Data
-- Download and unzip [test_data.zip](https://download.agora.io/demo/test/test_data_202408221437.zip)
+- Download and unzip [test_data.zip](https://download.agora.io/demo/test/test_data_202408221437.zip) to the Agora-Python-Server-SDK directory.
 
 # Using Agora-Python-Server-SDK
 ```

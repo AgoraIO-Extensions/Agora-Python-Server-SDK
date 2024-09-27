@@ -20,7 +20,7 @@
   - Python 3.8 及以上
 
 # 测试数据
-- 下载并解压 [test_data.zip](https://download.agora.io/demo/test/test_data_202408221437.zip)
+- 下载并解压 [test_data.zip](https://download.agora.io/demo/test/test_data_202408221437.zip) 到Agora-Python-Server-SDK目录
 
 # 使用Agora-Python-Server-SDK
 ```
