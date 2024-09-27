@@ -44,7 +44,13 @@ connection.connect(sample_options.token, sample_options.channel_id, sample_optio
 #---------------3. Create Media Sender
 media_node_factory = agora_service.create_media_node_factory()
 audio_sender = media_node_factory.create_audio_encoded_frame_sender()
+if not audio_sender:
+    logger.error("create audio sender failed")
+    exit(1)
 audio_track = agora_service.create_custom_audio_track_encoded(audio_sender, 1)
+if not audio_track:
+    logger.error("create audio track failed")
+    exit(1)
 
 local_user = connection.get_local_user()
 localuser_observer = DYSLocalUserObserver()

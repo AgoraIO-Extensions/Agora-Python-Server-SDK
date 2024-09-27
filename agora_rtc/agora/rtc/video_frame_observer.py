@@ -42,3 +42,6 @@ class VideoFrame():
 class IVideoFrameObserver():
     def on_frame(self, agora_handle, channel_id, user_id, video_frame:VideoFrame):
         pass
+
+    def get_rotation_applied(self) -> bool:
+        pass

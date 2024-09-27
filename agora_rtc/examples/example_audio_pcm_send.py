@@ -27,6 +27,7 @@ logger.info(f"app_id: {sample_options.app_id}, channel_id: {sample_options.chann
 
 #---------------1. Init SDK
 config = AgoraServiceConfig()
+config.audio_scenario = AudioScenarioType.AUDIO_SCENARIO_CHORUS
 config.appid = sample_options.app_id
 config.log_path = get_log_path_with_filename(os.path.splitext(__file__)[0])
 

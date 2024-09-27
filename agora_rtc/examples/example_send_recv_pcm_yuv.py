@@ -29,6 +29,7 @@ if sample_options.hours == 0:
 #---------------1. Init SDK
 config = AgoraServiceConfig()
 config.appid = sample_options.app_id
+config.audio_scenario = AudioScenarioType.AUDIO_SCENARIO_CHORUS
 config.log_path = get_log_path_with_filename(os.path.splitext(__file__)[0])
 agora_service = AgoraService()
 agora_service.initialize(config)
@@ -42,19 +43,40 @@ def create_conn_and_send(channel_id, uid = 0):
         channel_profile=ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
     )
     connection = agora_service.create_rtc_connection(con_config)
+    if not connection:
+        logger.error("create connection failed")
+        return
     conn_observer = DYSConnectionObserver()
     connection.register_observer(conn_observer)
-    connection.connect(sample_options.token, channel_id, uid)
-
+    ret = connection.connect(sample_options.token, channel_id, uid)
+    if ret < 0:
+        logger.error(f"connect failed: {ret}")
+        return
+    
     #---------------3. Create Media Sender
     media_node_factory = agora_service.create_media_node_factory()
+    if not media_node_factory:
+        logger.error("create media node factory failed")
+        return
 
     pcm_data_sender = media_node_factory.create_audio_pcm_data_sender()
+    if not pcm_data_sender:
+        logger.error("create pcm data sender failed")
+        return
     audio_track = agora_service.create_custom_audio_track_pcm(pcm_data_sender)
+    if not audio_track:
+        logger.error("create audio track failed")
+        return
     # audio_track.set_max_buffer_audio_frame_number(320*2000)
     
     video_sender = media_node_factory.create_video_frame_sender()
+    if not video_sender:
+        logger.error("create video frame sender failed")
+        return
     video_track = agora_service.create_custom_video_track_frame(video_sender)
+    if not video_track:
+        logger.error("create video track failed")
+        return
 
     local_user = connection.get_local_user()
     localuser_observer = DYSLocalUserObserver()

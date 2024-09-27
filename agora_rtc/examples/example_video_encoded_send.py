@@ -38,8 +38,14 @@ connection.connect(sample_options.token, sample_options.channel_id, sample_optio
 
 media_node_factory = agora_service.create_media_node_factory()
 video_sender = media_node_factory.create_video_encoded_image_sender()
+if not video_sender:
+    logger.error("create video sender failed")
+    exit(1)
 sender_options = SenderOptions(0, 2, 640)
 video_track = agora_service.create_custom_video_track_encoded(video_sender, sender_options)
+if not video_track:
+    logger.error("create video track failed")
+    exit(1)
 local_user = connection.get_local_user()
 
 video_track.set_enabled(1)

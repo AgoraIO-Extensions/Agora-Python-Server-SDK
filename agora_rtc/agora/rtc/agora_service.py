@@ -210,7 +210,7 @@ class AgoraService:
 
 
     #createCustomAudioTrackPcm	创建一个自定义音频Track。
-    def create_custom_audio_track_pcm(self, audio_pcm_data_sender:AudioPcmDataSender):
+    def create_custom_audio_track_pcm(self, audio_pcm_data_sender:AudioPcmDataSender) -> LocalAudioTrack | None:
         if not self.inited:
             logger.error("AgoraService is not initialized. Please call initialize() first.")
             return None

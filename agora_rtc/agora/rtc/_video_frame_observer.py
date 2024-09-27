@@ -52,6 +52,13 @@ class VideoFrameInner(ctypes.Structure):
 
 ON_FRAME_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_char_p, user_id_t, ctypes.POINTER(VideoFrameInner))
 
+# AGORA_API_C_INT agora_video_frame_observer_get_rotation_applied(AGORA_HANDLE agora_video_frame_observer);
+
+agora_video_frame_observer_get_rotation_applied = agora_lib.agora_video_frame_observer_get_rotation_applied
+agora_video_frame_observer_get_rotation_applied.restype = ctypes.c_int
+agora_video_frame_observer_get_rotation_applied.argtypes = [AGORA_HANDLE]
+
+
 class VideoFrameObserverInner(ctypes.Structure):
     _fields_ = [
         ("on_frame", ON_FRAME_CALLBACK)
@@ -69,7 +76,9 @@ class VideoFrameObserverInner(ctypes.Structure):
         self.video_frame_observer.on_frame(agora_handle, channel_id.decode() if channel_id else None, user_id.decode(), vf.to_video_frame())
     
 
-
+    # def _get_rotation_applied(self):
+    #     return self.video_frame_observer.get_rotation_applied()
+        # return agora_video_frame_observer_get_rotation_applied(self.local_user.local_user_handle)
 
 
 
