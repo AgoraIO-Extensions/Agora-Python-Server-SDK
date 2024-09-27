@@ -1,6 +1,6 @@
 import time
 import ctypes
-from threading import RLock
+from threading import RLock, Lock
 from .agora_base import *
 from .local_video_track import *
 from .local_audio_track import *
@@ -224,15 +224,15 @@ class LocalUser:
         self.user_handle = local_user_handle
         self.connection = connection
         #for AudioTrack/videoTrack in local_user, we need to keep the reference of them
-        self._audio_track_lock = RLock()
-        self._video_track_lock = RLock()
+        self._audio_track_lock = Lock()
+        self._video_track_lock = Lock()
         #map
         self._audio_track_map = {}
         self._video_track_map = {}
         #remote audio track
         #remote video track
-        self._remote_audio_track_lock = RLock()
-        self._remote_video_track_lock = RLock()
+        self._remote_audio_track_lock = Lock()
+        self._remote_video_track_lock = Lock()
         self._remote_audio_track_map = {}
         self._remote_video_track_map = {}
 
@@ -512,9 +512,9 @@ class LocalUser:
 
     def release(self): #do nothing, just do api allign
         #clean all
-        with self.remote_audio_tracks_lock:
+        with self._remote_audio_track_lock:
             self._remote_audio_track_map.clear()
-        with self.remote_video_tracks_lock:
+        with self._remote_video_track_lock:
             self._remote_video_track_map.clear()
         with self._audio_track_lock:
             self._audio_track_map.clear()
@@ -526,7 +526,7 @@ class LocalUser:
         return self.connection
     def get_remote_audio_track(self, uid):
         #enum & get audio track
-        with self.remote_audio_tracks_lock:
+        with self._remote_audio_track_lock:
             for handle, remote_audio_track in self.remote_audio_tracks.items():
                 if remote_audio_track.user_id == uid:
                     return remote_audio_track
