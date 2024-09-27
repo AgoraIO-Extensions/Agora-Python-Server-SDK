@@ -173,7 +173,10 @@ def create_conn_and_send(channel_id, uid = 0):
     audio_track.set_enabled(0)
     video_track.set_enabled(0)
     connection.unregister_observer()
-    connection.disconnect()
+    ret = connection.disconnect()
+    if ret < 0:
+        logger.error(f"disconnect failed: {ret}")
+        return
     connection.release()
     logger.info("release")
     
