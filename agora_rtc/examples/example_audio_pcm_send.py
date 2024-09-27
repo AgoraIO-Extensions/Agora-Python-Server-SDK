@@ -10,9 +10,9 @@ from common.path_utils import get_log_path_with_filename
 from common.pacer import Pacer
 from common.parse_args import parse_args_example
 from common.audio_consumer import AudioStreamConsumer
-from observer.connection_observer import DYSConnectionObserver
-# from observer.audio_frame_observer import DYSAudioFrameObserver
-from observer.local_user_observer import DYSLocalUserObserver
+from observer.connection_observer import SampleConnectionObserver
+# from observer.audio_frame_observer import SampleAudioFrameObserver
+from observer.local_user_observer import SampleLocalUserObserver
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora.rtc.audio_pcm_data_sender import PcmAudioFrame
 from agora.rtc.agora_base import *
@@ -42,7 +42,7 @@ def create_conn_and_send(channel_id, uid = 0):
         channel_profile=ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
     )
     connection = agora_service.create_rtc_connection(con_config)
-    conn_observer = DYSConnectionObserver()
+    conn_observer = SampleConnectionObserver()
     connection.register_observer(conn_observer)
     connection.connect(sample_options.token, channel_id, uid)
 
@@ -53,9 +53,9 @@ def create_conn_and_send(channel_id, uid = 0):
     audio_track = agora_service.create_custom_audio_track_pcm(pcm_data_sender)
 
     local_user = connection.get_local_user()
-    localuser_observer = DYSLocalUserObserver()
+    localuser_observer = SampleLocalUserObserver()
     local_user.register_local_user_observer(localuser_observer)
-    # audio_frame_observer = DYSAudioFrameObserver()
+    # audio_frame_observer = SampleAudioFrameObserver()
     # local_user.register_audio_frame_observer(audio_frame_observer)
 
     # audio_track.set_max_buffer_audio_frame_number(320*2000)

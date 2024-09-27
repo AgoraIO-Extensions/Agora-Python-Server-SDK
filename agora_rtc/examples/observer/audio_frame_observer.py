@@ -11,9 +11,9 @@ source_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.
 filename, _ = os.path.splitext(os.path.basename(__file__))
 log_folder = os.path.join(source_dir, 'logs', filename ,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S"))
 os.makedirs(log_folder, exist_ok=True)
-class DYSAudioFrameObserver(IAudioFrameObserver):
+class SampleAudioFrameObserver(IAudioFrameObserver):
     def __init__(self):
-        super(DYSAudioFrameObserver, self).__init__()
+        super(SampleAudioFrameObserver, self).__init__()
 
     # def on_get_playback_audio_frame_param(self, agora_local_user):
     #     audio_params_instance = AudioParams()

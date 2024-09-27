@@ -4,9 +4,9 @@ import time
 import os
 from common.path_utils import get_log_path_with_filename 
 from common.parse_args import parse_args_example
-from observer.connection_observer import DYSConnectionObserver
-from observer.local_user_observer import DYSLocalUserObserver
-from observer.video_encoded_frame_observer import DYSVideoEncodedFrameObserver
+from observer.connection_observer import SampleConnectionObserver
+from observer.local_user_observer import SampleLocalUserObserver
+from observer.video_encoded_frame_observer import SampleVideoEncodedFrameObserver
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig, SenderOptions
 from agora.rtc.agora_base import VideoSubscriptionOptions, VIDEO_STREAM_TYPE
 from agora.rtc.agora_base import *
@@ -35,7 +35,7 @@ con_config = RTCConnConfig(
 )
 
 connection = agora_service.create_rtc_connection(con_config)
-conn_observer = DYSConnectionObserver()
+conn_observer = SampleConnectionObserver()
 connection.register_observer(conn_observer)
 connection.connect(sample_options.token, sample_options.channel_id, sample_options.user_id)
 
@@ -47,7 +47,7 @@ video_track = agora_service.create_custom_video_track_encoded(video_sender, send
 # video_track.register_video_encoded_image_receiver(video_sender)
 
 local_user = connection.get_local_user()
-localuser_observer = DYSLocalUserObserver()
+localuser_observer = SampleLocalUserObserver()
 local_user.register_local_user_observer(localuser_observer)
 
 video_subscription_options = VideoSubscriptionOptions(
@@ -57,9 +57,9 @@ video_subscription_options = VideoSubscriptionOptions(
 local_user.subscribe_all_video(video_subscription_options)
 
 # video_sender = connection.GetVideoSender()
-# video_frame_observer = DYSVideoFrameObserver()
-# video_encoded_image_receiver = DYSVideoEncodedImageReceiver()
-video_encoded_frame_observer = DYSVideoEncodedFrameObserver()
+# video_frame_observer = SampleVideoFrameObserver()
+# video_encoded_image_receiver = SampleVideoEncodedImageReceiver()
+video_encoded_frame_observer = SampleVideoEncodedFrameObserver()
 local_user.register_video_encoded_frame_observer(video_encoded_frame_observer)
 
 video_track.set_enabled(1)

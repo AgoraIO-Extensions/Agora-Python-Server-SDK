@@ -3,8 +3,8 @@ import os
 from common.path_utils import get_log_path_with_filename 
 from common.parse_args import parse_args_example
 from common.pacer import Pacer
-from observer.connection_observer import DYSConnectionObserver
-from observer.local_user_observer import DYSLocalUserObserver
+from observer.connection_observer import SampleConnectionObserver
+from observer.local_user_observer import SampleLocalUserObserver
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig, SenderOptions
 from agora.rtc.video_frame_sender import EncodedVideoFrameInfo
 from agora.rtc.agora_base import *
@@ -32,7 +32,7 @@ con_config = RTCConnConfig(
 )
 
 connection = agora_service.create_rtc_connection(con_config)
-conn_observer = DYSConnectionObserver()
+conn_observer = SampleConnectionObserver()
 connection.register_observer(conn_observer)
 connection.connect(sample_options.token, sample_options.channel_id, sample_options.user_id)
 

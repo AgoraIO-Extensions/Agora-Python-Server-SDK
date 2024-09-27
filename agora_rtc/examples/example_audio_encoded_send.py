@@ -8,8 +8,8 @@ import av
 from common.path_utils import get_log_path_with_filename 
 from common.parse_args import parse_args_example
 from common.pacer import Pacer
-from observer.connection_observer import DYSConnectionObserver
-from observer.local_user_observer import DYSLocalUserObserver
+from observer.connection_observer import SampleConnectionObserver
+from observer.local_user_observer import SampleLocalUserObserver
 
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora.rtc.audio_encoded_frame_sender import EncodedAudioFrame
@@ -37,7 +37,7 @@ con_config = RTCConnConfig(
 )
 
 connection = agora_service.create_rtc_connection(con_config)
-conn_observer = DYSConnectionObserver()
+conn_observer = SampleConnectionObserver()
 connection.register_observer(conn_observer)
 connection.connect(sample_options.token, sample_options.channel_id, sample_options.user_id)
 
@@ -53,7 +53,7 @@ if not audio_track:
     exit(1)
 
 local_user = connection.get_local_user()
-localuser_observer = DYSLocalUserObserver()
+localuser_observer = SampleLocalUserObserver()
 local_user.register_local_user_observer(localuser_observer)
 # audio_track.set_max_buffer_audio_frame_number(320*2000)
 

@@ -1,7 +1,7 @@
 from .audio_pcm_data_sender import AudioPcmDataSender
 from .audio_encoded_frame_sender import AudioEncodedFrameSender
 from .video_frame_sender import VideoFrameSender
-from .video_frame_sender import VideoEncodedImageSender
+from .video_encoded_image_sender import VideoEncodedImageSender
 from .agora_base import *
 
 agora_media_node_factory_create_audio_pcm_data_sender = agora_lib.agora_media_node_factory_create_audio_pcm_data_sender

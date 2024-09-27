@@ -12,9 +12,9 @@ logger = logging.getLogger(__name__)
 
 from common.path_utils import get_log_path_with_filename 
 from common.parse_args import parse_args_example
-from observer.connection_observer import DYSConnectionObserver
-# from observer.audio_frame_observer import DYSAudioFrameObserver
-from observer.local_user_observer import DYSLocalUserObserver
+from observer.connection_observer import SampleConnectionObserver
+# from observer.audio_frame_observer import SampleAudioFrameObserver
+from observer.local_user_observer import SampleLocalUserObserver
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, AudioSubscriptionOptions, RTCConnConfig
 from agora.rtc.audio_encoded_frame_sender import EncodedAudioFrame
 from agora.rtc.agora_base import *
@@ -33,9 +33,9 @@ from agora.rtc.audio_frame_observer import IAudioFrameObserver, AudioFrame
 import logging
 logger = logging.getLogger(__name__)
 
-class DYSAudioFrameObserver(IAudioFrameObserver):
+class SampleAudioFrameObserver(IAudioFrameObserver):
     def __init__(self):
-        super(DYSAudioFrameObserver, self).__init__()
+        super(SampleAudioFrameObserver, self).__init__()
 
     def on_record_audio_frame(self, agora_local_user ,channelId, frame):        
         logger.info(f"on_record_audio_frame")
@@ -90,15 +90,15 @@ con_config = RTCConnConfig(
 media_node_factory = agora_service.create_media_node_factory()
 
 connection = agora_service.create_rtc_connection(con_config)
-conn_observer = DYSConnectionObserver()
+conn_observer = SampleConnectionObserver()
 connection.register_observer(conn_observer)
 connection.connect(sample_options.token, sample_options.channel_id, sample_options.user_id)
 
 local_user = connection.get_local_user()
 local_user.set_playback_audio_frame_before_mixing_parameters(1, 16000)
-localuser_observer = DYSLocalUserObserver()
+localuser_observer = SampleLocalUserObserver()
 local_user.register_local_user_observer(localuser_observer)
-audio_frame_observer = DYSAudioFrameObserver()
+audio_frame_observer = SampleAudioFrameObserver()
 local_user.register_audio_frame_observer(audio_frame_observer)
 local_user.subscribe_all_audio()
 
@@ -107,7 +107,7 @@ local_user.subscribe_all_audio()
 send_channel = sample_options.channel_id + "_1"
 
 connection2 = agora_service.create_rtc_connection(con_config)
-conn_observer2 = DYSConnectionObserver()
+conn_observer2 = SampleConnectionObserver()
 connection2.register_observer(conn_observer2)
 connection2.connect(sample_options.token, send_channel, sample_options.user_id)
 
