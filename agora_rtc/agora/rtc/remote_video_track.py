@@ -75,9 +75,9 @@ agora_remote_video_track_unregister_video_encoded_image_receiver.argtypes = [AGO
 # agora_remote_video_track_unregister_media_packet_receiver.restype = ctypes.c_int
 # agora_remote_video_track_unregister_media_packet_receiver.argtypes = [AGORA_HANDLE, ctypes.POINTER(media_packet_receiver)]
 
-agora_remote_video_track_get_type = agora_lib.agora_remote_video_track_get_type
-agora_remote_video_track_get_type.restype = ctypes.c_int
-agora_remote_video_track_get_type.argtypes = [AGORA_HANDLE]
+# agora_remote_video_track_get_type = agora_lib.agora_remote_video_track_get_type
+# agora_remote_video_track_get_type.restype = ctypes.c_int
+# agora_remote_video_track_get_type.argtypes = [AGORA_HANDLE]
 
 class RemoteVideoTrack:
     def __init__(self, track_handle, user_id_str):
@@ -125,7 +125,7 @@ class RemoteVideoTrack:
     #     ret = agora_remote_video_track_unregister_media_packet_receiver(self.track_handle, receiver)
     #     return ret
 
-    def get_type(self):
-        ret =  agora_remote_video_track_get_type(self.track_handle)
-        return ret
+    # def get_type(self):
+    #     ret =  agora_remote_video_track_get_type(self.track_handle)
+    #     return ret
 

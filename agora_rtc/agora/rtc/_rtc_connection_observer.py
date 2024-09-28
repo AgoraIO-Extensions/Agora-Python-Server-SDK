@@ -194,7 +194,7 @@ class RTCConnectionObserverInner(ctypes.Structure):
 
     def _on_user_joined(self, agora_rtc_conn, user_id):
         logger.debug(f"ConnCB _on_user_joined: {agora_rtc_conn}, {user_id}")
-        userid_str = user_id.decode('utf-8')--
+        userid_str = user_id.decode('utf-8')
         self.conn_observer.on_user_joined(self.conn, userid_str)
 
     def _on_user_left(self, agora_rtc_conn, user_id, reason):
