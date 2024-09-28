@@ -55,11 +55,9 @@ def create_conn_and_recv(channel_id, uid = 0):
     local_user.set_playback_audio_frame_before_mixing_parameters(1, 16000)
     localuser_observer = SampleLocalUserObserver()
     local_user.register_local_user_observer(localuser_observer)
+    
     audio_frame_observer = SampleAudioFrameObserver()
     local_user.register_audio_frame_observer(audio_frame_observer)
-    # local_user.subscribe_audio("3")
-    # local_user.subscribe_all_audio()
-
 
     video_frame_observer = SampleVideoFrameObserver()
     local_user.register_video_frame_observer(video_frame_observer)
@@ -71,13 +69,13 @@ def create_conn_and_recv(channel_id, uid = 0):
     # local_user.publish_audio(audio_track)
 
     time.sleep(100)
-    # local_user.unpublish_audio(audio_track)
-    # audio_track.set_enabled(0)
-    connection.unregister_observer()
+
+    local_user.unregister_audio_frame_observer(audio_frame_observer)
+    local_user.unregister_video_frame_observer(video_frame_observer)
+
     connection.disconnect()
     connection.release()
-    logger.info("release")
-
+    logger.info("connection release")
 
 
 threads = []
