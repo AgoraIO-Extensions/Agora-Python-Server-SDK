@@ -6,9 +6,6 @@ logger = logging.getLogger(__name__)
 class EncodedAudioFrame:
     def __init__(
             self, 
-            # data: bytearray = None,
-            # buffer_ptr: int = 0,
-            # buffer_size: int = 0,
             capture_timems: int = 0,
             codec: AudioCodecType = AudioCodecType.AUDIO_CODEC_AACLC, 
             number_of_channels: int = 1,
@@ -17,18 +14,13 @@ class EncodedAudioFrame:
             send_even_if_empty: int = 1,
             speech: int = 1
             )->None:
-        # self.data = data        
-        # self.buffer_ptr = buffer_ptr
-        # self.buffer_size = buffer_size
-        self.capture_timems = capture_timems #int64, 音频帧的 Unix 时间戳（毫秒）
-        #int, 音频帧的编码格式; ref: https://doc.shengwang.cn/api-ref/rtc-server-sdk/cpp/namespaceagora_1_1rtc#ac211c1a503d38d504c92b5f006240053
+        self.capture_timems = capture_timems
         self.codec = codec
         self.number_of_channels = number_of_channels
         self.sample_rate = sample_rate
-        #int, 对于 aac 编码格式，默认为 1024；对于 Opus 编码格式，默认为 960
         self.samples_per_channel = samples_per_channel
-        self.send_even_if_empty = send_even_if_empty #bool value, 是否发送空音频帧,default TRUE
-        self.speech = speech #bool, 是否是语音,default TRUE
+        self.send_even_if_empty = send_even_if_empty
+        self.speech = speech
 
     def to_owned_encoded_audio_frame(self):
         info = OwnedEncodedAudioFrameInfo()
@@ -82,8 +74,3 @@ class AudioEncodedFrameSender:
         ownedinfo = frame.to_owned_encoded_audio_frame()
         ret = agora_audio_encoded_frame_sender_send(self.sender_handle, buffer_ptr, ctypes.c_uint32(buffer_size), ctypes.byref(ownedinfo))
         return ret
-
-    
-    def release(self):
-        # agora_local_audio_track_destroy(self.sender_handle)
-        pass

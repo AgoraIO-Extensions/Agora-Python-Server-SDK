@@ -4,21 +4,7 @@ from agora.rtc.video_frame_observer import *
 import logging
 logger = logging.getLogger(__name__)
 
-
 class OwnedEncodedVideoFrameInfo(ctypes.Structure):
-    # _fields_ = [
-    #     ('codec_type', ctypes.c_int),
-    #     ('width', ctypes.c_int),
-    #     ('height', ctypes.c_int),
-    #     ('frames_per_second', ctypes.c_int),
-    #     ('frame_type', ctypes.c_int),
-    #     ('rotation', ctypes.c_int),
-    #     ('track_id', ctypes.c_int),
-    #     ('render_time_ms', ctypes.c_int64),
-    #     ('internal_send_ts', ctypes.c_uint64),
-    #     ('uid', ctypes.c_uint),
-    # ]
-
     _fields_ = [
         ("codec_type", ctypes.c_int),
         ("width", ctypes.c_int),

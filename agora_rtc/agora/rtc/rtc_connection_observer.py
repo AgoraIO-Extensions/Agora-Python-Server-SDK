@@ -1,10 +1,3 @@
-"""
-RTCConnectionObserver
-conn_info: instantce of RTCConnInfo
-agora_rtc_conn: instance of RTCConnection
-reasion: int type of error code
-quality: ref to c++ sdk
-"""
 class IRTCConnectionObserver():
     def on_connected(self, agora_rtc_conn, conn_info, reason):
         pass
@@ -62,15 +55,12 @@ class IRTCConnectionObserver():
 
     def on_network_type_changed(self, agora_rtc_conn, network_type):
         pass
-    #error:int, api_type/api_param:string
     def on_api_call_executed(self, agora_rtc_conn, error, api_type, api_param):
         pass
 
-    #result: int
     def on_content_inspect_result(self, agora_rtc_conn, result):
         pass
 
-    #uid: int, file_path: str, width: int, height: int, err_code: int
     def on_snapshot_taken(self, agora_rtc_conn, uid, file_path, width, height, err_code):
         pass
 

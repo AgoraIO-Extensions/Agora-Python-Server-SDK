@@ -52,8 +52,6 @@ class VideoFrameInner(ctypes.Structure):
 
 ON_FRAME_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_char_p, user_id_t, ctypes.POINTER(VideoFrameInner))
 
-# AGORA_API_C_INT agora_video_frame_observer_get_rotation_applied(AGORA_HANDLE agora_video_frame_observer);
-
 agora_video_frame_observer_get_rotation_applied = agora_lib.agora_video_frame_observer_get_rotation_applied
 agora_video_frame_observer_get_rotation_applied.restype = ctypes.c_int
 agora_video_frame_observer_get_rotation_applied.argtypes = [AGORA_HANDLE]
@@ -72,31 +70,5 @@ class VideoFrameObserverInner(ctypes.Structure):
 
     def _on_frame(self, agora_handle, channel_id, user_id, video_frame:VideoFrameInner):
         vf = video_frame.contents
-        # logger.debug("VideoFrameObserver _on_frame:", agora_handle, channel_id, user_id, vf.metadata_buffer, vf.metadata_size)
         self.video_frame_observer.on_frame(agora_handle, channel_id.decode() if channel_id else None, user_id.decode(), vf.to_video_frame())
     
-
-    # def _get_rotation_applied(self):
-    #     return self.video_frame_observer.get_rotation_applied()
-        # return agora_video_frame_observer_get_rotation_applied(self.local_user.local_user_handle)
-
-
-
-# ON_ENCODED_VIDEO_IMAGE_RECEIVED_CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.c_uint32, ctypes.POINTER(encoded_video_frame_info))
-
-# class VideoEncodedImageReceiverInner(ctypes.Structure):
-#     _fields_ = [
-#         ("on_encoded_video_image_received", ON_ENCODED_VIDEO_IMAGE_RECEIVED_CALLBACK)
-#     ]
-
-#     def __init__(self, video_encoded_image_receiver:'IVideoEncodedImageReceiver'):
-#         self.video_encoded_image_receiver = video_encoded_image_receiver
-#         self.on_encoded_video_image_received = ON_ENCODED_VIDEO_IMAGE_RECEIVED_CALLBACK(self._on_encoded_video_image_received)
-
-
-#     def _on_encoded_video_image_received(self, agora_handle, image_buffer, length, info):
-#         logger.debug("VideoFrameObserver _on_frame:", agora_handle, image_buffer, length, info)
-#         # self.on_encoded_video_image_received(agora_handle, image_buffer, length, info)
-#         self.video_encoded_image_receiver.on_encoded_video_image_received(agora_handle, image_buffer, length, info)
-
-

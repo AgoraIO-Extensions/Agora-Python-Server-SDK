@@ -6,12 +6,6 @@ from .video_encoded_frame_observer import IVideoEncodedFrameObserver, EncodedVid
 import logging
 logger = logging.getLogger(__name__)
 
-# typedef struct _video_encoded_frame_observer {
-#   int (*on_encoded_video_frame)(AGORA_HANDLE agora_video_encoded_frame_observer, uid_t uid, const uint8_t* image_buffer, size_t length,
-#                                 const encoded_video_frame_info* video_encoded_frame_info);
-# } video_encoded_frame_observer;
-
-
 class EncodedVideoFrameInfoInner(ctypes.Structure):
     _fields_ = [
         ("codec_type", ctypes.c_int),

@@ -44,21 +44,15 @@ class ExternalVideoFrame:
         self.egl_type = 0
         self.texture_id = 0
         self.matrix = []
-        # self.metadata_buffer = bytearray()
-        # self.metadata_size = 0
         self.metadata = ""
         self.alpha_buffer = None
 
     def to_owned_external_video_frame(self):
         c_buffer = (ctypes.c_uint8 * len(self.buffer)).from_buffer(self.buffer)
-        # 将 ctypes 数组转换为 c_void_p
         c_buffer_ptr = ctypes.cast(c_buffer, ctypes.c_void_p)
-
         cdata = bytearray(self.metadata.encode('utf-8'))
         c_metadata = (ctypes.c_uint8 * len(cdata)).from_buffer(cdata)
-
         c_matrix_buffer = (ctypes.c_float * 16)(*self.matrix)
-
         return OwnedExternalVideoFrame(
             self.type,
             self.format,

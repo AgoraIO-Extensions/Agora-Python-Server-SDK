@@ -6,14 +6,6 @@ from .remote_video_track import RemoteVideoTrack, RemoteVideoTrackStats
 import logging
 logger = logging.getLogger(__name__)
 
-
-uid_t = ctypes.c_uint
-track_id_t = ctypes.c_uint
-
-#========localuser observer=====
-
-
-
 class VideoTrackInfoInner(ctypes.Structure):
     _fields_ = [
         ("is_local", ctypes.c_int),
@@ -56,7 +48,6 @@ class RemoteVideoStreamInfo(ctypes.Structure):
         ("total_downscale_level_counts", ctypes.c_uint8)
     ]
 
-# 定义回调函数类型
 ON_AUDIO_TRACK_PUBLISH_SUCCESS_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, AGORA_HANDLE)
 ON_AUDIO_TRACK_PUBLISH_START_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, AGORA_HANDLE)
 ON_AUDIO_TRACK_UNPUBLISHED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, AGORA_HANDLE)
@@ -95,31 +86,6 @@ ON_REMOTE_SUBSCRIBE_FALLBACK_TO_AUDIO_ONLY_CALLBACK = ctypes.CFUNCTYPE(None, AGO
 ON_STREAM_MESSAGE_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, user_id_t, ctypes.c_int, ctypes.c_char_p, ctypes.c_size_t)
 ON_USER_STATE_CHANGED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, user_id_t, ctypes.c_uint32)
 
-
-"""
-on_user_info_updated(user_id_t: string ;  msg: int, val: int)
-msg:  
-enum USER_MEDIA_INFO {
-    /**
-     * 0: The user has muted the audio.
-     */
-    USER_MEDIA_INFO_MUTE_AUDIO = 0,
-    /**
-     * 1: The user has muted the video.
-     */
-    USER_MEDIA_INFO_MUTE_VIDEO = 1,
-    /**
-     * 4: The user has enabled the video, which includes video capturing and encoding.
-     */
-    USER_MEDIA_INFO_ENABLE_VIDEO = 4,
-    /**
-     * 8: The user has enabled the local video capturing.
-     */
-    USER_MEDIA_INFO_ENABLE_LOCAL_VIDEO = 8,
-  };
-  val: 1: The user has muted the audio.0: unmuted the audio
-参考：https://doc.shengwang.cn/api-ref/rtc-server-sdk/cpp/classagora_1_1rtc_1_1_i_local_user_observer#onUserInfoUpdated()
-"""
 class RTCLocalUserObserverInner(ctypes.Structure):
     _fields_ = [
         ("on_audio_track_publish_success", ON_AUDIO_TRACK_PUBLISH_SUCCESS_CALLBACK),
@@ -241,7 +207,6 @@ class RTCLocalUserObserverInner(ctypes.Structure):
     def _on_audio_track_publication_failure(self, local_user_handle, local_audio_track_handle, error_code):
         logger.debug(f"LocalUserCB _on_audio_track_publication_failure: {local_user_handle}, {local_audio_track_handle}, {error_code}")
         audio_track = self.local_user.get_audio_map(local_audio_track_handle)
-        #note :move from map for failed publish
         self.local_user.del_audio_map(local_audio_track_handle)
         self.local_user_observer.on_audio_track_publication_failure(self.local_user, audio_track, error_code)
     
@@ -251,22 +216,9 @@ class RTCLocalUserObserverInner(ctypes.Structure):
         self.local_user_observer.on_local_audio_track_state_changed(self.local_user, audio_track, state, error)
 
     def _on_local_audio_track_statistics(self, local_user_handle, stats):
-        #logger.debug("LocalUserCB _on_local_audio_track_statistics:", local_user_handle, stats)
-        #stats: pointer to LocalAudioStats
         local_audio_stats = stats.contents
         self.local_user_observer.on_local_audio_track_statistics(self.local_user, local_audio_stats)
-    #这个有点trick
-    """
-    # 在LocalUser中是通过LocalUser.sub_audio(uid) 创建的，所以这里直接用uid来获取对应的RemoteAudioTrack
-    # 也就是说从app层的视角，对audio的区分是uid，但这边的回调并没有userid，所以对app层是不太友好的
-    # 也就是需要在LocalUser层中建立一个map表，用来记录userid和handle
-    # 然后在回调中，通过handle，找到uid，然后call 给app层的是uid
-    # 这样的话，在LocalUser层，就可以直接通过uid来获取对应的RemoteAudioTrack
-    """
-    #
-    # _on_user_audio_track_subscribed:in LocalUser to do sub(userid), and in this call back it pass out with 
-    # user_id & remote_audio_track_handle, so we should construct RemoteAudioTrack with (user_id & remote_audio_track_handle
-    # and save it in local_user, then in app layer, we can get RemoteAudioTrack with userid)
+
     def _on_user_audio_track_subscribed(self, local_user_handle, user_id, remote_audio_track_handle):
         logger.debug(f"LocalUserCB _on_user_audio_track_subscribed: {local_user_handle}, {user_id}, {remote_audio_track_handle}")
         user_id_str = user_id.decode('utf-8') if user_id else ""
@@ -281,7 +233,6 @@ class RTCLocalUserObserverInner(ctypes.Structure):
         audio_stats = stats.contents #RemoteAudioTrackStats
         remote_audio_track = self.local_user.get_remote_audio_map(remote_audio_track_handle)
         self.local_user_observer.on_remote_audio_track_statistics(self.local_user, remote_audio_track, audio_stats)
-
 
     def _on_user_audio_track_state_changed(self, local_user_handle, user_id, remote_audio_track_handle, state, reason, elapsed):
         logger.debug(f"LocalUserCB _on_user_audio_track_state_changed: {local_user_handle}, {user_id}, {remote_audio_track_handle}, {state}, {reason}, {elapsed}")
@@ -333,7 +284,6 @@ class RTCLocalUserObserverInner(ctypes.Structure):
         local_video_track = self.local_user.get_video_map(local_video_track_handle)
         video_stats = stats.contents
         self.local_user_observer.on_local_video_track_statistics(self.local_user, local_video_track, video_stats)
-    # # #ctypes.CFUNCTYPE(None, AGORA_HANDLE, user_id_t, ctypes.POINTER(VideoTrackInfo), AGORA_HANDLE)
     def _on_user_video_track_subscribed(self, local_user_handle, user_id, video_track_info, remote_video_track_handle):
         logger.debug(f"LocalUserCB _on_user_video_track_subscribed: {local_user_handle}, {user_id}, {remote_video_track_handle}, {video_track_info}")
         user_id_str = user_id.decode('utf-8') if user_id else ""

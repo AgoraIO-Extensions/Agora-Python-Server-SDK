@@ -22,7 +22,7 @@ class IRTCLocalUserObserver():
 
     def on_local_audio_track_state_changed(self, agora_local_user, agora_local_audio_track, state, error):
         pass
-    #stats: instance of LocalAudioStats
+
     def on_local_audio_track_statistics(self, agora_local_user, stats):
         pass
 
