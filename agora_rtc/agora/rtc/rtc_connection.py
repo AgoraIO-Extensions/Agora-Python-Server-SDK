@@ -261,7 +261,7 @@ class RTCConnection:
         AgoraHandleInstanceMap().set_con_map(self.conn_handle, self)
     
     # 
-    def connect(self, token, chan_id, user_id)->int:
+    def connect(self, token:str, chan_id:str, user_id:str)->int:
         ret = agora_rtc_conn_connect(self.conn_handle, ctypes.create_string_buffer(token.encode('utf-8')),ctypes.create_string_buffer(chan_id.encode('utf-8')), ctypes.create_string_buffer(user_id.encode('utf-8')))
         return ret
 

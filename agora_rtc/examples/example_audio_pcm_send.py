@@ -34,7 +34,7 @@ config.log_path = get_log_path_with_filename(os.path.splitext(__file__)[0])
 agora_service = AgoraService()
 agora_service.initialize(config)
 
-def create_conn_and_send(channel_id, uid = 0):
+def create_conn_and_send(channel_id, uid = "0"):
 
     #---------------2. Create Connection
     con_config = RTCConnConfig(

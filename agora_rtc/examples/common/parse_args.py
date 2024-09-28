@@ -8,7 +8,7 @@ class SampleOptions:
         self.token = None
         self.channel_id = None
         self.connection_number:int = 1
-        self.user_id = 0
+        self.user_id = "0"
         self.audio_file = None
         self.low_delay = False
         self.video_file = None
