@@ -60,8 +60,6 @@ class LocalAudioTrack:
     def is_enabled(self):
         enabled = ctypes.c_int()
         ret = agora_local_audio_track_is_enabled(self.track_handle, ctypes.byref(enabled))
-        if ret != 0:
-            logger.error(f"Failed to get local audio track enabled state, error code: {ret}")
         return ret, enabled.value
 
     def get_state(self):
@@ -81,27 +79,19 @@ class LocalAudioTrack:
 
     def adjust_publish_volume(self, volume):
         ret = agora_local_audio_track_adjust_publish_volume(self.track_handle, volume)
-        if ret != 0:
-            logger.error(f"Failed to adjust publish volume, error code: {ret}")
         return ret
 
     def get_publish_volume(self):
         volume = ctypes.c_int()
         ret = agora_local_audio_track_get_publish_volume(self.track_handle, ctypes.byref(volume))
-        if ret != 0:
-            logger.error(f"Failed to get publish volume, error code: {ret}")
         return ret, volume.value
 
     def enable_local_playback(self, enable):
         ret = agora_local_audio_track_enable_local_playback(self.track_handle, enable)
-        if ret != 0:
-            logger.error(f"Failed to enable local playback, error code: {ret}")
         return ret
 
     def enable_ear_monitor(self, enable, include_audio_filter):
         ret = agora_local_audio_track_enable_ear_monitor(self.track_handle, enable, include_audio_filter)
-        if ret != 0:
-            logger.error(f"Failed to enable ear monitor, error code: {ret}")
         return ret
 
     def set_max_buffer_audio_frame_number(self, num):

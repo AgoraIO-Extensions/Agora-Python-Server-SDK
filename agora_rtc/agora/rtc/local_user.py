@@ -300,19 +300,13 @@ class LocalUser:
 
     def set_user_role(self, role):
         ret = agora_local_user_set_user_role(self.user_handle, role)
-        if ret < 0:
-            logger.error("Failed to set user role")
         return ret
     def get_user_role(self):
         ret = agora_local_user_get_user_role(self.user_handle)
-        if ret < 0:
-            logger.error("Failed to get user role")
         return ret
 
     def set_audio_encoder_configuration(self, config):
         ret = agora_local_user_set_audio_encoder_config(self.user_handle, config)
-        if ret < 0:
-            logger.error("Failed to set audio encoder config")
         return ret
 
     def get_local_audio_statistics(self):
@@ -335,9 +329,6 @@ class LocalUser:
 
     def unpublish_audio(self, agora_local_audio_track:LocalAudioTrack):
         ret = agora_local_user_unpublish_audio(self.user_handle, agora_local_audio_track.track_handle)
-        if ret < 0:
-            logger.error("Failed to unpublish audio")
-        #wait for callback to do del, do not remove map here!
         return ret
 
     def publish_video(self, agora_local_video_track:LocalVideoTrack):
@@ -350,22 +341,14 @@ class LocalUser:
 
     def unpublish_video(self, agora_local_video_track:LocalVideoTrack):
         ret = agora_local_user_unpublish_video(self.user_handle, agora_local_video_track.track_handle)
-        if ret < 0:
-            logger.error("Failed to unpublish video")
-        #note: can not del in this function, because the video track may be used in callback, 
-        # move del to unpublish_video callback
         return ret
 
     def subscribe_audio(self, user_id):
         ret = agora_local_user_subscribe_audio(self.user_handle,ctypes.c_char_p(user_id.encode()) )
-        if ret < 0:
-            logger.error("Failed to subscribe audio")
         return ret
 
     def subscribe_all_audio(self):
         ret = agora_local_user_subscribe_all_audio(self.user_handle)
-        if ret < 0:
-            logger.error("Failed to subscribe all audio")
         return ret
 
     def unsubscribe_audio(self, user_id):
@@ -386,84 +369,57 @@ class LocalUser:
 
     def adjust_playback_signal_volume(self, volume):
         ret = agora_local_user_adjust_playback_signal_volume(self.user_handle, volume)
-        if ret < 0:
-            logger.error("Failed to adjust playback signal volume")
         return ret
 
     def get_playback_signal_volume(self):
         volume = ctypes.c_int(0)
         ret = agora_local_user_get_playback_signal_volume(self.user_handle, volume)
-        if ret < 0:
-            logger.error("Failed to get playback signal volume")
         return ret, volume.value
 
     # def pull_mixed_audio_pcm_data(self, payload_data, info):
     #     ret = agora_local_user_pull_mixed_audio_pcm_data(self.user_handle, payload_data, info)
-    #     if ret < 0:
-    #         logger.error("Failed to pull mixed audio PCM data")
     #     return ret
 
     def set_playback_audio_frame_parameters(self, channels, sample_rate_hz, mode, samples_per_call):
         ret = agora_local_user_set_playback_audio_frame_parameters(self.user_handle, channels, sample_rate_hz, mode, samples_per_call)
-        if ret < 0:
-            logger.error("Failed to set playback audio frame parameters")
         return ret
 
     def set_recording_audio_frame_parameters(self, channels, sample_rate_hz, mode, samples_per_call):
         ret = agora_local_user_set_recording_audio_frame_parameters(self.user_handle, channels, sample_rate_hz, mode, samples_per_call)
-        if ret < 0:
-            logger.error("Failed to set recording audio frame parameters")
         return ret
 
     def set_mixed_audio_frame_parameters(self, channels, sample_rate_hz, samples_per_call):
         ret = agora_local_user_set_mixed_audio_frame_parameters(self.user_handle, channels, sample_rate_hz, samples_per_call)
-        if ret < 0:
-            logger.error("Failed to set mixed audio frame parameters")
         return ret
 
     def set_playback_audio_frame_before_mixing_parameters(self, channels, sample_rate_hz):
         ret = agora_local_user_set_playback_audio_frame_before_mixing_parameters(self.user_handle, channels, sample_rate_hz)
-        if ret < 0:
-            logger.error("Failed to set playback audio frame before mixing parameters")
         return ret
 
     def register_audio_frame_observer(self, observer:IAudioFrameObserver):
         audio_frame_observer = AudioFrameObserverInner(observer, self)
         self.audio_frame_observer = audio_frame_observer
         ret = agora_local_user_register_audio_frame_observer(self.user_handle, audio_frame_observer)
-        if ret < 0:
-            logger.error("Failed to register audio frame observer")
         return ret
 
     def unregister_audio_frame_observer(self):
-        ret = agora_local_user_unregister_audio_frame_observer(self.user_handle)
-        if ret < 0:
-            logger.error("Failed to unregister audio frame observer")
-       
+        ret = agora_local_user_unregister_audio_frame_observer(self.user_handle)       
         return ret
 
     # def enable_audio_spectrum_monitor(self, interval_in_ms):
     #     ret = agora_local_user_enable_audio_spectrum_monitor(self.user_handle, interval_in_ms)
-    #     if ret < 0:
-    #         logger.error("Failed to enable audio spectrum monitor")
     #     return ret
 
     # def disable_audio_spectrum_monitor(self):
     #     ret = agora_local_user_disable_audio_spectrum_monitor(self.user_handle)
-    #     if ret < 0:
-    #         logger.error("Failed to disable audio spectrum monitor")
     #     return ret
 
     # def register_audio_spectrum_observer(self, observer):
     #     ret = agora_local_user_register_audio_spectrum_observer(self.user_handle, observer)
-    #     if ret < 0:
-    #         logger.error("Failed to register audio spectrum observer")
     #     return ret
 
     # def unregister_audio_spectrum_observer(self, observer):
     #     ret = agora_local_user_unregister_audio_spectrum_observer(self.user_handle, observer)
-    #     if ret < 0:
-    #         logger.error("Failed to unregister audio spectrum observer")
     #     return ret
 
     # def register_video_encoded_frame_observer(self, agora_video_encoded_frame_observer:IVideoEncodedImageReceiver):
@@ -474,49 +430,35 @@ class LocalUser:
         # self.video_encoded_frame_observer_handler = agora_video_encoded_image_receiver_create(self.video_encoded_frame_observer)
         self.video_encoded_frame_observer_handler = agora_video_encoded_frame_observer_create(self.video_encoded_frame_observer)
         ret = agora_local_user_register_video_encoded_frame_observer(self.user_handle, self.video_encoded_frame_observer_handler)
-        if ret < 0:
-            logger.error("Failed to register video encoded frame observer")
         return ret
     
     def unregister_video_encoded_frame_observer(self, agora_video_encoded_frame_observer):
         ret = agora_local_user_unregister_video_encoded_frame_observer(self.user_handle, agora_video_encoded_frame_observer)
-        if ret < 0:
-            logger.error("Failed to unregister video encoded frame observer")
         return ret
 
     def register_video_frame_observer(self, agora_video_frame_observer2:IVideoFrameObserver):
         self.video_frame_observer = VideoFrameObserverInner(agora_video_frame_observer2, self)        
         self.video_frame_observer_handler = agora_video_frame_observer2_create(self.video_frame_observer)
         ret = agora_local_user_register_video_frame_observer(self.user_handle, self.video_frame_observer_handler)
-        if ret < 0:
-            logger.error("Failed to register video frame observer")
         return ret
 
     def unregister_video_frame_observer(self, agora_video_frame_observer2):
         agora_video_frame_observer2_destroy(self.video_frame_observer_handler)
         ret = agora_local_user_unregister_video_frame_observer(self.user_handle, agora_video_frame_observer2)
-        if ret < 0:
-            logger.error("Failed to unregister video frame observer")
         return ret
 
     # def set_video_subscription_options(self, user_id, options):
     #     ret = agora_local_user_set_video_subscription_options(self.user_handle, user_id, options)
-    #     if ret < 0:
-    #         logger.error("Failed to set video subscription options")
     #     return ret
 
     def subscribe_video(self, user_id, options:VideoSubscriptionOptions): 
         user_id_t = user_id.encode('utf-8')
         
         ret = agora_local_user_subscribe_video(self.user_handle, user_id_t, ctypes.byref(options))
-        if ret < 0:
-            logger.error("Failed to subscribe video")
         return ret
 
     def subscribe_all_video(self, options:VideoSubscriptionOptions):
         ret = agora_local_user_subscribe_all_video(self.user_handle, ctypes.byref(options))
-        if ret < 0:
-            logger.error("Failed to subscribe all video")
         return ret
 
     def unsubscribe_video(self, user_id):
@@ -538,8 +480,6 @@ class LocalUser:
 
     def set_audio_volume_indication_parameters(self, interval_in_ms, smooth, report_vad):
         ret = agora_local_user_set_audio_volume_indication_parameters(self.user_handle, interval_in_ms, smooth, report_vad)
-        if ret < 0:
-            logger.error("Failed to set audio volume indication parameters")
         return ret
 
     def register_local_user_observer(self, observer:IRTCLocalUserObserver):
@@ -547,39 +487,27 @@ class LocalUser:
         self.user_observer_inner = user_observer_inner
         self.user_observer = observer
         ret = agora_local_user_register_observer(self.user_handle, user_observer_inner)
-        if ret < 0:
-            logger.error("Failed to register observer")
         return ret
 
     def unregister_local_user_observer(self):
         ret = agora_local_user_unregister_observer(self.user_handle)
-        if ret < 0:
-            logger.error("Failed to unregister observer")
         return ret
 
     def get_media_control_packet_sender(self):
         ret = agora_local_user_get_media_control_packet_sender(self.user_handle)
-        if ret < 0:
-            logger.error("Failed to get media control packet sender")
         return ret
 
     def register_media_control_packet_receiver(self, agora_media_packet_receiver):
         ret = agora_local_user_register_media_control_packet_receiver(self.user_handle, agora_media_packet_receiver)
-        if ret < 0:
-            logger.error("Failed to register media control packet receiver")
         return ret
 
     def unregister_media_control_packet_receiver(self, agora_media_packet_receiver):
         ret = agora_local_user_unregister_media_control_packet_receiver(self.user_handle, agora_media_packet_receiver)
-        if ret < 0:
-            logger.error("Failed to unregister media control packet receiver")
         return ret
 
     def send_intra_request(self, uid):
         uid_t = uid.encode('utf-8')
         ret = agora_local_user_send_intra_request(self.user_handle, uid_t)
-        if ret < 0:
-            logger.error("Failed to send intra request")
         return ret
 
     def release(self): #do nothing, just do api allign

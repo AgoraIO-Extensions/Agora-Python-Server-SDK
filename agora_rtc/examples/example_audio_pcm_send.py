@@ -59,6 +59,7 @@ def create_conn_and_send(channel_id, uid = 0):
     # local_user.register_audio_frame_observer(audio_frame_observer)
 
     # audio_track.set_max_buffer_audio_frame_number(320*2000)
+    
 
     #---------------4. Send Media Stream
     audio_track.set_enabled(1)
@@ -109,6 +110,7 @@ def create_conn_and_send(channel_id, uid = 0):
     audio_stream_consumer.clear()
     audio_stream_consumer.release()
     local_user.unpublish_audio(audio_track)
+    audio_track.clear_sender_buffer()
     audio_track.set_enabled(0)
     connection.unregister_observer()
     connection.disconnect()

@@ -45,20 +45,14 @@ class LocalVideoTrack:
 
     def set_video_encoder_configuration(self, config):
         ret = agora_local_video_track_set_video_encoder_config(self.track_handle, ctypes.byref(config))
-        if ret != 0:
-            logger.error(f"Failed to set video encoder configuration, error code: {ret}")
         return ret
 
     def enable_simulcast_stream(self, enabled, config):
         ret = agora_local_video_track_enable_simulcast_stream(self.track_handle, enabled, ctypes.byref(config))
-        if ret != 0:
-            logger.error(f"Failed to enable simulcast stream, error code: {ret}")
         return ret
 
     # def update_simulcast_stream(self, enabled, config):
     #     ret = agora_local_video_track_update_simulcast_stream(self.track_handle, enabled, ctypes.byref(config))
-    #     if ret != 0:
-    #         logger.error(f"Failed to update simulcast stream, error code: {ret}")
     #     return ret
 
     def get_state(self):

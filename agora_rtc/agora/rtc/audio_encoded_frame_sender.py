@@ -75,16 +75,12 @@ class AudioEncodedFrameSender:
     #     c_date = (ctypes.c_char * len(frame.data)).from_buffer(frame.data)
     #     ownedinfo = frame.to_owned_encoded_audio_frame()
     #     ret = agora_audio_encoded_frame_sender_send(self.sender_handle, c_date, ctypes.c_uint32(len(frame.data)), ctypes.byref(ownedinfo))
-    #     if ret < 0:
-    #         logger.error(f"Failed to send encoded audio frame with error code: {ret}")
     #     return ret
     
     def send_encoded_audio_frame(self, buffer_ptr:int, buffer_size:int, frame:EncodedAudioFrame):
         buffer_ptr = ctypes.cast(buffer_ptr, ctypes.POINTER(ctypes.c_void_p))
         ownedinfo = frame.to_owned_encoded_audio_frame()
         ret = agora_audio_encoded_frame_sender_send(self.sender_handle, buffer_ptr, ctypes.c_uint32(buffer_size), ctypes.byref(ownedinfo))
-        if ret < 0:
-            logger.error(f"Failed to send encoded audio frame with error code: {ret}")
         return ret
 
     
