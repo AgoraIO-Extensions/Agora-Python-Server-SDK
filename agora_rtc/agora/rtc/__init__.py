@@ -25,7 +25,7 @@ def _check_download_and_extract_sdk():
     if os.path.exists(libagora_rtc_sdk_path):
         return
 
-    logger.error("agora sdk was broken, now download it, please wait for a while...")
+    logger.error("missing agora sdk, now download it, please wait for a while...")
     if os.path.exists(sdk_dir):
         os.system(f"rm -rf {sdk_dir}")        
     os.makedirs(agora_service_path, exist_ok=True)
