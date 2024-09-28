@@ -115,7 +115,6 @@ class AudioVad:
 		self.handler = None
 		self.lastOutTs = 0
 		self.initialized = False
-	# Create
 	# return 0 if success， -1 if failed
 	def Create(self, vadCfg):
 		if self.initialized:
@@ -150,7 +149,7 @@ class AudioVad:
 		inVadData.audioData = ctypes.cast(buffer, ctypes.c_void_p) 
 		inVadData.size = len(framein)
 		 
-		outVadData = VadAudioData(None, 0)  # 输出数据可能需要预分配，但通常C函数会处理它  
+		outVadData = VadAudioData(None, 0)  #c api will allocate memory  
 		vadflag = VAD_STATE(0)
 		ret = agora_uap_vad_proc(self.handler, ctypes.byref(inVadData), ctypes.byref(outVadData), ctypes.byref(vadflag))
 

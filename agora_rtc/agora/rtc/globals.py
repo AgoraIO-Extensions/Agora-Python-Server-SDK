@@ -28,7 +28,7 @@ class AgoraHandleInstanceMap:
         self.local_user_map = {}
         self.local_user_lock = threading.RLock()
         
-    # 使用示例：内部使用with方法来自动获取和释放锁
+    # with method to acquire & release lock
     def set_con_map(self, con_handle, con_instance):
         with self.con_lock:
             self.con_map[con_handle] = con_instance
@@ -52,12 +52,12 @@ class AgoraHandleInstanceMap:
         
 
 
-# 使用示例
+# test code
 if __name__ == "__main__":
     instance1 = AgoraHandleInstanceMap()
     instance2 = AgoraHandleInstanceMap()
 
-    print(instance1 is instance2)  # 应该输出 True
+    print(instance1 is instance2)  # should output True
 
     instance1.set_con_map('key', 'value')
-    print(instance2.get_con_map('key'))  # 应该输出 'value'
+    print(instance2.get_con_map('key'))  # should output  'value'

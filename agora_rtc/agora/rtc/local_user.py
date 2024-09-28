@@ -229,8 +229,7 @@ class LocalUser:
         #map
         self._audio_track_map = {}
         self._video_track_map = {}
-        #remote audio track
-        #remote video track
+        
         self._remote_audio_track_lock = Lock()
         self._remote_video_track_lock = Lock()
         self._remote_audio_track_map = {}
@@ -510,7 +509,7 @@ class LocalUser:
         ret = agora_local_user_send_intra_request(self.user_handle, uid_t)
         return ret
 
-    def release(self): #do nothing, just do api allign
+    def release(self): 
         #clean all
         with self._remote_audio_track_lock:
             self._remote_audio_track_map.clear()

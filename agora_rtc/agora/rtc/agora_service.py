@@ -188,7 +188,7 @@ class AgoraService:
         self.inited = False
         self.service_handle = None
     
-    #createMediaNodeFactory	创建一个媒体节点工厂对象。
+    #createMediaNodeFactory: to create a medianode factory object
     def create_media_node_factory(self):
         if not self.inited:
             logger.error("AgoraService is not initialized. Please call initialize() first.")
@@ -209,7 +209,7 @@ class AgoraService:
         return RTCConnection(rtc_conn_handle)
 
 
-    #createCustomAudioTrackPcm	创建一个自定义音频Track。
+    #createCustomAudioTrackPcm: creatae a custom audio track from pcm data sender
     def create_custom_audio_track_pcm(self, audio_pcm_data_sender:AudioPcmDataSender) -> LocalAudioTrack | None:
         if not self.inited:
             logger.error("AgoraService is not initialized. Please call initialize() first.")

@@ -1,6 +1,10 @@
 #!env python
 
 import time
+# note:
+# from 2020/09/10, 
+# The Pacer method is no longer recommended to consume pcm data. 
+# It is recommended to use AudioConsumer to consume pcm data(or push generated pcm data to rtc)
 
 class Pacer:
     def __init__(self,interval):

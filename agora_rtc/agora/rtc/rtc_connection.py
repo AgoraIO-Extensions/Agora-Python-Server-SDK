@@ -52,7 +52,7 @@ class AudioSubscriptionOptions(ctypes.Structure):
         self.sample_rate_hz = sample_rate_hz
 
 
-# 定义 _rtc_conn_config 结构体
+
 class RTCConnConfig():
     def __init__(self, 
                 auto_subscribe_audio = 0, 
@@ -260,22 +260,22 @@ class RTCConnection:
         AgoraHandleInstanceMap().set_local_user_map(self.conn_handle, self)
         AgoraHandleInstanceMap().set_con_map(self.conn_handle, self)
     
-    # 连接 RTC 频道， token/chan_id/user_id 都需要为str 类型
+    # 
     def connect(self, token, chan_id, user_id)->int:
         ret = agora_rtc_conn_connect(self.conn_handle, ctypes.create_string_buffer(token.encode('utf-8')),ctypes.create_string_buffer(chan_id.encode('utf-8')), ctypes.create_string_buffer(user_id.encode('utf-8')))
         return ret
 
-    # 与 RTC 频道断开连接。
+    # 
     def disconnect(self)->int:
         ret = agora_rtc_conn_disconnect(self.conn_handle)
         return ret
 
-    # 更新 Token。
+    # update token when token expired
     def renew_token(self, token)->int:
         ret = agora_rtc_conn_renew_token(self.conn_handle, token.encode('utf-8'))
         return ret
 
-    # 注册 RTC 连接 observer。
+    # 
     def register_observer(self, conn_observer:IRTCConnectionObserver)->int:
         self.con_observer = conn_observer        
         con_observer_inner = RTCConnectionObserverInner(self.con_observer, self)
@@ -283,13 +283,13 @@ class RTCConnection:
         ret = agora_rtc_conn_register_observer(self.conn_handle, con_observer_inner)
         return ret
 
-    # 销毁网络状态 observer。
+    # 
     def unregister_observer(self)->int:
         ret = agora_rtc_conn_unregister_observer(self.conn_handle)
         self.con_observer = None
         return ret
         
-    # 创建数据流。
+    # create a data stream
     def create_data_stream(self, reliable, ordered)->int:
         stream_id = ctypes.c_int(0)
         ret = agora_rtc_conn_create_data_stream(self.conn_handle, ctypes.byref(stream_id), int(reliable), int(ordered))
@@ -297,7 +297,7 @@ class RTCConnection:
             return None
         return stream_id.value
 
-    # 发送数据流消息。
+    # send data stream message to connection
     def send_stream_message(self, stream_id, data)->int:
         encoded_data = data.encode('utf-8')
         length = len(encoded_data)
@@ -309,7 +309,7 @@ class RTCConnection:
         )
         return ret
 
-    # 获取 AgoraParameter 对象。
+    # 
     def get_agora_parameter(self):
         agora_parameter = agora_rtc_conn_get_agora_parameter(self.conn_handle)
         if not agora_parameter:
@@ -317,7 +317,7 @@ class RTCConnection:
         return AgoraParameter(agora_parameter)
 
 
-    # 获取本地用户对象。
+    # 
     def get_local_user(self):
         return self.local_user
 
