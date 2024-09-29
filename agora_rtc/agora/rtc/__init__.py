@@ -10,6 +10,14 @@ import site
 import zipfile
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
+import hashlib
+
+def get_file_md5(file_path):
+    hash_md5 = hashlib.md5()
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
 
 def _check_download_and_extract_sdk():
     agora_service_path = os.path.dirname(os.path.abspath(__file__))
@@ -18,11 +26,13 @@ def _check_download_and_extract_sdk():
 
     url = "https://download.agora.io/sdk/release/agora_rtc_sdk_linux_v4.4.30-20240928_160128-358664.zip"
     libagora_rtc_sdk_path = os.path.join(sdk_dir, "libagora_rtc_sdk.so")
+    rtc_md5 = "2c1d3fcac8ba6a491be4254186e963fc"
     if sys.platform == 'darwin':
         url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.30_22119_FULL_20240928_1647_358680.zip"
         libagora_rtc_sdk_path = os.path.join(sdk_dir, "libAgoraRtcKit.dylib")
+        rtc_md5 = "e0be66fa1d9a067c04fa68dca634b35e"
 
-    if os.path.exists(libagora_rtc_sdk_path):
+    if os.path.exists(libagora_rtc_sdk_path) and get_file_md5(libagora_rtc_sdk_path) == rtc_md5:
         return
 
     logger.error("missing agora sdk, now download it, please wait for a while...")
