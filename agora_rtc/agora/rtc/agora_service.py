@@ -23,8 +23,8 @@ class AgoraServiceConfig(ctypes.Structure):
 
             appid: str = "",
             area_code: int = AreaCode.AREA_CODE_GLOB.value,
-            channel_profile: ChannelProfileType = ChannelProfileType.CHANNEL_PROFILE_COMMUNICATION,
-            audio_scenario: AudioScenarioType = AudioScenarioType.AUDIO_SCENARIO_DEFAULT,
+            channel_profile: ChannelProfileType = ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
+            audio_scenario: AudioScenarioType = AudioScenarioType.AUDIO_SCENARIO_CHORUS,
             use_string_uid: int = 0,
         ) -> None:
         self.log_path = log_path
