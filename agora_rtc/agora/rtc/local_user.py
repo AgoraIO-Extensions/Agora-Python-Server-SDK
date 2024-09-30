@@ -218,6 +218,10 @@ agora_local_user_send_intra_request = agora_lib.agora_local_user_send_intra_requ
 agora_local_user_send_intra_request.restype = AGORA_API_C_INT
 agora_local_user_send_intra_request.argtypes = [AGORA_HANDLE, user_id_t]
 
+# AGORA_API_C_INT agora_local_user_set_audio_scenario(AGORA_HANDLE agora_local_user, const int scenario_type);
+agora_local_user_set_audio_scenario = agora_lib.agora_local_user_set_audio_scenario
+agora_local_user_set_audio_scenario.restype = AGORA_API_C_INT
+agora_local_user_set_audio_scenario.argtypes = [AGORA_HANDLE, ctypes.c_int]
 
 class LocalUser:
     def __init__(self, local_user_handle, connection):
@@ -530,3 +534,7 @@ class LocalUser:
                 if remote_audio_track.user_id == uid:
                     return remote_audio_track
         return None
+
+    def set_audio_scenario(self, scenario_type:AudioScenarioType):
+        ret = agora_local_user_set_audio_scenario(self.user_handle, scenario_type.value)
+        return ret
