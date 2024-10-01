@@ -64,7 +64,8 @@ def create_conn_and_send(channel_id, uid = "0"):
 
     #---------------4. Send Media Stream
     audio_track.set_enabled(1)
-    local_user.publish_audio(audio_track)
+    audio_track.set_send_delay_ms(100)
+    local_user.publish_audio(audio_track)    
     audio_stream_consumer = AudioStreamConsumer(pcm_data_sender)
 
     sendinterval = 0.1

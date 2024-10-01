@@ -49,6 +49,10 @@ agora_local_audio_track_clear_buffer = agora_lib.agora_local_audio_track_clear_s
 agora_local_audio_track_clear_buffer.restype = ctypes.c_int
 agora_local_audio_track_clear_buffer.argtypes = [AGORA_HANDLE]
 
+# AGORA_API_C_VOID agora_local_audio_track_set_send_delay_ms(AGORA_HANDLE agora_local_audio_track,int delay_ms);
+agora_local_audio_track_set_send_delay_ms = agora_lib.agora_local_audio_track_set_send_delay_ms
+agora_local_audio_track_set_send_delay_ms.restype = None
+agora_local_audio_track_set_send_delay_ms.argtypes = [AGORA_HANDLE, ctypes.c_int]
 
 class LocalAudioTrack:
     def __init__(self, track_handle):
@@ -106,3 +110,6 @@ class LocalAudioTrack:
         # if self.track_handle:
         #     agora_local_audio_track_release(self.track_handle)
         #     self.track_handle = None
+
+    def set_send_delay_ms(self, delay_ms:int):
+        agora_local_audio_track_set_send_delay_ms(self.track_handle, delay_ms)
