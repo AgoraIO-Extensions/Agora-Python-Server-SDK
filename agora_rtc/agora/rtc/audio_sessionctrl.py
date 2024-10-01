@@ -314,7 +314,138 @@ Agora_UAP_SessCtrl_handleAsrResponse.restype = ctypes.c_int
 
 
 
+class SessionControl:
+    def __init__(self):
+        self._handler = ctypes.c_void_p
+        self._static_config = SessCtrl_StaticCfg()
+        self._dynamic_config = SessCtrl_DynamCfg()
+        self._initialized = False
+        #pre allocated null buffer struct for proc
+        self._sessctrl_in_data = SessCtrl_InputData()
+        self._sessctrl_out_data = SessCtrl_OutputData()
+        self._frm_count = 0
+        pass
+    def _prepare_sessctrl_cfg(self) -> int:
 
+		#get default config and default frame config
+        ret_static  = Agora_UAP_SessCtrl_getDefaultStaticCfg(ctypes.byref(self._static_config))
+        frmCtrl = SessCtrl_FrmCtrl()
+        ret_dynamic = Agora_UAP_SessCtrl_getDefaultDynamCfg(ctypes.byref(frmCtrl), ctypes.byref(self._dynamic_config))
+        
 
+		#assign value to static config
+        self._static_config.userID = "2222"
+        self._static_config.frmSz = 160
+        self._static_config.smplFrq = SessCtrlFs.kFs_16000
+        self._static_config.persistentVoiceLenOfSOS = 10
+        self._static_config.prePaddingLenOfSessCtrlSOS = 0
+        self._static_config.postPaddingLenOfSessCtrlEOS = 0
+        self._static_config.unVoiceLenOfTriggerSessCtrlEOS = 1000000
+        self._static_config.unVoiceLenOfTriggerServerEOS = 0
+        self._static_config.eosWaitTime = 0
+        self._static_config.eosRetryWaitTime =0
+        self._static_config.eosRetryPadding = 0
+        self._static_config.eosRetryMaxIteration = 0
+        
+		#assign value to dynamic config
+        self._dynamic_config.logLv = 10
+        self._dynamic_config.sessCtrlTimeOutInMs = 10000000000
+        self._dynamic_config.sessCtrlStartSniffWordGapInMs = 100000000
+        self._dynamic_config.sessCtrlWordGapLenInMs = 10
+        self._dynamic_config.sessCtrlWordGapLenVolumeThr = 0
+        self._dynamic_config.sessCtrlEnableDumpFlag = 0
+        self._dynamic_config.vadThr = -2
+        self._dynamic_config.voiceThr = -2
+        self._dynamic_config.sessCtrlFinalRMSThr = 80
+        self._dynamic_config.sessCtrlFinalThr = 200
+        self._dynamic_config.sessCtrlFinalThrInc = 100
+        self._dynamic_config.sessCtrlFinalThrMax = 3
+        self._dynamic_config.meterRMSThr = 65
+        self._dynamic_config.sessCtrlBSVoiceGateFlag = 1
+        self._dynamic_config.sessCtrlBSVoiceAggressive = 4
+        self._dynamic_config.sessCtrlAiVadBasedDenoiseFlag = 1
+        self._dynamic_config.sessCtrlAiVadBasedDenoiseDelayInMs = 50
+        self._dynamic_config.sessCtrlAiVadBasedVoiceDenoiseProbThr = 0.5
+        self._dynamic_config.sessCtrlAiVadBasedMusicDenoiseProbThr = 0.5
 
+        return (ret_static and ret_dynamic)
+    def _init(self) -> int:
+        if self._initialized:
+            return 0
+        #create handler
+        self._handler = ctypes.c_void_p()
+        ret = Agora_UAP_SessCtrl_create(ctypes.byref(self._handler))
+        if ret < 0:
+            return ret
+        
+		#prepari static config & dynamic configure
+        ret = self._prepare_sessctrl_cfg()
 
+		#memory allocate
+        ret = Agora_UAP_SessCtrl_memAllocate(self._handler, ctypes.byref(self._static_config))
+        if ret < 0:
+            return ret
+
+		#init
+        ret = Agora_UAP_SessCtrl_init(self._handler)
+        if ret < 0:
+            return ret
+        
+		#set dynamic configure
+        ret = Agora_UAP_SessCtrl_setDynamCfg(self._handler, ctypes.byref(self._dynamic_config))
+        if ret < 0:
+            return ret
+        self._initialized = True if ret == 0 else False
+        return ret
+    def process (self, c_buffer:ctypes.c_void_p, size_in_short: int) -> int:
+       
+        self._sessctrl_in_data.pcm = c_buffer
+        self._sessctrl_in_data.frmIdx = self._frm_count 
+        self._frm_count += 1
+        #inputData.ts = (frmCnt * frmSz) / (MT_TEST_FS / 1000);
+        self._sessctrl_in_data.ts = self._frm_count * self._static_config.frmSz / (SessCtrlFs.kFs_16000 / 1000)
+        
+self._sessctrl_out_data.status = SessCtrlStatus.kSCStatus_None
+        self._sessctrl_out_data.pcmBuf = ctypes.c_void_p(0)
+        
+        
+        ret = Agora_UAP_SessCtrl_proc(self._handler, ctypes.byref(self._static_config), c_buffer, size_in_short)
+        pass
+        
+        
+        
+		
+        
+
+"""		
+		while (true) {
+			if(fread(inputPcm, sizeof(short), frmSz, inputPcmFPtr)!=frmSz){
+				break;
+			}
+			frmCnt++;
+			// printf("%d\n",frmCnt);
+			inputData.pcm = inputPcm;
+			inputData.frmIdx = frmCnt;
+			inputData.ts = (frmCnt * frmSz) / (MT_TEST_FS / 1000);
+			outputData.status = kSCStatus_None;
+			outputData.pcmBuf = NULL;
+			if (Agora_UAP_SessCtrl_proc(sessCtrler, &frmCtrl, &inputData, &outputData) < 0) {
+				fprintf(stderr, "Main: session control module processing failed!\n");
+				exit(1);
+			}
+			if (outputData.nSamplesInPcmBuf > 0) {
+				printf("%d,%d,%d\n",frmSz,frmCnt,outputData.nSamplesInPcmBuf);
+			fwrite(outputData.pcmBuf, sizeof(short), outputData.nSamplesInPcmBuf, outputPcmFPtr);
+			outSamples += outputData.nSamplesInPcmBuf;
+			}
+		}
+
+		fclose(inputPcmFPtr);
+		fclose(outputPcmFPtr);
+
+		// destroy 
+		Agora_UAP_SessCtrl_destroy(&sessCtrler);
+		printf("%d\n",outSamples);
+		fprintf(stdout, "\nSimulation Done!\n");
+		return 0;
+    """
