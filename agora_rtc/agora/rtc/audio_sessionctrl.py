@@ -402,6 +402,7 @@ class SessionControl:
         self._sessctrl_in_data.pcm = c_buffer
         self._sessctrl_in_data.frmIdx = self._frm_count 
         self._frm_count += 1
+        
         #inputData.ts = (frmCnt * frmSz) / (MT_TEST_FS / 1000);
         self._sessctrl_in_data.ts = self._frm_count * self._static_config.frmSz / (SessCtrlFs.kFs_16000 / 1000)
         
