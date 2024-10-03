@@ -65,6 +65,7 @@ def create_conn_and_send(channel_id, uid = 0):
     video_track = agora_service.create_custom_video_track_frame(video_sender)
 
     local_user = connection.get_local_user()
+    local_user.set_audio_scenario(AudioScenarioType.AUDIO_SCENARIO_CHORUS)
     localuser_observer = SampleLocalUserObserver()
     local_user.register_local_user_observer(localuser_observer)
 

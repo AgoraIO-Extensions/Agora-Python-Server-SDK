@@ -52,6 +52,7 @@ def create_conn_and_send(channel_id, uid = 0):
 
     video_track.set_video_encoder_configuration(video_config)
     local_user = connection.get_local_user()
+    local_user.set_audio_scenario(AudioScenarioType.AUDIO_SCENARIO_CHORUS)
 
     video_track.set_enabled(1)
     local_user.publish_video(video_track)

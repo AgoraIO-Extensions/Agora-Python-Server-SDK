@@ -47,6 +47,7 @@ if not video_track:
     logger.error("create video track failed")
     exit(1)
 local_user = connection.get_local_user()
+local_user.set_audio_scenario(AudioScenarioType.AUDIO_SCENARIO_CHORUS)
 
 video_track.set_enabled(1)
 local_user.publish_video(video_track)

@@ -52,6 +52,7 @@ def create_conn_and_recv(channel_id, uid = 0):
     audio_track = agora_service.create_custom_audio_track_encoded(audio_sender, 0)
 
     local_user = connection.get_local_user()
+    local_user.set_audio_scenario(AudioScenarioType.AUDIO_SCENARIO_CHORUS)
     local_user.set_playback_audio_frame_before_mixing_parameters(1, 16000)
     localuser_observer = SampleLocalUserObserver()
     local_user.register_local_user_observer(localuser_observer)

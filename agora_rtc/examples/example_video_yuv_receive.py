@@ -45,6 +45,7 @@ def create_conn_and_recv(channel_id, uid = 0):
     video_sender = media_node_factory.create_video_frame_sender()
     video_track = agora_service.create_custom_video_track_frame(video_sender)
     local_user = connection.get_local_user()
+    local_user.set_audio_scenario(AudioScenarioType.AUDIO_SCENARIO_CHORUS)
 
     # video_sender = connection.GetVideoSender()
     video_frame_observer = SampleVideoFrameObserver()

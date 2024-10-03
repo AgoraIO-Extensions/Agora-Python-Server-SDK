@@ -47,6 +47,7 @@ video_track = agora_service.create_custom_video_track_encoded(video_sender, send
 # video_track.register_video_encoded_image_receiver(video_sender)
 
 local_user = connection.get_local_user()
+local_user.set_audio_scenario(AudioScenarioType.AUDIO_SCENARIO_CHORUS)
 localuser_observer = SampleLocalUserObserver()
 local_user.register_local_user_observer(localuser_observer)
 

@@ -95,6 +95,7 @@ connection.register_observer(conn_observer)
 connection.connect(sample_options.token, sample_options.channel_id, sample_options.user_id)
 
 local_user = connection.get_local_user()
+local_user.set_audio_scenario(AudioScenarioType.AUDIO_SCENARIO_CHORUS)
 local_user.set_playback_audio_frame_before_mixing_parameters(1, 16000)
 localuser_observer = SampleLocalUserObserver()
 local_user.register_local_user_observer(localuser_observer)
