@@ -1,10 +1,10 @@
 #!env python
 
 #coding=utf-8
-
+import asyncio
+import signal
 import time
 import os
-import sys
 import threading
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -24,14 +24,9 @@ from agora.rtc.agora_base import *
 sample_options = parse_args_example()
 logger.info(f"app_id: {sample_options.app_id}, channel_id: {sample_options.channel_id}, uid: {sample_options.user_id}")
 
-#---------------1. Init SDK
-config = AgoraServiceConfig()
-config.appid = sample_options.app_id
-config.log_path = get_log_path_with_filename(os.path.splitext(__file__)[0])
-agora_service = AgoraService()
-agora_service.initialize(config)
+_exit = threading.Event()
 
-def create_conn_and_recv(channel_id, uid = 0):
+def create_conn_and_recv(agora_service:AgoraService, channel_id, uid = 0):
     #---------------2. Create Connection
     con_config = RTCConnConfig(
         client_role_type=ClientRoleType.CLIENT_ROLE_BROADCASTER,
@@ -57,31 +52,40 @@ def create_conn_and_recv(channel_id, uid = 0):
     local_user.register_audio_frame_observer(audio_frame_observer)
     # local_user.subscribe_audio("3")
     local_user.subscribe_all_audio()
-
-    #---------------4. Send Media Stream
-    # audio_track.set_enabled(1)
-    # local_user.publish_audio(audio_track)
-
-    time.sleep(100)
-    # local_user.unpublish_audio(audio_track)
-    # audio_track.set_enabled(0)
+    _exit.wait()
     connection.unregister_observer()
     connection.disconnect()
     connection.release()
-    logger.info("release")
+    logger.info("connection.release")
 
+def handle_signal(signum, frame):
+    _exit.set()
 
+def run_example():
 
-threads = []
-for i in range(int(sample_options.connection_number)):
-    channel_id = sample_options.channel_id + str(i+1)
-    logger.info(f"channel_id: {channel_id}")
-    thread = threading.Thread(target=create_conn_and_recv, args=(channel_id, sample_options.user_id))
-    thread.start()
-    threads.append(thread)
+    signal.signal(signal.SIGINT, handle_signal)  # Forward SIGINT
+    signal.signal(signal.SIGTERM, handle_signal)  # Forward SIGTERM
 
-for t in threads:
-    t.join()
+    #---------------1. Init SDK
+    config = AgoraServiceConfig()
+    config.appid = sample_options.app_id
+    config.log_path = get_log_path_with_filename(os.path.splitext(__file__)[0])
+    agora_service = AgoraService()
+    agora_service.initialize(config)
 
-agora_service.release()
-logger.info("end")
+    threads = []
+    for i in range(int(sample_options.connection_number)):
+        channel_id = sample_options.channel_id + str(i+1)
+        logger.info(f"channel_id: {channel_id}")
+        thread = threading.Thread(target=create_conn_and_recv, args=(agora_service, channel_id, sample_options.user_id))
+        thread.start()
+        threads.append(thread)
+
+    for t in threads:
+        t.join()
+
+    agora_service.release()
+    logger.info("agora_service.release")
+
+if __name__ == "__main__":
+    run_example()
