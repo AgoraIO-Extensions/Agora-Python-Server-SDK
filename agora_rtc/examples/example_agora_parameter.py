@@ -23,7 +23,7 @@ config = AgoraServiceConfig()
 config.appid = sample_options.app_id
 config.area_code = AreaCode.AREA_CODE_CN.value | AreaCode.AREA_CODE_JP.value
 logger.info(f"config.area_code: {config.area_code}")
-config.log_path = get_log_path_with_filename(os.path.splitext(__file__)[0])
+config.log_path = get_log_path_with_filename(sample_options.channel_id , os.path.splitext(__file__)[0])
 
 agora_service = AgoraService()
 agora_service.initialize(config)

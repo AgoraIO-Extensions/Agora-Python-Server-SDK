@@ -30,7 +30,7 @@ if sample_options.hours == 0:
 config = AgoraServiceConfig()
 config.appid = sample_options.app_id
 config.audio_scenario = AudioScenarioType.AUDIO_SCENARIO_CHORUS
-config.log_path = get_log_path_with_filename(os.path.splitext(__file__)[0])
+config.log_path = get_log_path_with_filename(sample_options.channel_id , os.path.splitext(__file__)[0])
 agora_service = AgoraService()
 agora_service.initialize(config)
 def create_conn_and_send(channel_id, uid = 0):

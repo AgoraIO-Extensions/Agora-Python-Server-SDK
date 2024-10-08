@@ -69,7 +69,7 @@ def run_example():
     #---------------1. Init SDK
     config = AgoraServiceConfig()
     config.appid = sample_options.app_id
-    config.log_path = get_log_path_with_filename(os.path.splitext(__file__)[0])
+    config.log_path = get_log_path_with_filename(sample_options.channel_id , os.path.splitext(__file__)[0])
     agora_service = AgoraService()
     agora_service.initialize(config)
 

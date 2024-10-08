@@ -29,7 +29,7 @@ logger.info(f"app_id: {sample_options.app_id}, channel_id: {sample_options.chann
 config = AgoraServiceConfig()
 config.audio_scenario = AudioScenarioType.AUDIO_SCENARIO_CHORUS
 config.appid = sample_options.app_id
-config.log_path = get_log_path_with_filename(os.path.splitext(__file__)[0])
+config.log_path = get_log_path_with_filename(sample_options.channel_id , os.path.splitext(__file__)[0])
 
 agora_service = AgoraService()
 agora_service.initialize(config)
@@ -70,27 +70,6 @@ def create_conn_and_send(channel_id, uid = "0"):
 
     sendinterval = 0.1
     pacer = Pacer(sendinterval)
-
-    # def read_and_send_packets():
-    #     count = 0
-    #     with open(sample_options.audio_file, "rb") as file:        
-    #         while True:
-    #             send_size = int(sample_options.sample_rate*sample_options.num_of_channels*sendinterval*2)
-    #             frame_buf = bytearray(send_size)            
-    #             success = file.readinto(frame_buf)
-    #             if not success:
-    #                 break
-    #             frame = PcmAudioFrame()
-    #             frame.data = frame_buf
-    #             frame.timestamp = 0
-    #             frame.samples_per_channel = int(sample_options.sample_rate * sendinterval)
-    #             frame.bytes_per_sample = 2
-    #             frame.number_of_channels = sample_options.num_of_channels
-    #             frame.sample_rate = sample_options.sample_rate
-    #             ret = pcm_data_sender.send_audio_pcm_data(frame)
-    #             count += 1
-    #             logger.info(f"count,ret={count},{ret}")
-    #             pacer.pace()
 
     def read_and_send_packets():
         with open(sample_options.audio_file, "rb") as file:        
