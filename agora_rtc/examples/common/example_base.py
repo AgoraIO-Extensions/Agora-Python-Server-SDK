@@ -7,19 +7,21 @@ from observer.local_user_observer import ExampleLocalUserObserver
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig, RTCConnection, LocalUser
 from agora.rtc.agora_base import *
 import logging
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class RTCBaseProcess():
     def __init__(self):
         self._exit = asyncio.Event()    
-    async def connect_and_release(self, agora_service:AgoraService, channel_id, sample_options:ExampleOptions):
-        #---------------2. Create Connection
-        con_config = RTCConnConfig(
+        self._conn_config = RTCConnConfig(
             client_role_type=ClientRoleType.CLIENT_ROLE_BROADCASTER,
             channel_profile=ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
         )
-        connection = agora_service.create_rtc_connection(con_config)
+        self._serv_config = AgoraServiceConfig()
+    async def connect_and_release(self, agora_service:AgoraService, channel_id, sample_options:ExampleOptions):
+        #---------------2. Create Connection
+        self.set_conn_config()
+        logger.info(f"connect_and_release: {self._conn_config.auto_subscribe_video}, auto_subscribe_audio: {self._conn_config.auto_subscribe_audio}")
+        connection = agora_service.create_rtc_connection(self._conn_config)
         conn_observer = ExampleConnectionObserver()
         connection.register_observer(conn_observer)
         connection.connect(sample_options.token, channel_id, sample_options.user_id)
@@ -29,37 +31,61 @@ class RTCBaseProcess():
         local_user_observer = ExampleLocalUserObserver()
         local_user.register_local_user_observer(local_user_observer)
 
-        await self.setup_sender(agora_service, local_user ,sample_options)        
+        await self.setup_sender_or_receiver(agora_service, local_user ,sample_options)        
 
         connection.unregister_observer()
         connection.disconnect()
         connection.release()
 
-    async def setup_sender(self,agora_service:AgoraService, local_user:LocalUser, sample_options:ExampleOptions):
+    def set_conn_config(self):
+        pass
+    def set_serv_config(self):
+        pass
+    async def setup_sender_or_receiver(self,agora_service:AgoraService, local_user:LocalUser, sample_options:ExampleOptions):
         pass
 
     def handle_signal(self):
         self._exit.set()
     async def run(self, sample_options:ExampleOptions, log_path:str):
-        logger.info(f"app_id: {sample_options.app_id}, channel_id: {sample_options.channel_id}, uid: {sample_options.user_id}")
-
         loop = asyncio.get_event_loop()
         loop.add_signal_handler(signal.SIGINT, self.handle_signal)
         loop.add_signal_handler(signal.SIGTERM, self.handle_signal)
 
-        config = AgoraServiceConfig()
-        config.appid = sample_options.app_id
-        config.audio_scenario = AudioScenarioType.AUDIO_SCENARIO_CHORUS
-        config.log_path = log_path
+        # config = AgoraServiceConfig()
+        self._serv_config.appid = sample_options.app_id
+        self._serv_config.log_path = log_path
+        self.set_serv_config()
         agora_service = AgoraService()
-        agora_service.initialize(config)
+        agora_service.initialize(self._serv_config)
 
         async with asyncio.TaskGroup() as tg:
             for i in range(int(sample_options.connection_number)):
-                logger.info(f"channel {i}")
                 channel_id = sample_options.channel_id + str(i+1)
+                logger.info(f"------channel_id: {channel_id}, uid: {sample_options.user_id}")
                 tg.create_task(self.connect_and_release(agora_service, channel_id, sample_options))
 
         agora_service.release()
         logger.info("agora_service.release-coro")
 
+
+class RTCBaseSendAVProcess(RTCBaseProcess):
+    async def setup_sender_or_receiver(self,agora_service:AgoraService, local_user:LocalUser, sample_options:ExampleOptions):
+        await self.setup_sender(agora_service, local_user, sample_options)
+
+    async def setup_sender(self,agora_service:AgoraService, local_user:LocalUser, sample_options:ExampleOptions):
+        pass
+
+class RTCBaseRecvAVProcess(RTCBaseProcess):
+    def set_conn_config(self):
+        self._conn_config.auto_subscribe_video = 1
+        self._conn_config.auto_subscribe_audio = 1
+        logger.info(f"auto_subscribe_video: {self._conn_config.auto_subscribe_video}, auto_subscribe_audio: {self._conn_config.auto_subscribe_audio}")
+        
+    def set_serv_config(self):
+        self._serv_config.enable_video = 1
+
+    async def setup_sender_or_receiver(self,agora_service:AgoraService, local_user:LocalUser, sample_options:ExampleOptions):
+        await self.setup_receiver(agora_service, local_user, sample_options)
+
+    async def setup_receiver(self,agora_service:AgoraService, local_user:LocalUser, sample_options:ExampleOptions):
+        pass

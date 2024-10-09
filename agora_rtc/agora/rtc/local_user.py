@@ -445,9 +445,9 @@ class LocalUser:
         ret = agora_local_user_register_video_frame_observer(self.user_handle, self.video_frame_observer_handler)
         return ret
 
-    def unregister_video_frame_observer(self, agora_video_frame_observer2):
+    def unregister_video_frame_observer(self):
         agora_video_frame_observer2_destroy(self.video_frame_observer_handler)
-        ret = agora_local_user_unregister_video_frame_observer(self.user_handle, agora_video_frame_observer2)
+        ret = agora_local_user_unregister_video_frame_observer(self.user_handle, self.video_frame_observer_handler)
         return ret
 
     # def set_video_subscription_options(self, user_id, options):
