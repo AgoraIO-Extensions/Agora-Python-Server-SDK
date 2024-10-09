@@ -20,7 +20,7 @@ from agora.rtc.audio_encoded_frame_sender import EncodedAudioFrame
 from agora.rtc.agora_base import *
 
 # run this example
-# python agora_rtc/examples/example_audio_pcm_receive.py --appId=xxx --channelId=xxx --userId=xxx
+# python agora_rtc/examples/example_audio_pcm_receive.py --appId=xxx --channelId=xxx
 sample_options = parse_args_example()
 logger.info(f"app_id: {sample_options.app_id}, channel_id: {sample_options.channel_id}, uid: {sample_options.user_id}")
 

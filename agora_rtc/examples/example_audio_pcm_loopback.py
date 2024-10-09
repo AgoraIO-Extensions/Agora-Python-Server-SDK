@@ -20,7 +20,7 @@ from common.audio_consumer import AudioStreamConsumer
 from agora.rtc.audio_pcm_data_sender import PcmAudioFrame
 
 # run this example
-# python agora_rtc/examples/example_audio_pcm_loopback.py --appId=xxx --channelId=xxx --userId=xxx
+# python agora_rtc/examples/example_audio_pcm_loopback.py --appId=xxx --channelId=xxx
 sample_options = parse_args_example()
 logger.info(f"app_id: {sample_options.app_id}, channel_id: {sample_options.channel_id}, uid: {sample_options.user_id}")
 from agora.rtc.audio_frame_observer import IAudioFrameObserver, AudioFrame

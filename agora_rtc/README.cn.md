@@ -32,6 +32,6 @@ pip install agora_python_server_sdk
 
 ## 执行测试脚本
 ```
-python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.pcm --sampleRate=16000 --numOfChannels=1
+python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx --audioFile=./test_data/demo.pcm --sampleRate=16000 --numOfChannels=1
 ```
 

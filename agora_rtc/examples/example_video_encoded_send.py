@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # run this example
-# python agora_rtc/examples/example_video_encoded_send.py --appId=xxx --channelId=xxx --userId=xxx --videoFile=./test_data/send_video.h264
+# python agora_rtc/examples/example_video_encoded_send.py --appId=xxx --channelId=xxx --videoFile=./test_data/send_video.h264
 sample_options = parse_args_example()
 logger.info(f"app_id: {sample_options.app_id}, channel_id: {sample_options.channel_id}, uid: {sample_options.user_id}")
 

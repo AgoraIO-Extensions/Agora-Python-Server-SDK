@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # run this example
-# python agora_rtc/examples/example_audio_pcm_receive.py --appId=xxx --channelId=xxx --userId=xxx
+# python agora_rtc/examples/example_audio_pcm_receive.py --appId=xxx --channelId=xxx
 
 class RTCProcessIMPL(RTCBaseRecvAVProcess):
     def __init__(self):

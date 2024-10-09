@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 from common.parse_args import parse_args_example
 # run this example
-## python agora_rtc/examples/example_audio_encoded_receive.py --appId=xxx --channelId=xxx --userId=xxx
+## python agora_rtc/examples/example_audio_encoded_receive.py --appId=xxx --channelId=xxx
 sample_options = parse_args_example()
 logger.info(f"app_id: {sample_options.app_id}, channel_id: {sample_options.channel_id}, uid: {sample_options.user_id}")
 
