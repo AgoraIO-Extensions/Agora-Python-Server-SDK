@@ -3,7 +3,7 @@
 import os
 import asyncio
 from common.path_utils import get_log_path_with_filename 
-from common.parse_args import parse_args_example, SampleOptions
+from common.parse_args import parse_args_example, ExampleOptions
 from common.push_pcm_file import push_pcm_data_from_file
 from common.push_yuv_file import push_yuv_data_from_file
 from common.example_base import RTCBaseProcess
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 class RTCProcessIMPL(RTCBaseProcess):
     def __init__(self):
         super().__init__()
-    async def setup_sender(self,agora_service:AgoraService, local_user:LocalUser, sample_options:SampleOptions):
+    async def setup_sender(self,agora_service:AgoraService, local_user:LocalUser, sample_options:ExampleOptions):
         logger.info(f"setup_sender --- app_id: {sample_options.app_id}, channel_id: {sample_options.channel_id}, uid: {sample_options.user_id}")
 
         media_node_factory = agora_service.create_media_node_factory()
@@ -40,7 +40,7 @@ class RTCProcessIMPL(RTCBaseProcess):
         audio_track.set_enabled(0)
         video_track.set_enabled(0)
 
-    async def send(self,sample_options:SampleOptions, pcm_data_sender, yuv_data_sender):
+    async def send(self,sample_options:ExampleOptions, pcm_data_sender, yuv_data_sender):
         pcm_task = asyncio.create_task(push_pcm_data_from_file(sample_options.sample_rate, sample_options.num_of_channels, pcm_data_sender, sample_options.audio_file, self._exit))
         yuv_task = asyncio.create_task(push_yuv_data_from_file(sample_options.width, sample_options.height, sample_options.fps, yuv_data_sender, sample_options.video_file, self._exit))
         await pcm_task

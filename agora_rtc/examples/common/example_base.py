@@ -1,9 +1,9 @@
 #!env python
 import asyncio
 import signal
-from common.parse_args import SampleOptions
-from observer.connection_observer import SampleConnectionObserver
-from observer.local_user_observer import SampleLocalUserObserver
+from common.parse_args import ExampleOptions
+from observer.connection_observer import ExampleConnectionObserver
+from observer.local_user_observer import ExampleLocalUserObserver
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig, RTCConnection, LocalUser
 from agora.rtc.agora_base import *
 import logging
@@ -13,20 +13,20 @@ logger = logging.getLogger(__name__)
 class RTCBaseProcess():
     def __init__(self):
         self._exit = asyncio.Event()    
-    async def connect_and_release(self, agora_service:AgoraService, channel_id, sample_options:SampleOptions):
+    async def connect_and_release(self, agora_service:AgoraService, channel_id, sample_options:ExampleOptions):
         #---------------2. Create Connection
         con_config = RTCConnConfig(
             client_role_type=ClientRoleType.CLIENT_ROLE_BROADCASTER,
             channel_profile=ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
         )
         connection = agora_service.create_rtc_connection(con_config)
-        conn_observer = SampleConnectionObserver()
+        conn_observer = ExampleConnectionObserver()
         connection.register_observer(conn_observer)
         connection.connect(sample_options.token, channel_id, sample_options.user_id)
 
         local_user = connection.get_local_user()
         local_user.set_audio_scenario(AudioScenarioType.AUDIO_SCENARIO_CHORUS)
-        local_user_observer = SampleLocalUserObserver()
+        local_user_observer = ExampleLocalUserObserver()
         local_user.register_local_user_observer(local_user_observer)
 
         await self.setup_sender(agora_service, local_user ,sample_options)        
@@ -35,12 +35,12 @@ class RTCBaseProcess():
         connection.disconnect()
         connection.release()
 
-    async def setup_sender(self,agora_service:AgoraService, local_user:LocalUser, sample_options:SampleOptions):
+    async def setup_sender(self,agora_service:AgoraService, local_user:LocalUser, sample_options:ExampleOptions):
         pass
 
     def handle_signal(self):
         self._exit.set()
-    async def run(self, sample_options:SampleOptions, log_path:str):
+    async def run(self, sample_options:ExampleOptions, log_path:str):
         logger.info(f"app_id: {sample_options.app_id}, channel_id: {sample_options.channel_id}, uid: {sample_options.user_id}")
 
         loop = asyncio.get_event_loop()

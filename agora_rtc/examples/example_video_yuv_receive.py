@@ -5,9 +5,9 @@ import os
 import threading
 from common.path_utils import get_log_path_with_filename 
 from common.parse_args import parse_args_example
-from observer.connection_observer import SampleConnectionObserver
-from observer.local_user_observer import SampleLocalUserObserver
-from observer.video_frame_observer import SampleVideoFrameObserver
+from observer.connection_observer import ExampleConnectionObserver
+from observer.local_user_observer import ExampleLocalUserObserver
+from observer.video_frame_observer import ExampleVideoFrameObserver
 
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora.rtc.agora_base import *
@@ -37,7 +37,7 @@ def create_conn_and_recv(channel_id, uid = 0):
     )
 
     connection = agora_service.create_rtc_connection(con_config)
-    conn_observer = SampleConnectionObserver()
+    conn_observer = ExampleConnectionObserver()
     connection.register_observer(conn_observer)
     connection.connect(sample_options.token, channel_id, uid)
 
@@ -48,7 +48,7 @@ def create_conn_and_recv(channel_id, uid = 0):
     local_user.set_audio_scenario(AudioScenarioType.AUDIO_SCENARIO_CHORUS)
 
     # video_sender = connection.GetVideoSender()
-    video_frame_observer = SampleVideoFrameObserver()
+    video_frame_observer = ExampleVideoFrameObserver()
     local_user.register_video_frame_observer(video_frame_observer)
 
     video_track.set_enabled(1)

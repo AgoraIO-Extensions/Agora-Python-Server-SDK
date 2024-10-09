@@ -2,7 +2,7 @@ import argparse
 import logging
 logger = logging.getLogger(__name__)
 
-class SampleOptions:
+class ExampleOptions:
     def __init__(self):
         self.app_id = None
         self.token = None
@@ -32,7 +32,7 @@ def parse_args():
     parser.add_argument("--audioFile", required=False, help="The audio file in raw PCM format to be sent")
     parser.add_argument("--lowdelay", action="store_true", help="Enable the low delay")
     parser.add_argument("--videoFile", help="The video file in YUV420 format to be sent")
-    parser.add_argument("--sampleRate", type=int, help="Sample rate for the PCM file to be sent")
+    parser.add_argument("--sampleRate", type=int, help="Example rate for the PCM file to be sent")
     parser.add_argument("--numOfChannels", type=int, help="Number of channels for the PCM file to be sent")
     parser.add_argument("--fps", type=int, help="Target frame rate for sending the video stream")
     parser.add_argument("--width", type=int, help="Image width for the YUV file to be sent")
@@ -43,10 +43,10 @@ def parse_args():
 
     return parser.parse_args()
 
-def parse_args_example() -> SampleOptions:
+def parse_args_example() -> ExampleOptions:
     args = parse_args()
     logger.info(f"Parsed arguments:{args}")
-    sample_options = SampleOptions()
+    sample_options = ExampleOptions()
     sample_options.app_id = args.appId
     if args.token:
         sample_options.token = args.token

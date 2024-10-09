@@ -3,9 +3,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 from agora.rtc.rtc_connection_observer import IRTCConnectionObserver
-class SampleConnectionObserver(IRTCConnectionObserver):
+class ExampleConnectionObserver(IRTCConnectionObserver):
     def __init__(self):
-        super(SampleConnectionObserver, self).__init__()
+        super(ExampleConnectionObserver, self).__init__()
 
     def on_connected(self, agora_rtc_conn, conn_info, reason):
         logger.info(f"on_connected, agora_rtc_conn={agora_rtc_conn}, local_user_id={conn_info.local_user_id}, state={conn_info.state}, internal_uid={conn_info.internal_uid} ,reason={reason}")

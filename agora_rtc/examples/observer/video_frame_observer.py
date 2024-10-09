@@ -11,9 +11,9 @@ filename, _ = os.path.splitext(os.path.basename(__file__))
 log_folder = os.path.join(source_dir, 'logs', filename ,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S"))
 os.makedirs(log_folder, exist_ok=True)
 
-class SampleVideoFrameObserver(IVideoFrameObserver):
+class ExampleVideoFrameObserver(IVideoFrameObserver):
     def __init__(self):
-        super(SampleVideoFrameObserver, self).__init__()
+        super(ExampleVideoFrameObserver, self).__init__()
 
     def on_frame(self, video_frame_observer, channel_id, remote_uid, frame:VideoFrame):
         logger.info(f"on_frame, channel_id={channel_id}, remote_uid={remote_uid}, width={frame.width}, height={frame.height}, y_stride={frame.y_stride}, u_stride={frame.u_stride}, v_stride={frame.v_stride}, len_y={len(frame.y_buffer)}, len_u={len(frame.u_buffer)}, len_v={len(frame.v_buffer)}")
@@ -33,6 +33,6 @@ class SampleVideoFrameObserver(IVideoFrameObserver):
         return 0
     
     # def on_user_video_track_subscribed(self, agora_local_user, user_id, agora_remote_video_track:RemoteVideoTrack, video_track_info):
-        # logger.info("SampleVideoFrameObserver _on_user_video_track_subscribed:", agora_local_user, user_id, agora_remote_video_track, video_track_info)        
+        # logger.info("ExampleVideoFrameObserver _on_user_video_track_subscribed:", agora_local_user, user_id, agora_remote_video_track, video_track_info)        
         # agora_remote_video_track.register_video_encoded_image_receiver(video_encoded_image_receiver)
 

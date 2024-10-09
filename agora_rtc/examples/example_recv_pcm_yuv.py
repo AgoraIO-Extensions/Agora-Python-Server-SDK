@@ -8,13 +8,13 @@ import sys
 import threading
 from common.path_utils import get_log_path_with_filename 
 from common.parse_args import parse_args_example
-from observer.connection_observer import SampleConnectionObserver
-from observer.audio_frame_observer import SampleAudioFrameObserver
-from observer.local_user_observer import SampleLocalUserObserver
+from observer.connection_observer import ExampleConnectionObserver
+from observer.audio_frame_observer import ExampleAudioFrameObserver
+from observer.local_user_observer import ExampleLocalUserObserver
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, AudioSubscriptionOptions, RTCConnConfig
 from agora.rtc.audio_encoded_frame_sender import EncodedAudioFrame
 from agora.rtc.agora_base import *
-from observer.video_frame_observer import SampleVideoFrameObserver
+from observer.video_frame_observer import ExampleVideoFrameObserver
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ def create_conn_and_recv(channel_id, uid = 0):
     )
 
     connection = agora_service.create_rtc_connection(con_config)
-    conn_observer = SampleConnectionObserver()
+    conn_observer = ExampleConnectionObserver()
     connection.register_observer(conn_observer)
     connection.connect(sample_options.token, channel_id, uid)
 
@@ -54,13 +54,13 @@ def create_conn_and_recv(channel_id, uid = 0):
     local_user = connection.get_local_user()
     local_user.set_audio_scenario(AudioScenarioType.AUDIO_SCENARIO_CHORUS)
     local_user.set_playback_audio_frame_before_mixing_parameters(1, 16000)
-    localuser_observer = SampleLocalUserObserver()
+    localuser_observer = ExampleLocalUserObserver()
     local_user.register_local_user_observer(localuser_observer)
     
-    audio_frame_observer = SampleAudioFrameObserver()
+    audio_frame_observer = ExampleAudioFrameObserver()
     local_user.register_audio_frame_observer(audio_frame_observer)
 
-    video_frame_observer = SampleVideoFrameObserver()
+    video_frame_observer = ExampleVideoFrameObserver()
     local_user.register_video_frame_observer(video_frame_observer)
     # local_user.subscribe_all_video()
 

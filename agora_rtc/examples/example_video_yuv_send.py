@@ -6,7 +6,7 @@ import threading
 from common.path_utils import get_log_path_with_filename 
 from common.parse_args import parse_args_example
 from common.pacer import Pacer
-from observer.connection_observer import SampleConnectionObserver
+from observer.connection_observer import ExampleConnectionObserver
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora.rtc.video_frame_sender import ExternalVideoFrame
 from agora.rtc.agora_base import *
@@ -35,7 +35,7 @@ def create_conn_and_send(channel_id, uid = 0):
     )
 
     connection = agora_service.create_rtc_connection(con_config)
-    conn_observer = SampleConnectionObserver()
+    conn_observer = ExampleConnectionObserver()
     connection.register_observer(conn_observer)
     connection.connect(sample_options.token, channel_id, uid)
 

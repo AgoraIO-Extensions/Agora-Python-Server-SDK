@@ -6,9 +6,9 @@ import time
 import os
 from common.path_utils import get_log_path_with_filename 
 from common.parse_args import parse_args_example
-from observer.connection_observer import SampleConnectionObserver
-from observer.audio_frame_observer import SampleAudioFrameObserver
-from observer.local_user_observer import SampleLocalUserObserver
+from observer.connection_observer import ExampleConnectionObserver
+from observer.audio_frame_observer import ExampleAudioFrameObserver
+from observer.local_user_observer import ExampleLocalUserObserver
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, AudioSubscriptionOptions, RTCConnConfig
 from agora.rtc.audio_encoded_frame_sender import EncodedAudioFrame
 from agora.rtc.agora_base import *
@@ -37,12 +37,12 @@ con_config = RTCConnConfig(
 )
 
 connection = agora_service.create_rtc_connection(con_config)
-conn_observer = SampleConnectionObserver()
+conn_observer = ExampleConnectionObserver()
 connection.register_observer(conn_observer)
 connection.connect(sample_options.token, "dys_channel_test1", sample_options.user_id)
 
 connection2 = agora_service.create_rtc_connection(con_config)
-conn_observer2 = SampleConnectionObserver()
+conn_observer2 = ExampleConnectionObserver()
 connection2.register_observer(conn_observer2)
 connection2.connect(sample_options.token, "dys_channel_test2", sample_options.user_id)
 
@@ -55,9 +55,9 @@ audio_track = agora_service.create_custom_audio_track_encoded(audio_sender, 0)
 local_user = connection.get_local_user()
 local_user.set_audio_scenario(AudioScenarioType.AUDIO_SCENARIO_CHORUS)
 local_user.set_playback_audio_frame_before_mixing_parameters(1, 16000)
-localuser_observer = SampleLocalUserObserver()
+localuser_observer = ExampleLocalUserObserver()
 local_user.register_local_user_observer(localuser_observer)
-audio_frame_observer = SampleAudioFrameObserver()
+audio_frame_observer = ExampleAudioFrameObserver()
 local_user.register_audio_frame_observer(audio_frame_observer)
 local_user.subscribe_all_audio()
 
@@ -66,9 +66,9 @@ audio_sender2 = media_node_factory.create_audio_encoded_frame_sender()
 audio_track2 = agora_service.create_custom_audio_track_encoded(audio_sender2, 0)
 local_user2 = connection2.get_local_user()
 local_user2.set_playback_audio_frame_before_mixing_parameters(1, 16000)
-localuser_observer2 = SampleLocalUserObserver()
+localuser_observer2 = ExampleLocalUserObserver()
 local_user2.register_local_user_observer(localuser_observer2)
-audio_frame_observer2 = SampleAudioFrameObserver()
+audio_frame_observer2 = ExampleAudioFrameObserver()
 local_user2.register_audio_frame_observer(audio_frame_observer2)
 local_user2.subscribe_all_audio()
 
