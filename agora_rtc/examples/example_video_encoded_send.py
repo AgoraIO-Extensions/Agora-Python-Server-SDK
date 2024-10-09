@@ -6,7 +6,7 @@ from common.pacer import Pacer
 from observer.connection_observer import ExampleConnectionObserver
 from observer.local_user_observer import ExampleLocalUserObserver
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig, SenderOptions
-from agora.rtc.video_frame_sender import EncodedVideoFrameInfo
+from agora.rtc.video_encoded_image_sender import EncodedVideoFrameInfo
 from agora.rtc.agora_base import *
 import av
 import logging

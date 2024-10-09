@@ -240,6 +240,7 @@ class LocalUser:
         self._remote_video_track_map = {}
 
         self.video_frame_observer_handler = None
+        self.video_encoded_frame_observer_handler = None
 
     def _set_audio_map(self, track_handle, track:LocalAudioTrack):
         with self._audio_track_lock:
@@ -437,8 +438,10 @@ class LocalUser:
         ret = agora_local_user_register_video_encoded_frame_observer(self.user_handle, self.video_encoded_frame_observer_handler)
         return ret
     
-    def unregister_video_encoded_frame_observer(self, agora_video_encoded_frame_observer):
-        ret = agora_local_user_unregister_video_encoded_frame_observer(self.user_handle, agora_video_encoded_frame_observer)
+    def unregister_video_encoded_frame_observer(self):
+        if not self.video_encoded_frame_observer_handler:
+            return 0
+        ret = agora_local_user_unregister_video_encoded_frame_observer(self.user_handle, self.video_encoded_frame_observer_handler)
         return ret
 
     def register_video_frame_observer(self, agora_video_frame_observer2:IVideoFrameObserver):
