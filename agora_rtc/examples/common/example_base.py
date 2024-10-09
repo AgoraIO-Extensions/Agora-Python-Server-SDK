@@ -31,7 +31,7 @@ class RTCBaseProcess():
         local_user_observer = ExampleLocalUserObserver()
         local_user.register_local_user_observer(local_user_observer)
 
-        await self.setup_sender_or_receiver(agora_service, local_user ,sample_options)        
+        await self.setup_in_connection(agora_service, connection, local_user ,sample_options)        
 
         connection.unregister_observer()
         connection.disconnect()
@@ -41,7 +41,7 @@ class RTCBaseProcess():
         pass
     def set_serv_config(self):
         pass
-    async def setup_sender_or_receiver(self,agora_service:AgoraService, local_user:LocalUser, sample_options:ExampleOptions):
+    async def setup_in_connection(self,agora_service:AgoraService, connection:RTCConnection, local_user:LocalUser, sample_options:ExampleOptions):
         pass
 
     def handle_signal(self):
@@ -69,7 +69,7 @@ class RTCBaseProcess():
 
 
 class RTCBaseSendAVProcess(RTCBaseProcess):
-    async def setup_sender_or_receiver(self,agora_service:AgoraService, local_user:LocalUser, sample_options:ExampleOptions):
+    async def setup_in_connection(self,agora_service:AgoraService, connection:RTCConnection, local_user:LocalUser, sample_options:ExampleOptions):
         await self.setup_sender(agora_service, local_user, sample_options)
 
     async def setup_sender(self,agora_service:AgoraService, local_user:LocalUser, sample_options:ExampleOptions):
@@ -84,7 +84,7 @@ class RTCBaseRecvAVProcess(RTCBaseProcess):
     def set_serv_config(self):
         self._serv_config.enable_video = 1
 
-    async def setup_sender_or_receiver(self,agora_service:AgoraService, local_user:LocalUser, sample_options:ExampleOptions):
+    async def setup_in_connection(self,agora_service:AgoraService, connection:RTCConnection, local_user:LocalUser, sample_options:ExampleOptions):
         await self.setup_receiver(agora_service, local_user, sample_options)
 
     async def setup_receiver(self,agora_service:AgoraService, local_user:LocalUser, sample_options:ExampleOptions):
