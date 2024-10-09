@@ -26,5 +26,5 @@ async def push_pcm_data_from_file(sample_rate, num_of_channels , pcm_data_sender
             frame.sample_rate = sample_rate
             ret = pcm_data_sender.send_audio_pcm_data(frame)
             pcm_count += 1
-            logger.debug(f"send pcm: count,ret={pcm_count}, {ret}, {send_size}, {pcm_sendinterval}")
+            logger.info(f"send pcm: count,ret={pcm_count}, {ret}, {send_size}, {pcm_sendinterval}")
             await pacer_pcm.apace_interval(0.1)

@@ -28,5 +28,5 @@ async def push_yuv_data_from_file(width, height, fps, video_sender:VideoFrameSen
             frame.metadata = "hello metadata"
             ret = video_sender.send_video_frame(frame)        
             yuv_count += 1
-            logger.debug("send yuv: count,ret=%d, %s", yuv_count, ret)
+            logger.info("send yuv: count,ret=%d, %s", yuv_count, ret)
             await pacer_yuv.apace_interval(yuv_sendinterval)

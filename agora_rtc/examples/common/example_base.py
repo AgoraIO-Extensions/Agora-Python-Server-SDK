@@ -67,25 +67,3 @@ class RTCBaseProcess():
         agora_service.release()
         logger.info("agora_service.release-coro")
 
-
-class RTCBaseSendAVProcess(RTCBaseProcess):
-    async def setup_in_connection(self,agora_service:AgoraService, connection:RTCConnection, local_user:LocalUser, sample_options:ExampleOptions):
-        await self.setup_sender(agora_service, local_user, sample_options)
-
-    async def setup_sender(self,agora_service:AgoraService, local_user:LocalUser, sample_options:ExampleOptions):
-        pass
-
-class RTCBaseRecvAVProcess(RTCBaseProcess):
-    def set_conn_config(self):
-        self._conn_config.auto_subscribe_video = 1
-        self._conn_config.auto_subscribe_audio = 1
-        logger.info(f"auto_subscribe_video: {self._conn_config.auto_subscribe_video}, auto_subscribe_audio: {self._conn_config.auto_subscribe_audio}")
-        
-    def set_serv_config(self):
-        self._serv_config.enable_video = 1
-
-    async def setup_in_connection(self,agora_service:AgoraService, connection:RTCConnection, local_user:LocalUser, sample_options:ExampleOptions):
-        await self.setup_receiver(agora_service, local_user, sample_options)
-
-    async def setup_receiver(self,agora_service:AgoraService, local_user:LocalUser, sample_options:ExampleOptions):
-        pass

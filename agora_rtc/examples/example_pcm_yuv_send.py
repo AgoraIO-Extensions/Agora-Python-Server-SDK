@@ -6,8 +6,8 @@ from common.path_utils import get_log_path_with_filename
 from common.parse_args import parse_args_example, ExampleOptions
 from common.push_pcm_file import push_pcm_data_from_file
 from common.push_yuv_file import push_yuv_data_from_file
-from common.example_base import RTCBaseSendAVProcess
-from agora.rtc.agora_service import AgoraService, LocalUser
+from common.example_base import RTCBaseProcess
+from agora.rtc.agora_service import AgoraService, LocalUser, RTCConnection
 from agora.rtc.agora_base import *
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -16,10 +16,10 @@ logger = logging.getLogger(__name__)
 # run this example
 # python agora_rtc/examples/example_send_pcm_yuv.py --appId=xxx --channelId=xxx --connectionNumber=1 --videoFile=./test_data/103_RaceHorses_416x240p30_300.yuv --width=416 --height=240 --fps=30 --audioFile=./test_data/demo.pcm --sampleRate=16000 --numOfChannels=1
 
-class RTCProcessIMPL(RTCBaseSendAVProcess):
+class RTCProcessIMPL(RTCBaseProcess):
     def __init__(self):
         super().__init__()
-    async def setup_sender(self,agora_service:AgoraService, local_user:LocalUser, sample_options:ExampleOptions):
+    async def setup_in_connection(self,agora_service:AgoraService, connection:RTCConnection, local_user:LocalUser, sample_options:ExampleOptions):
         media_node_factory = agora_service.create_media_node_factory()
         pcm_data_sender = media_node_factory.create_audio_pcm_data_sender()
         audio_track = agora_service.create_custom_audio_track_pcm(pcm_data_sender)
