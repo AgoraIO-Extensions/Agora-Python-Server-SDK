@@ -239,6 +239,8 @@ class LocalUser:
         self._remote_audio_track_map = {}
         self._remote_video_track_map = {}
 
+        self.video_frame_observer_handler = None
+
     def _set_audio_map(self, track_handle, track:LocalAudioTrack):
         with self._audio_track_lock:
             # no need to theck key is existed or not,just do replace
@@ -446,6 +448,8 @@ class LocalUser:
         return ret
 
     def unregister_video_frame_observer(self):
+        if not self.video_frame_observer_handler:
+            return 0
         agora_video_frame_observer2_destroy(self.video_frame_observer_handler)
         ret = agora_local_user_unregister_video_frame_observer(self.user_handle, self.video_frame_observer_handler)
         return ret

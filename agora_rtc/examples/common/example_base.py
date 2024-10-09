@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class RTCBaseProcess():
     def __init__(self):
-        self._exit = asyncio.Event()    
+        self._exit = asyncio.Event()
         self._conn_config = RTCConnConfig(
             client_role_type=ClientRoleType.CLIENT_ROLE_BROADCASTER,
             channel_profile=ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
