@@ -39,7 +39,7 @@ AGORA_UAP_SESSCTRL_COUNTER_SILENCE_LENGTH_HISTOGRAM_NUM = 18
 AGORA_UAP_SESSCTRL_COUNTER_INPUT_VOLUME_HISTOGRAM_NUM = 10
 
 # Enum for sample rate
-class SessCtrlFs(Enum):
+class SessCtrlFs(ctypes.c_int):
     kFs_16000 = 16000
     kFs_32000 = 32000
     kFs_44100 = 44100
@@ -47,7 +47,7 @@ class SessCtrlFs(Enum):
     kFs_24000 = 24000
 
 # Enum for session control status
-class SessCtrlStatus(Enum):
+class SessCtrlStatus(ctypes.c_int):
     kSCStatus_None = 0          # Not in Session
     kSCStatus_SOS = 1           # Start Of Sentence
     kSCStatus_Continue = 2      # Continue sending data during a sentence
@@ -59,14 +59,14 @@ class SessCtrlStatus(Enum):
     kSCStatus_Cnt = 8           # Number of status
 
 # Enum for ASR events
-class SessCtrlAsrEvent(Enum):
+class SessCtrlAsrEvent(ctypes.c_int):
     kSCAsrEvent_NONFINAL = 0   # "final"-waiting has been timeout
     kSCAsrEvent_FINAL = 1      # A "final" event has been received from ASR service
     kSCAsrEvent_TIME_OUT = 2   # Time out event
     kSCAsrEvent_Cnt = 3        # Number of events
 
 # Enum for sentence finalization status
-class SessCtrlSentenceFinal(Enum):
+class SessCtrlSentenceFinal(ctypes.c_int):
     kSCSentence_NONFINAL = 0   # Non-final
     kSCSentence_FINAL = 1      # Final
     kSCSentence_UNKNOWN = 2    # Unknown
@@ -81,7 +81,7 @@ class SessCtrl_StaticCfg(ctypes.Structure):
         ("persistentVoiceLenOfSOS", ctypes.c_int),
         ("prePaddingLenOfSessCtrlSOS", ctypes.c_int),
         ("postPaddingLenOfSessCtrlEOS", ctypes.c_int),
-        ("unVoiceLenOfTriggerSessCtrlEOS", ctypes._int),
+        ("unVoiceLenOfTriggerSessCtrlEOS", ctypes.c_int),
         ("unVoiceLenOfTriggerServerEOS", ctypes.c_int),
         ("eosWaitTime", ctypes.c_int),
         ("eosRetryWaitTime", ctypes.c_int),
@@ -90,7 +90,7 @@ class SessCtrl_StaticCfg(ctypes.Structure):
         ("enableMainSpeakerDet", ctypes.c_int)
     ]
     def __init__(self):
-        self.userID = None
+        self.userID = ctypes.c_char_p("")
         self.frmSz = 160
         self.smplFrq = 16000
         self.persistentVoiceLenOfSOS = 0
@@ -158,7 +158,7 @@ class SessCtrl_InputData(ctypes.Structure):
         ("ts", ctypes.c_long)
     ]
     def __init__(self):
-        self.pcm = None
+        self.pcm = ctypes.c_void_p(0)
         self.frmIdx = 0
         self.ts = 0
         pass
@@ -178,6 +178,8 @@ class SessCtrl_OutputData(ctypes.Structure):
         ("avgRMS", ctypes.c_float)
     ]
     def __init__(self):
+        self.nSamplesInPcmBuf = 0
+        
         pass
     
 
@@ -308,33 +310,34 @@ Agora_UAP_SessCtrl_proc.argtypes = [ctypes.c_void_p, ctypes.POINTER(SessCtrl_Frm
 Agora_UAP_SessCtrl_proc.restype = ctypes.c_int
 
 #AGORA_API int Agora_UAP_SessCtrl_handleAsrResponse(void* stPtr, const SessCtrl_AsrResponse* pAsrResponse, SessCtrl_OutputData* pOut,SessCtrl_AsrHandleResponseFinal* pFinal);
-Agora_UAP_SessCtrl_handleAsrResponse = sessctrl_lib.Agora_UAP_SessCtrl_handleAsrResponse
-Agora_UAP_SessCtrl_handleAsrResponse.argtypes = [ctypes.c_void_p, ctypes.POINTER(SessCtrl_AsrResponse), ctypes.POINTER(SessCtrl_OutputData), ctypes.POINTER(SessCtrl_AsrHandleResponseFinal)]
-Agora_UAP_SessCtrl_handleAsrResponse.restype = ctypes.c_int
 
 
 
 class SessionControl:
-    def __init__(self):
-        self._handler = ctypes.c_void_p
+    def __init__(self, userid:ctypes.c_char_p):
+        self._handler = ctypes.c_void_p(0)
         self._static_config = SessCtrl_StaticCfg()
         self._dynamic_config = SessCtrl_DynamCfg()
         self._initialized = False
         #pre allocated null buffer struct for proc
         self._sessctrl_in_data = SessCtrl_InputData()
         self._sessctrl_out_data = SessCtrl_OutputData()
+        self._frm_ctrl = SessCtrl_FrmCtrl()
         self._frm_count = 0
+        self._user_id = userid #str type
+        ret = self._prepare_sessctrl_cfg()
+        # for lifetime control
+        self._last_access_time = time.time()*1000 #unit in ms
         pass
     def _prepare_sessctrl_cfg(self) -> int:
 
 		#get default config and default frame config
         ret_static  = Agora_UAP_SessCtrl_getDefaultStaticCfg(ctypes.byref(self._static_config))
-        frmCtrl = SessCtrl_FrmCtrl()
-        ret_dynamic = Agora_UAP_SessCtrl_getDefaultDynamCfg(ctypes.byref(frmCtrl), ctypes.byref(self._dynamic_config))
+        ret_dynamic = Agora_UAP_SessCtrl_getDefaultDynamCfg(ctypes.byref(self._frm_ctrl), ctypes.byref(self._dynamic_config))
         
 
 		#assign value to static config
-        self._static_config.userID = "2222"
+        self._static_config.userID = ctypes.c_char_p(self._user_id.encode('utf-8'))  
         self._static_config.frmSz = 160
         self._static_config.smplFrq = SessCtrlFs.kFs_16000
         self._static_config.persistentVoiceLenOfSOS = 10
@@ -349,8 +352,8 @@ class SessionControl:
         
 		#assign value to dynamic config
         self._dynamic_config.logLv = 10
-        self._dynamic_config.sessCtrlTimeOutInMs = 10000000000
-        self._dynamic_config.sessCtrlStartSniffWordGapInMs = 100000000
+        self._dynamic_config.sessCtrlTimeOutInMs = 1000000
+        self._dynamic_config.sessCtrlStartSniffWordGapInMs = 1000000
         self._dynamic_config.sessCtrlWordGapLenInMs = 10
         self._dynamic_config.sessCtrlWordGapLenVolumeThr = 0
         self._dynamic_config.sessCtrlEnableDumpFlag = 0
@@ -397,56 +400,85 @@ class SessionControl:
             return ret
         self._initialized = True if ret == 0 else False
         return ret
-    def process (self, c_buffer:ctypes.c_void_p, size_in_short: int) -> int:
+    def process (self, c_buffer:ctypes.c_void_p, size_in_short: int) -> tuple[int, ctypes.c_void_p]: # return ret, pcm data in bytes. ret is len of uint8
        
+       #update last access time
+        self._last_access_time = time.time()*1000
         self._sessctrl_in_data.pcm = c_buffer
         self._sessctrl_in_data.frmIdx = self._frm_count 
         self._frm_count += 1
+        #todo：
+        #如果mute后，是否有必要销毁session ctrl？---暂时不考虑销毁
+        #用户id：和外部对齐
+        #功能点：
+        #
         
         #inputData.ts = (frmCnt * frmSz) / (MT_TEST_FS / 1000);
         self._sessctrl_in_data.ts = self._frm_count * self._static_config.frmSz / (SessCtrlFs.kFs_16000 / 1000)
-        
-self._sessctrl_out_data.status = SessCtrlStatus.kSCStatus_None
+        self._sessctrl_out_data.status = SessCtrlStatus.kSCStatus_None
         self._sessctrl_out_data.pcmBuf = ctypes.c_void_p(0)
+        self._sessctrl_out_data.nSamplesInPcmBuf = 0 #added by me ,ToDo check if needed, parameters need to be rest or not?
         
         
-        ret = Agora_UAP_SessCtrl_proc(self._handler, ctypes.byref(self._static_config), c_buffer, size_in_short)
+        ret = Agora_UAP_SessCtrl_proc(self._handler, ctypes.byref(self._frm_ctrl), ctypes.byref(self._sessctrl_in_data), ctypes.byref(self._sessctrl_out_data))
+        if ret < 0:
+            return ret, ctypes.c_void_p(0) #exit(1) ?? indicate error and do not continue to process next frame? ToDo
+        #get output data
+        if self._sessctrl_out_data.nSamplesInPcmBuf > 0: #unit: unit16
+            ret = self._sessctrl_out_data.nSamplesInPcmBuf * 2 #unit: unit8
+            return ret, self._sessctrl_out_data.pcmBuf
+        return 0, ctypes.c_void_p(0) #no data
         pass
-        
-        
-        
-		
-        
+    def release(self):
+        if self._initialized:
+            ret = Agora_UAP_SessCtrl_destroy(self._handler)
+            self._initialized = False
+            self._handler = ctypes.c_void_p(0)
+        pass
+    def is_expired(self, interval: int) -> bool:
+        return ( time.time()*1000 - self._last_access_time > interval )
 
-"""		
-		while (true) {
-			if(fread(inputPcm, sizeof(short), frmSz, inputPcmFPtr)!=frmSz){
-				break;
-			}
-			frmCnt++;
-			// printf("%d\n",frmCnt);
-			inputData.pcm = inputPcm;
-			inputData.frmIdx = frmCnt;
-			inputData.ts = (frmCnt * frmSz) / (MT_TEST_FS / 1000);
-			outputData.status = kSCStatus_None;
-			outputData.pcmBuf = NULL;
-			if (Agora_UAP_SessCtrl_proc(sessCtrler, &frmCtrl, &inputData, &outputData) < 0) {
-				fprintf(stderr, "Main: session control module processing failed!\n");
-				exit(1);
-			}
-			if (outputData.nSamplesInPcmBuf > 0) {
-				printf("%d,%d,%d\n",frmSz,frmCnt,outputData.nSamplesInPcmBuf);
-			fwrite(outputData.pcmBuf, sizeof(short), outputData.nSamplesInPcmBuf, outputPcmFPtr);
-			outSamples += outputData.nSamplesInPcmBuf;
-			}
-		}
-
-		fclose(inputPcmFPtr);
-		fclose(outputPcmFPtr);
-
-		// destroy 
-		Agora_UAP_SessCtrl_destroy(&sessCtrler);
-		printf("%d\n",outSamples);
-		fprintf(stdout, "\nSimulation Done!\n");
-		return 0;
-    """
+    #manager for sessionctrol
+class SessionCtrlManager:
+    def __init__(self, update_interval: int = 100, expired_duration: int = 1000*10) -> None:
+        self._sessions = {}
+        self._last_update_time = time.time()*1000  #in ms
+        self._update_interval = update_interval  # in ms, every 100ms to do check
+        self._expired_duration = expired_duration  #10s expired
+    pass
+    def process_audio_frame(self, userid: ctypes.c_char_p, c_buffer:ctypes.c_void_p, size_in_short: int) -> tuple[int, ctypes.c_void_p]:
+        #check & release the expired sessions
+        ret = self._update_check()
+        #get session
+        #do process within session
+        session = self._get_session(userid)
+        ret, c_datas =  session.process(c_buffer, size_in_short)
+        return ret, c_datas
+        pass
+    def _get_session(self, userid:ctypes.c_char_p) -> SessionControl:
+        if userid not in self._sessions:
+            #add new session & do init process
+            session = SessionControl(userid)
+            session._init()
+            self._sessions[userid] = session
+        return self._sessions[userid]
+    def _update_check(self) -> None:
+        now = time.time()*1000 #in ms
+        if now - self._last_update_time < self._update_interval:
+            return
+        self._last_update_time = now
+        for userid in self._sessions:
+            session = self._sessions[userid]
+            if session.is_expired(self._expired_duration):
+                session.release()
+                del self._sessions[userid]
+    def release(self, userid: int) -> None:
+        if userid in self._sessions:
+            self._sessions[userid].release()
+            del self._sessions[userid]
+        pass
+    def clear(self) -> None:
+        for userid in self._sessions:
+            self._sessions[userid].release()
+        self._sessions.clear()
+        pass

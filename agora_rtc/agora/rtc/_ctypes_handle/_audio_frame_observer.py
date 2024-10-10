@@ -5,6 +5,7 @@ import ctypes
 from ..audio_frame_observer import *
 import logging
 logger = logging.getLogger(__name__)
+from .audio_sessionctrl import *
 
 ON_RECORD_AUDIO_FRAME_CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int, AGORA_HANDLE, ctypes.c_char_p, ctypes.POINTER(AudioFrameInner))
 ON_PLAYBACK_AUDIO_FRAME_CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int, AGORA_HANDLE, ctypes.c_char_p, ctypes.POINTER(AudioFrameInner))
@@ -43,6 +44,7 @@ class AudioFrameObserverInner(ctypes.Structure):
         self.on_ear_monitoring_audio_frame = ON_EAR_MONITORING_AUDIO_FRAME_CALLBACK(self._on_ear_monitoring_audio_frame)
         self.on_playback_audio_frame_before_mixing = ON_PLAYBACK_AUDIO_FRAME_BEFORE_MIXING_CALLBACK(self._on_playback_audio_frame_before_mixing)
         self.on_get_audio_frame_position = ON_GET_AUDIO_FRAME_POSITION_CALLBACK(self._on_get_audio_frame_position)
+        self._session_ctrl_manager = SessionCtrlManager()
 
         # self.on_get_playback_audio_frame_param = ON_GET_PLAYBACK_AUDIO_FRAME_PARAM_CALLBACK(self._on_get_playback_audio_frame_param)
         # self.on_get_record_audio_frame_param = ON_GET_RECORD_AUDIO_FRAME_PARAM_CALLBACK(self._on_get_record_audio_frame_param)
@@ -73,8 +75,12 @@ class AudioFrameObserverInner(ctypes.Structure):
         ret = self.observer.on_ear_monitoring_audio_frame(self.local_user, audio_frame_inner)
         return ret
 
-    def _on_playback_audio_frame_before_mixing(self, local_user_handle, channel_id, user_id, audio_frame_inner: AudioFrameInner):
-        # logger.debug(f"AudioFrameObserverInner _on_playback_audio_frame_before_mixing: {local_user_handle}, {channel_id}, {user_id}, {audio_frame_inner}")
+    def _on_playback_audio_frame_before_mixing(self, local_user_handle, channel_id, user_id, audio_frame_inner):
+        #session control here !
+        ret, c_data = self._session_ctrl_manager.process_audio_frame(user_id, audio_frame_inner.contents.buffer, audio_frame_inner.contents.samples_per_channel)
+        
+        print("ret = ", ret)
+        #logger.debug(f"AudioFrameObserverInner _on_playback_audio_frame_before_mixing: {local_user_handle}, {channel_id}, {user_id}, {audio_frame_inner}")
         if channel_id is None:
             channel_id_str = ""
         else:
