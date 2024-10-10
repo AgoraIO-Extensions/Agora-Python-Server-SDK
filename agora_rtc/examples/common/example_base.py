@@ -60,7 +60,10 @@ class RTCBaseProcess():
 
         async with asyncio.TaskGroup() as tg:
             for i in range(int(sample_options.connection_number)):
-                channel_id = sample_options.channel_id + str(i+1)
+                if i == 0:
+                    channel_id = sample_options.channel_id
+                else:
+                    channel_id = sample_options.channel_id + str(i)
                 logger.info(f"------channel_id: {channel_id}, uid: {sample_options.user_id}")
                 tg.create_task(self.connect_and_release(agora_service, channel_id, sample_options))
 
