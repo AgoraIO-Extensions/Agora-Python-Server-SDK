@@ -36,6 +36,7 @@ class RTCBaseProcess():
         connection.unregister_observer()
         connection.disconnect()
         connection.release()
+        logger.info("connection release")
 
     def set_conn_config(self):
         pass
@@ -46,6 +47,8 @@ class RTCBaseProcess():
 
     def handle_signal(self):
         self._exit.set()
+
+    
     async def run(self, sample_options:ExampleOptions, log_path:str):
         loop = asyncio.get_event_loop()
         loop.add_signal_handler(signal.SIGINT, self.handle_signal)
@@ -58,6 +61,12 @@ class RTCBaseProcess():
         agora_service = AgoraService()
         agora_service.initialize(self._serv_config)
 
+        await self.create_connections(sample_options, agora_service)
+
+        agora_service.release()
+        logger.info("agora_service.release")
+
+    async def create_connections(self, sample_options:ExampleOptions, agora_service):
         async with asyncio.TaskGroup() as tg:
             for i in range(int(sample_options.connection_number)):
                 if i == 0:
@@ -66,7 +75,4 @@ class RTCBaseProcess():
                     channel_id = sample_options.channel_id + str(i)
                 logger.info(f"------channel_id: {channel_id}, uid: {sample_options.user_id}")
                 tg.create_task(self.connect_and_release(agora_service, channel_id, sample_options))
-
-        agora_service.release()
-        logger.info("agora_service.release")
 
