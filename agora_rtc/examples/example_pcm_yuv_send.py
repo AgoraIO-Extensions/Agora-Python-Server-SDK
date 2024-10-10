@@ -46,7 +46,6 @@ class RTCProcessIMPL(RTCBaseProcess):
         logger.info("send finish")
 
 if __name__ == '__main__':
-    
     sample_options = parse_args_example()
     rtc = RTCProcessIMPL()
     asyncio.run(rtc.run(sample_options, get_log_path_with_filename(sample_options.channel_id,os.path.splitext(__file__)[0])))

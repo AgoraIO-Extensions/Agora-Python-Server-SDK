@@ -8,7 +8,6 @@ from common.example_base import RTCBaseProcess
 from observer.audio_frame_observer import ExampleAudioFrameObserver
 from agora.rtc.agora_service import AgoraService, LocalUser, RTCConnection
 from agora.rtc.agora_base import *
-# from observer.local_user_observer import ExampleLocalUserObserver
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -36,7 +35,6 @@ class RTCProcessIMPL(RTCBaseProcess):
 
 
 if __name__ == '__main__':
-    
     sample_options = parse_args_example()
     rtc = RTCProcessIMPL()
     asyncio.run(rtc.run(sample_options, get_log_path_with_filename(sample_options.channel_id,os.path.splitext(__file__)[0])))

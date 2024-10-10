@@ -11,12 +11,9 @@ logger = logging.getLogger(__name__)
 from common.path_utils import get_log_path_with_filename 
 from common.parse_args import parse_args_example
 from observer.connection_observer import ExampleConnectionObserver
-# from observer.audio_frame_observer import ExampleAudioFrameObserver
 from observer.local_user_observer import ExampleLocalUserObserver
-from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, AudioSubscriptionOptions, RTCConnConfig
-from agora.rtc.audio_encoded_frame_sender import EncodedAudioFrame
+from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora.rtc.agora_base import *
-from common.audio_consumer import AudioStreamConsumer
 from agora.rtc.audio_pcm_data_sender import PcmAudioFrame
 
 # run this example

@@ -4,7 +4,6 @@ import os
 import asyncio
 from common.path_utils import get_log_path_with_filename 
 from common.parse_args import parse_args_example, ExampleOptions
-from agora_rtc.examples.common.push_audio_pcm_file import push_pcm_data_from_file
 from agora_rtc.examples.common.push_video_yuv_file import push_yuv_data_from_file
 from common.example_base import RTCBaseProcess
 from agora.rtc.agora_service import AgoraService, LocalUser, RTCConnection
@@ -50,7 +49,6 @@ class RTCProcessIMPL(RTCBaseProcess):
 
 
 if __name__ == '__main__':
-    
     sample_options = parse_args_example()
     rtc = RTCProcessIMPL()
     asyncio.run(rtc.run(sample_options, get_log_path_with_filename(sample_options.channel_id,os.path.splitext(__file__)[0])))
