@@ -68,5 +68,5 @@ class RTCBaseProcess():
                 tg.create_task(self.connect_and_release(agora_service, channel_id, sample_options))
 
         agora_service.release()
-        logger.info("agora_service.release-coro")
+        logger.info("agora_service.release")
 
