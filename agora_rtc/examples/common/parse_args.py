@@ -40,6 +40,9 @@ def parse_args():
     parser.add_argument("--bitrate", type=int, help="Target bitrate (bps) for encoding the YUV stream")
     parser.add_argument("--message", help="The message to be sent")
     parser.add_argument("--hours", default="0", help="The time to run")
+    #added by wei on 10/10
+    parser.add_argument("--mode", type=int, help="mode value",default=1)
+    parser.add_argument("--value", type=int, help="reversed value",default=0)
 
     return parser.parse_args()
 
@@ -66,5 +69,7 @@ def parse_args_example() -> ExampleOptions:
     sample_options.bitrate = args.bitrate
     sample_options.msg = args.message
     sample_options.hours = args.hours
+    sample_options.mode = args.mode
+    sample_options.value = args.value
 
     return sample_options

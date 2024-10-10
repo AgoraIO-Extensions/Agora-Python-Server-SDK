@@ -4,6 +4,7 @@
 import asyncio
 import signal
 import os
+import time
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -16,16 +17,21 @@ from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnCon
 from agora.rtc.agora_base import *
 from agora.rtc.audio_pcm_data_sender import PcmAudioFrame
 
-# run this example
-# python agora_rtc/examples/example_audio_pcm_loopback.py --appId=xxx --channelId=xxx
+# run this example： mode 0 or 1. 0: no delay, 1: with delay. default delay value =180ms
+# python agora_rtc/examples/example_audio_pcm_loopback.py --appId=xxx --channelId=xxx --mode=1
 sample_options = parse_args_example()
 logger.info(f"app_id: {sample_options.app_id}, channel_id: {sample_options.channel_id}, uid: {sample_options.user_id}")
 from agora.rtc.audio_frame_observer import IAudioFrameObserver, AudioFrame
 
 class ExampleAudioFrameObserver(IAudioFrameObserver):
-    def __init__(self, pcm_data_sender, loop) -> None:
+    def __init__(self, pcm_data_sender, loop, enable_delay_mode=True) -> None:
         self._loop = loop
         self._pcm_data_sender = pcm_data_sender
+        #for delay test to verify sdk's inner delay
+        self._last_push_time = time.time()*1000 #in ms
+        self._data = bytearray()
+        self._is_delay_pushed = False
+        self._enable_delay_mode = enable_delay_mode #default to true
 
     def on_record_audio_frame(self, agora_local_user ,channelId, frame):        
         logger.info(f"on_record_audio_frame")
@@ -39,16 +45,51 @@ class ExampleAudioFrameObserver(IAudioFrameObserver):
 
     def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, audio_frame:AudioFrame):
         # logger.info(f"on_playback_audio_frame_before_mixing:{threading.current_thread().ident}, {len(audio_frame.buffer)}")
-        frame = PcmAudioFrame()
-        frame.data = audio_frame.buffer
-        frame.timestamp = 0
-        frame.samples_per_channel = 160
-        frame.bytes_per_sample = 2
-        frame.number_of_channels = 1
-        frame.sample_rate = 16000        
-        self._loop.call_soon_threadsafe(
-            self._pcm_data_sender.send_audio_pcm_data,frame
-        )
+        #check do push immediately or not
+        now = time.time()*1000 #in ms
+        #check diff with last push
+        diff = now - self._last_push_time
+        if diff > 18*10: #180ms
+            self._is_delay_pushed = False
+
+        #if mode is false, then force delayed_push to true
+        if self._enable_delay_mode == False:
+            self._is_delay_pushed = True
+
+        #do op
+        if self._is_delay_pushed == False:
+          packs = len(self._data) // (320)
+          if packs < 18:
+              self._data += audio_frame.buffer
+          else: #push all data and set to TRUE
+            frame = PcmAudioFrame()
+            frame.data = self._data
+            frame.timestamp = 0
+            frame.samples_per_channel = 160*packs
+            frame.bytes_per_sample = 2
+            frame.number_of_channels = 1
+            frame.sample_rate = 16000        
+            self._loop.call_soon_threadsafe(
+                self._pcm_data_sender.send_audio_pcm_data,frame
+            )
+            self._is_delay_pushed = True
+            self._last_push_time = now
+            self._data.clear()
+            print("push chunk: =", packs)
+        else: #push immediately
+            #do immediately
+            frame = PcmAudioFrame()
+            frame.data = audio_frame.buffer
+            frame.timestamp = 0
+            frame.samples_per_channel = 160
+            frame.bytes_per_sample = 2
+            frame.number_of_channels = 1
+            frame.sample_rate = 16000        
+            self._loop.call_soon_threadsafe(
+                self._pcm_data_sender.send_audio_pcm_data,frame
+            )
+            self._last_push_time = now
+        #return value
         return 1
 
     def on_get_audio_frame_position(self, agora_local_user):
@@ -94,7 +135,8 @@ async def run_example():
     audio_track.set_enabled(1)
     local_user.publish_audio(audio_track)
 
-    audio_frame_observer = ExampleAudioFrameObserver(pcm_data_sender, loop)
+    print("register_audio_frame_observer:mode = ", sample_options.mode)
+    audio_frame_observer = ExampleAudioFrameObserver(pcm_data_sender, loop, True if sample_options.mode ==1 else False)
     local_user.register_audio_frame_observer(audio_frame_observer)
 
     await _exit
