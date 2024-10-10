@@ -4,8 +4,8 @@ import os
 import asyncio
 from common.path_utils import get_log_path_with_filename 
 from common.parse_args import parse_args_example, ExampleOptions
-from common.push_pcm_file import push_pcm_data_from_file
-from common.push_yuv_file import push_yuv_data_from_file
+from agora_rtc.examples.common.push_audio_pcm_file import push_pcm_data_from_file
+from agora_rtc.examples.common.push_video_yuv_file import push_yuv_data_from_file
 from common.example_base import RTCBaseProcess
 from agora.rtc.agora_service import AgoraService, LocalUser, RTCConnection
 from agora.rtc.agora_base import *

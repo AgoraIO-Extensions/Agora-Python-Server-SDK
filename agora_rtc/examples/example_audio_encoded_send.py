@@ -39,8 +39,6 @@ class RTCProcessIMPL(RTCBaseProcess):
     async def send(self,sample_options:ExampleOptions, audio_sender):
         audio_task = asyncio.create_task(push_encoded_audio_from_file(audio_sender, sample_options.audio_file, self._exit))
         await audio_task
-        # audio_task = asyncio.create_task(push_encoded_audio_from_file(audio_sender, sample_options.audio_file, self._exit))
-        # await push_encoded_audio_from_file(audio_sender, sample_options.audio_file, self._exit)
         logger.info("send finish")
 
 if __name__ == '__main__':
