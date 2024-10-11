@@ -35,15 +35,19 @@ class RTCProcessIMPL(RTCBaseProcess):
     async def create_connections(self, sample_options:ExampleOptions, agora_service):
         while not self._exit.is_set():
             self.conn_exit.clear()
-            async with asyncio.TaskGroup() as tg:
-                for i in range(int(sample_options.connection_number)):
-                    if i == 0:
-                        channel_id = sample_options.channel_id
-                    else:
-                        channel_id = sample_options.channel_id + str(i)
-                    logger.info(f"------channel_id: {channel_id}, uid: {sample_options.user_id}")
-                    tg.create_task(self.connect_and_release(agora_service, channel_id, sample_options))
-                self.timer =tg.create_task(self.my_conn_life_timer(5+random.uniform(0, 5)))
+            tasks = []
+            for i in range(int(sample_options.connection_number)):
+                if i == 0:
+                    channel_id = sample_options.channel_id
+                else:
+                    channel_id = sample_options.channel_id + str(i)
+                logger.info(f"------channel_id: {channel_id}, uid: {sample_options.user_id}")
+                tasks.append(asyncio.create_task(self.connect_and_release(agora_service, channel_id, sample_options)))
+            self.timer =asyncio.create_task(self.my_conn_life_timer(5+random.uniform(0, 5)))
+            tasks.append(self.timer)            
+            await asyncio.gather(*tasks, return_exceptions=True)
+            
+
     async def setup_in_connection(self,agora_service:AgoraService, connection:RTCConnection, local_user:LocalUser, sample_options:ExampleOptions):
         media_node_factory = agora_service.create_media_node_factory()
         local_user.set_playback_audio_frame_before_mixing_parameters(1, 16000)

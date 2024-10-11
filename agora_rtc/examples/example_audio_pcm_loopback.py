@@ -15,7 +15,7 @@ from observer.connection_observer import ExampleConnectionObserver
 from observer.local_user_observer import ExampleLocalUserObserver
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
 from agora.rtc.agora_base import *
-from agora.rtc.audio_pcm_data_sender import PcmAudioFrame
+from agora.rtc.audio_pcm_data_sender import PcmAudioFrame, AudioPcmDataSender
 
 # run this example： mode 0 or 1. 0: no delay, 1: with delay. default delay value =180ms
 # python agora_rtc/examples/example_audio_pcm_loopback.py --appId=xxx --channelId=xxx --mode=1
@@ -24,7 +24,7 @@ logger.info(f"app_id: {sample_options.app_id}, channel_id: {sample_options.chann
 from agora.rtc.audio_frame_observer import IAudioFrameObserver, AudioFrame
 
 class ExampleAudioFrameObserver(IAudioFrameObserver):
-    def __init__(self, pcm_data_sender, loop, enable_delay_mode=True) -> None:
+    def __init__(self, pcm_data_sender:AudioPcmDataSender, loop, enable_delay_mode=True) -> None:
         self._loop = loop
         self._pcm_data_sender = pcm_data_sender
         #for delay test to verify sdk's inner delay
@@ -96,6 +96,20 @@ class ExampleAudioFrameObserver(IAudioFrameObserver):
         logger.info(f"on_get_audio_frame_position")        
         return 0
 
+async def push_init_pcm(pcm_sender:AudioPcmDataSender):
+    packs = 18
+    data = bytearray(320*packs)
+    frame = PcmAudioFrame()
+    frame.data = data
+    frame.timestamp = 0
+    frame.samples_per_channel = 160*packs
+    frame.bytes_per_sample = 2
+    frame.number_of_channels = 1
+    frame.sample_rate = 16000   
+    pcm_sender.send_audio_pcm_data(frame)
+    await asyncio.sleep(0.20) 
+    logger.info("push_init_pcm done")
+
 async def run_example():
     loop = asyncio.get_event_loop()
     _exit = loop.create_future()
@@ -134,6 +148,8 @@ async def run_example():
     audio_track = agora_service.create_custom_audio_track_pcm(pcm_data_sender)
     audio_track.set_enabled(1)
     local_user.publish_audio(audio_track)
+
+    await push_init_pcm(pcm_data_sender)
 
     print("register_audio_frame_observer:mode = ", sample_options.mode)
     audio_frame_observer = ExampleAudioFrameObserver(pcm_data_sender, loop, True if sample_options.mode ==1 else False)
