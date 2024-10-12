@@ -64,7 +64,7 @@ class RTCBaseProcess():
         await self.create_connections(sample_options, agora_service)
 
         agora_service.release()
-        logger.info("agora_service.release")
+        logger.info("agora_service release")
 
     async def create_connections(self, sample_options:ExampleOptions, agora_service):
         tasks = []

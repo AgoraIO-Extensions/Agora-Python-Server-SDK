@@ -30,9 +30,12 @@ class ExampleAudioFrameObserver(IAudioFrameObserver):
         return 0
     
     def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, audio_frame:AudioFrame):
-        logger.info(f"on_playback_audio_frame_before_mixing, channelId={channelId}, uid={uid}, type={audio_frame.type}, samples_per_sec={audio_frame.samples_per_sec}, samples_per_channel={audio_frame.samples_per_channel}, bytes_per_sample={audio_frame.bytes_per_sample}, channels={audio_frame.channels}, len={len(audio_frame.buffer)}")
+        # logger.info(f"on_playback_audio_frame_before_mixing")
+        # logger.info(f"on_playback_audio_frame_before_mixing, channelId={channelId}, uid={uid}, type={audio_frame.type}, samples_per_sec={audio_frame.samples_per_sec}, samples_per_channel={audio_frame.samples_per_channel}, bytes_per_sample={audio_frame.bytes_per_sample}, channels={audio_frame.channels}, len={len(audio_frame.buffer)}")
+        # logger.info(f"on_playback_audio_frame_before_mixing, file_path={file_path}, len={len(audio_frame.buffer)}")        
+        logger.info(f"on_playback_audio_frame_before_mixing, far_field_flag={audio_frame.far_field_flag}, rms={audio_frame.rms}, voice_prob={audio_frame.voice_prob}, music_prob={audio_frame.music_prob} ,pitch={audio_frame.pitch}, len={len(audio_frame.buffer)}")
+
         file_path = os.path.join(log_folder, channelId + "_" + uid + '.pcm')
-        logger.info(f"on_playback_audio_frame_before_mixing, file_path={file_path}, len={len(audio_frame.buffer)}")
         with open(file_path, "ab") as f:
             f.write(audio_frame.buffer)
         return 1
