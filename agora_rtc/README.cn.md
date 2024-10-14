@@ -17,7 +17,7 @@
   - MacOS 13 及以上
 
 - Python 版本：
-  - Python 3.8 及以上
+  - Python 3.10 及以上
 
 
 # 使用Agora-Python-Server-SDK

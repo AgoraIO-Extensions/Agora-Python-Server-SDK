@@ -5,6 +5,7 @@ import asyncio
 import signal
 import os
 import time
+import datetime
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -107,8 +108,7 @@ async def push_init_pcm(pcm_sender:AudioPcmDataSender):
     frame.number_of_channels = 1
     frame.sample_rate = 16000   
     pcm_sender.send_audio_pcm_data(frame)
-    await asyncio.sleep(0.20) 
-    logger.info("push_init_pcm done")
+    await asyncio.sleep(1) 
 
 async def run_example():
     loop = asyncio.get_event_loop()
@@ -146,12 +146,12 @@ async def run_example():
 
     pcm_data_sender = media_node_factory.create_audio_pcm_data_sender()
     audio_track = agora_service.create_custom_audio_track_pcm(pcm_data_sender)
+    audio_track.set_send_delay_ms(0)
     audio_track.set_enabled(1)
     local_user.publish_audio(audio_track)
-
-    await push_init_pcm(pcm_data_sender)
-
-    print("register_audio_frame_observer:mode = ", sample_options.mode)
+    logger.info(f"push_init_pcm: before time:{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]}")
+    # await push_init_pcm(pcm_data_sender)
+    logger.info(f"rpush_init_pcm: after time:{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]}")
     audio_frame_observer = ExampleAudioFrameObserver(pcm_data_sender, loop, True if sample_options.mode ==1 else False)
     local_user.register_audio_frame_observer(audio_frame_observer)
 

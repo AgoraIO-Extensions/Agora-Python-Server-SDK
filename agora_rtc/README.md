@@ -17,7 +17,7 @@
   - MacOS 13 and above
 
 - Python version:
-  - Python 3.8 and above
+  - Python 3.10 and above
 
 # Using Agora-Python-Server-SDK
 ```
