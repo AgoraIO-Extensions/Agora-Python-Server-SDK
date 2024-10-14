@@ -18,12 +18,15 @@ class ExampleOptions:
         self.width = None
         self.height = None
         self.bitrate = None
+        self.save_to_disk = 0
         self.hours = 0
+        self.mode = 1
+        self.value = 0
         self.msg = "hello agora python sdk"
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Agora SDK Example")
+    parser = argparse.ArgumentParser(description="Agora Python SDK Example")
     parser.add_argument("--appId", required=True, help="The appid for authentication / must")
     parser.add_argument("--token", help="The token for authentication ")
     parser.add_argument("--channelId", required=True, help="Channel Id / must")
@@ -40,6 +43,7 @@ def parse_args():
     parser.add_argument("--bitrate", type=int, help="Target bitrate (bps) for encoding the YUV stream")
     parser.add_argument("--message", help="The message to be sent")
     parser.add_argument("--hours", default="0", help="The time to run")
+    parser.add_argument("--saveToDisk", default=0, help="The time to run")
     #added by wei on 10/10
     parser.add_argument("--mode", type=int, help="mode value",default=1)
     parser.add_argument("--value", type=int, help="reversed value",default=0)
@@ -69,6 +73,7 @@ def parse_args_example() -> ExampleOptions:
     sample_options.bitrate = args.bitrate
     sample_options.msg = args.message
     sample_options.hours = args.hours
+    sample_options.save_to_disk = args.saveToDisk
     sample_options.mode = args.mode
     sample_options.value = args.value
 

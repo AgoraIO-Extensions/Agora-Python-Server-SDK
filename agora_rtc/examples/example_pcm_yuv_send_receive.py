@@ -25,12 +25,12 @@ class RTCProcessIMPL(RTCBaseProcess):
     async def setup_in_connection(self,agora_service:AgoraService, connection:RTCConnection, local_user:LocalUser, sample_options:ExampleOptions):
         media_node_factory = agora_service.create_media_node_factory()
         local_user.set_playback_audio_frame_before_mixing_parameters(1, 16000)
-        audio_frame_observer = ExampleAudioFrameObserver()
+        audio_frame_observer = ExampleAudioFrameObserver(save_to_disk=sample_options.save_to_disk)
         ret = local_user.register_audio_frame_observer(audio_frame_observer)
         if ret < 0:
             logger.error(f"register_audio_frame_observer failed")
             return
-        video_frame_observer = ExampleVideoFrameObserver()
+        video_frame_observer = ExampleVideoFrameObserver(save_to_disk=sample_options.save_to_disk)
         local_user.register_video_frame_observer(video_frame_observer)
 
         pcm_data_sender = media_node_factory.create_audio_pcm_data_sender()

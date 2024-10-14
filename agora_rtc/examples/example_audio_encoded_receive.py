@@ -20,7 +20,7 @@ class RTCProcessIMPL(RTCBaseProcess):
     async def setup_in_connection(self,agora_service:AgoraService, connection:RTCConnection, local_user:LocalUser, sample_options:ExampleOptions):
 
         local_user.set_playback_audio_frame_before_mixing_parameters(1, 48000)
-        audio_frame_observer = ExampleAudioFrameObserver()
+        audio_frame_observer = ExampleAudioFrameObserver(save_to_disk=sample_options.save_to_disk)
         ret = local_user.register_audio_frame_observer(audio_frame_observer)
         if ret < 0:
             logger.error(f"register_audio_frame_observer failed")

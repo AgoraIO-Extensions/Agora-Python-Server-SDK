@@ -19,7 +19,7 @@ class RTCProcessIMPL(RTCBaseProcess):
     def __init__(self):
         super().__init__()
     async def setup_in_connection(self,agora_service:AgoraService, connection:RTCConnection, local_user:LocalUser, sample_options:ExampleOptions):
-        video_frame_observer = ExampleVideoFrameObserver()
+        video_frame_observer = ExampleVideoFrameObserver(save_to_disk=sample_options.save_to_disk)
         ret = local_user.register_video_frame_observer(video_frame_observer)
         if ret < 0:
             logger.error(f"register_video_encoded_frame_observer failed")

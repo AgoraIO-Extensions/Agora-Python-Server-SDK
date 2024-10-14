@@ -24,7 +24,7 @@ class RTCProcessIMPL(RTCBaseProcess):
                     encodedFrameOnly = 1
         )
         local_user.subscribe_all_video(video_subscription_options)
-        video_encoded_frame_observer = ExampleVideoEncodedFrameObserver()
+        video_encoded_frame_observer = ExampleVideoEncodedFrameObserver(save_to_disk=sample_options.save_to_disk)
         ret = local_user.register_video_encoded_frame_observer(video_encoded_frame_observer)
         if ret < 0:
             logger.error(f"register_video_encoded_frame_observer failed")

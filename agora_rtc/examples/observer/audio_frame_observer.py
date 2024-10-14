@@ -12,8 +12,9 @@ filename, _ = os.path.splitext(os.path.basename(__file__))
 log_folder = os.path.join(source_dir, 'logs', filename ,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S"))
 os.makedirs(log_folder, exist_ok=True)
 class ExampleAudioFrameObserver(IAudioFrameObserver):
-    def __init__(self):
+    def __init__(self, save_to_disk=0):
         super(ExampleAudioFrameObserver, self).__init__()
+        self._save_to_disk=save_to_disk
 
     # def on_get_playback_audio_frame_param(self, agora_local_user):
     #     audio_params_instance = AudioParams()
@@ -34,10 +35,11 @@ class ExampleAudioFrameObserver(IAudioFrameObserver):
         # logger.info(f"on_playback_audio_frame_before_mixing, channelId={channelId}, uid={uid}, type={audio_frame.type}, samples_per_sec={audio_frame.samples_per_sec}, samples_per_channel={audio_frame.samples_per_channel}, bytes_per_sample={audio_frame.bytes_per_sample}, channels={audio_frame.channels}, len={len(audio_frame.buffer)}")
         # logger.info(f"on_playback_audio_frame_before_mixing, file_path={file_path}, len={len(audio_frame.buffer)}")        
         logger.info(f"on_playback_audio_frame_before_mixing, far_field_flag={audio_frame.far_field_flag}, rms={audio_frame.rms}, voice_prob={audio_frame.voice_prob}, music_prob={audio_frame.music_prob} ,pitch={audio_frame.pitch}, len={len(audio_frame.buffer)}")
-
-        file_path = os.path.join(log_folder, channelId + "_" + uid + '.pcm')
-        with open(file_path, "ab") as f:
-            f.write(audio_frame.buffer)
+        if self._save_to_disk:
+            file_path = os.path.join(log_folder, channelId + "_" + uid + '.pcm')
+            logger.info(f"on_playback_audio_frame_before_mixing, file_path={file_path}, len={len(audio_frame.buffer)}")
+            with open(file_path, "ab") as f:
+                f.write(audio_frame.buffer)
         return 1
     
 

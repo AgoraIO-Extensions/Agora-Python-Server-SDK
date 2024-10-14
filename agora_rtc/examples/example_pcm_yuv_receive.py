@@ -22,11 +22,11 @@ class RTCProcessIMPL(RTCBaseProcess):
         logger.info(f"setup_receiver --- app_id: {sample_options.app_id}, channel_id: {sample_options.channel_id}, uid: {sample_options.user_id}")
 
         local_user.set_playback_audio_frame_before_mixing_parameters(1, 16000)
-        audio_frame_observer = ExampleAudioFrameObserver()
+        audio_frame_observer = ExampleAudioFrameObserver(save_to_disk=sample_options.save_to_disk)
         ret = local_user.register_audio_frame_observer(audio_frame_observer)
         logger.info(f"register_audio_frame_observer ret:{ret}")
 
-        video_frame_observer = ExampleVideoFrameObserver()
+        video_frame_observer = ExampleVideoFrameObserver(save_to_disk=sample_options.save_to_disk)
         local_user.register_video_frame_observer(video_frame_observer)
 
         await self._exit.wait()
