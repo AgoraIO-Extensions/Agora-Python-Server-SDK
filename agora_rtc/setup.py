@@ -20,7 +20,7 @@ class CustomInstallCommand(install):
         sdk_dir = os.path.join(agora_service_path, "agora_sdk")
         zip_path = os.path.join(agora_service_path, "agora_rtc_sdk.zip")
 
-        url = "https://download.agora.io/sdk/release/agora_rtc_sdk_linux_v4.4.30-20241003_233327-366740.zip"
+        url = "https://download.agora.io/sdk/release/agora_rtc_sdk-linux-gnu-v4.4.30-20241012_114642-379681.zip"
         if sys.platform == 'darwin':
             url = "https://download.agora.io/sdk/release/agora_rtc_sdk_mac_v4.4.30_22172_FULL_20241004_0009_366745.zip"
         

@@ -24,9 +24,9 @@ def _check_download_and_extract_sdk():
     sdk_dir = os.path.join(agora_service_path, "agora_sdk")
     zip_path = os.path.join(agora_service_path, "agora_rtc_sdk.zip")
 
-    url = "https://download.agora.io/sdk/release/agora_rtc_sdk_linux_v4.4.30-20241003_233327-366740.zip"
+    url = "https://download.agora.io/sdk/release/agora_rtc_sdk-linux-gnu-v4.4.30-20241012_114642-379681.zip"
     libagora_rtc_sdk_path = os.path.join(sdk_dir, "libagora_rtc_sdk.so")
-    rtc_md5 = "f3d5ac80cd56547b0a784f7489f0aca6"
+    rtc_md5 = "cf2705347bc8c3eae4bea98eab3dbf7e"
     if sys.platform == 'darwin':
         url = "https://download.agora.io/sdk/release/agora_rtc_sdk_mac_v4.4.30_22172_FULL_20241004_0009_366745.zip"
         libagora_rtc_sdk_path = os.path.join(sdk_dir, "libAgoraRtcKit.dylib")
