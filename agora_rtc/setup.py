@@ -22,7 +22,7 @@ class CustomInstallCommand(install):
 
         url = "https://download.agora.io/sdk/release/agora_rtc_sdk-linux-gnu-v4.4.30-20241012_114642-379681.zip"
         if sys.platform == 'darwin':
-            url = "https://download.agora.io/sdk/release/agora_rtc_sdk_mac_v4.4.30_22172_FULL_20241004_0009_366745.zip"
+            url = "https://download.agora.io/sdk/release/agora_rtc_sdk_mac_v4.4.30_22304_FULL_20241015_1616_384496.zip"
         
         if os.path.exists(sdk_dir):
             os.system(f"rm -rf {sdk_dir}")        
