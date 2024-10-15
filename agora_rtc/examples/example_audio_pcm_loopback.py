@@ -112,7 +112,7 @@ async def run_example():
 
     pcm_data_sender = media_node_factory.create_audio_pcm_data_sender()
     audio_track = agora_service.create_custom_audio_track_pcm(pcm_data_sender)
-    audio_track.set_send_delay_ms(0)
+    audio_track.set_send_delay_ms(10)
     audio_track.set_enabled(1)
     local_user.publish_audio(audio_track)
     # logger.info(f"push_init_pcm: before time:{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]}")

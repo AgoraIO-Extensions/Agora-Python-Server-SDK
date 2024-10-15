@@ -198,3 +198,4 @@ agora_rtc/examples/example.py
 run.sh
 
 tmp_*.py
+agora_cache.db
