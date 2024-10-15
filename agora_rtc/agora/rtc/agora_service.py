@@ -127,6 +127,9 @@ agora_service_enable_extension = agora_lib.agora_service_enable_extension
 agora_service_enable_extension.restype = AGORA_API_C_INT
 agora_service_enable_extension.argtypes = [AGORA_HANDLE, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_uint]
 
+agora_service_get_agora_parameter = agora_lib.agora_service_get_agora_parameter
+agora_service_get_agora_parameter.restype = AGORA_HANDLE
+agora_service_get_agora_parameter.argtypes = [AGORA_HANDLE]
 
 class SenderOptions(ctypes.Structure):
     _fields_ = [
@@ -168,6 +171,8 @@ class AgoraService:
         ctrak = ctypes.c_char_p(None)
         #agora_service_enable_extension(self.service_handle, "agora.builtin", "agora_audio_label_generator", None, 1)
         agora_service_enable_extension(self.service_handle, cprovider, cgenerator, ctrak, 1)
+        agora_parameter = self.get_agora_parameter()
+        agora_parameter.set_int("rtc.set_app_type", 18)
 
         if config.log_path:
             log_size = 512 * 1024
@@ -198,6 +203,12 @@ class AgoraService:
             return None
         return MediaNodeFactory(media_node_handle)
     
+
+    def get_agora_parameter(self):
+        agora_parameter = agora_service_get_agora_parameter(self.service_handle)
+        if not agora_parameter:
+            return None
+        return AgoraParameter(agora_parameter)
 
     def create_rtc_connection(self, con_config: RTCConnConfig):       
         if not self.inited:
