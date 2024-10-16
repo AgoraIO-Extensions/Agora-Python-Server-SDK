@@ -30,14 +30,14 @@ class RTCBaseProcess():
         local_user.set_audio_scenario(AudioScenarioType.AUDIO_SCENARIO_CHORUS)
         local_user_observer = ExampleLocalUserObserver()
         local_user.register_local_user_observer(local_user_observer)
-
-        await self.setup_in_connection(agora_service, connection, local_user ,sample_options)        
-
-        local_user.unregister_local_user_observer()
-        connection.unregister_observer()
-        connection.disconnect()
-        connection.release()
-        logger.info("connection release")
+        try:
+            await self.setup_in_connection(agora_service, connection, local_user ,sample_options)        
+        finally:
+            local_user.unregister_local_user_observer()
+            connection.unregister_observer()
+            connection.disconnect()
+            connection.release()
+            logger.info("connection release")
 
     def set_conn_config(self):
         pass
