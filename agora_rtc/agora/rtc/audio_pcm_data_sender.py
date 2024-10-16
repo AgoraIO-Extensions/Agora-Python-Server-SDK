@@ -28,7 +28,10 @@ class AudioPcmDataSender:
     def send_audio_pcm_data(self, frame:PcmAudioFrame):
         c_data = (ctypes.c_char * len(frame.data)).from_buffer(frame.data)
         c_data_ptr = ctypes.cast(c_data, ctypes.POINTER(ctypes.c_void_p))
-        return agora_audio_pcm_data_sender_send(self.sender_handle, c_data_ptr, frame.timestamp, frame.samples_per_channel, frame.bytes_per_sample, frame.number_of_channels, frame.sample_rate)
+        ret = agora_audio_pcm_data_sender_send(self.sender_handle, c_data_ptr, frame.timestamp, frame.samples_per_channel, frame.bytes_per_sample, frame.number_of_channels, frame.sample_rate)
+        frame.data = None       
+        frame = None 
+        return ret
     
     def release(self):
         agora_audio_pcm_data_sender_destroy(self.sender_handle)

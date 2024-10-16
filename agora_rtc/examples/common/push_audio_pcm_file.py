@@ -10,9 +10,9 @@ async def push_pcm_data_from_file(sample_rate, num_of_channels , pcm_data_sender
         pcm_sendinterval = 0.1
         pacer_pcm = Pacer(pcm_sendinterval)
         pcm_count = 0
+        send_size = int(sample_rate*num_of_channels*pcm_sendinterval*2)
+        frame_buf = bytearray(send_size)            
         while not _exit.is_set():
-            send_size = int(sample_rate*num_of_channels*pcm_sendinterval*2)
-            frame_buf = bytearray(send_size)            
             success = audio_file.readinto(frame_buf)
             if not success:
                 audio_file.seek(0)
@@ -28,3 +28,4 @@ async def push_pcm_data_from_file(sample_rate, num_of_channels , pcm_data_sender
             pcm_count += 1
             logger.info(f"send pcm: count,ret={pcm_count}, {ret}, {send_size}, {pcm_sendinterval}")
             await pacer_pcm.apace_interval(0.1)
+        frame_buf = None
