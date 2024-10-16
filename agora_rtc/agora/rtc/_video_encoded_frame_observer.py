@@ -52,5 +52,5 @@ class VideoEncodedFrameObserverInner(ctypes.Structure):
         # logger.debug("VideoEncodedFrameObserverInnerCB on_encoded_video_frame")
         img_buffer = ctypes.string_at(image_buffer, length)
         vefi = video_encoded_frame_info.contents._to_encoded_video_frame_info()
-        self.video_encoded_frame_observer.on_encoded_video_frame(agora_video_encoded_frame_observer, uid, img_buffer, length, vefi)
+        self.video_encoded_frame_observer.on_encoded_video_frame(uid, img_buffer, length, vefi)
         return 1

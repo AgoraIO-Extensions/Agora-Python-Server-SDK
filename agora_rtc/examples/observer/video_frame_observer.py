@@ -16,7 +16,7 @@ class ExampleVideoFrameObserver(IVideoFrameObserver):
         super(ExampleVideoFrameObserver, self).__init__()
         self._save_to_disk = save_to_disk
 
-    def on_frame(self, video_frame_observer, channel_id, remote_uid, frame:VideoFrame):
+    def on_frame(self, channel_id, remote_uid, frame:VideoFrame):
         logger.info(f"on_frame, channel_id={channel_id}, remote_uid={remote_uid}, width={frame.width}, height={frame.height}, y_stride={frame.y_stride}, u_stride={frame.u_stride}, v_stride={frame.v_stride}, len_y={len(frame.y_buffer)}, len_u={len(frame.u_buffer)}, len_v={len(frame.v_buffer)}")
         
         if self._save_to_disk:

@@ -14,7 +14,6 @@ class EncodedVideoFrameInfo():
         self.stream_type = stream_type
 
 class  IVideoEncodedFrameObserver():
-
-    def on_encoded_video_frame(self, agora_video_encoded_frame_observer, uid, image_buffer, length, video_encoded_frame_info:EncodedVideoFrameInfo):
+    def on_encoded_video_frame(self, uid, image_buffer, length, video_encoded_frame_info:EncodedVideoFrameInfo):
         pass
     

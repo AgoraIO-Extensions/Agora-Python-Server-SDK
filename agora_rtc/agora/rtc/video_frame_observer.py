@@ -40,8 +40,5 @@ class VideoFrame():
         self.alpha_buffer = alpha_buffer
 
 class IVideoFrameObserver():
-    def on_frame(self, agora_handle, channel_id, user_id, video_frame:VideoFrame):
-        pass
-
-    def get_rotation_applied(self) -> bool:
+    def on_frame(self, channel_id, remote_uid, frame:VideoFrame):
         pass
