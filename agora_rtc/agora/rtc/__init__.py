@@ -52,6 +52,7 @@ def _check_download_and_extract_sdk():
 
     if os.path.exists(zip_path):
         os.remove(zip_path)
+    logger.error("download done, continue...")
 
 
 _check_download_and_extract_sdk()
