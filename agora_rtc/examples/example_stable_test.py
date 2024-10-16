@@ -13,8 +13,9 @@ from observer.video_frame_observer import ExampleVideoFrameObserver
 from agora.rtc.agora_service import AgoraService, LocalUser, RTCConnection
 from agora.rtc.agora_base import *
 import logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
+import gc
 
 # run this example
 # python agora_rtc/examples/example_send_pcm_yuv.py --appId=xxx --channelId=xxx --videoFile=./test_data/103_RaceHorses_416x240p30_300.yuv --width=416 --height=240 --fps=30 --audioFile=./test_data/demo.pcm --sampleRate=16000 --numOfChannels=1
@@ -46,6 +47,10 @@ class RTCProcessIMPL(RTCBaseProcess):
             self.timer =asyncio.create_task(self.my_conn_life_timer(5+random.uniform(0, 5)))
             tasks.append(self.timer)            
             await asyncio.gather(*tasks, return_exceptions=True)
+            gc.collect()
+            print(gc.isenabled())
+
+
             
 
     async def setup_in_connection(self,agora_service:AgoraService, connection:RTCConnection, local_user:LocalUser, sample_options:ExampleOptions):

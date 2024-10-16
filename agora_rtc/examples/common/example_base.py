@@ -33,6 +33,7 @@ class RTCBaseProcess():
 
         await self.setup_in_connection(agora_service, connection, local_user ,sample_options)        
 
+        local_user.unregister_local_user_observer()
         connection.unregister_observer()
         connection.disconnect()
         connection.release()
