@@ -20,7 +20,7 @@ class RTCProcessIMPL(RTCBaseProcess):
         super().__init__()
     async def setup_in_connection(self,agora_service:AgoraService, connection:RTCConnection, local_user:LocalUser, sample_options:ExampleOptions):
         video_subscription_options = VideoSubscriptionOptions(
-                    type = VIDEO_STREAM_TYPE.VIDEO_STREAM_HIGH,
+                    type = VideoStreamType.VIDEO_STREAM_HIGH,
                     encodedFrameOnly = 1
         )
         local_user.subscribe_all_video(video_subscription_options)

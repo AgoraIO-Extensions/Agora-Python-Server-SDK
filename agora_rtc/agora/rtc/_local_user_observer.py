@@ -1,52 +1,11 @@
 import ctypes
 from .agora_base import *
 from .local_user import *
+from ._ctypes_data import VideoTrackInfoInner
 from .remote_audio_track import RemoteAudioTrack, RemoteAudioTrackStats
 from .remote_video_track import RemoteVideoTrack, RemoteVideoTrackStats
 import logging
 logger = logging.getLogger(__name__)
-
-class VideoTrackInfoInner(ctypes.Structure):
-    _fields_ = [
-        ("is_local", ctypes.c_int),
-        ("owner_uid", uid_t),
-        ("track_id", track_id_t),
-        ("channel_id", ctypes.c_char_p),
-        ("stream_type", ctypes.c_int),
-        ("codec_type", ctypes.c_int),
-        ("encoded_frame_only", ctypes.c_int),
-        ("source_type", ctypes.c_int),
-        ("observation_position", ctypes.c_uint32)
-    ]
-    def _convert_to_video_track_info(self):
-        
-        track_info = VideoTrackInfo()
-        track_info.is_local = self.is_local
-        track_info.channel_id = self.channel_id.decode('utf-8') if self.channel_id else ''
-        track_info.codec_type = self.codec_type
-        track_info.track_id = self.track_id
-        track_info.stream_type = self.stream_type
-        track_info.source_type = self.source_type
-        track_info.observation_position = self.observation_position
-        track_info.track_id = self.track_id
-        track_info.owner_uid = self.owner_uid
-        return track_info
-
-class AudioVolumeInfo(ctypes.Structure):
-    _fields_ = [
-        ("user_id", ctypes.c_uint),
-        ("volume", ctypes.c_uint),
-        ("vad", ctypes.c_uint),
-        ("voicePitch", ctypes.c_double)
-    ]
-
-class RemoteVideoStreamInfo(ctypes.Structure):
-    _fields_ = [
-        ("uid", ctypes.c_uint),
-        ("stream_type", ctypes.c_uint8),
-        ("current_downscale_level", ctypes.c_uint8),
-        ("total_downscale_level_counts", ctypes.c_uint8)
-    ]
 
 ON_AUDIO_TRACK_PUBLISH_SUCCESS_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, AGORA_HANDLE)
 ON_AUDIO_TRACK_PUBLISH_START_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, AGORA_HANDLE)

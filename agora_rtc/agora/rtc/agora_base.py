@@ -1,6 +1,8 @@
 import ctypes
-from enum import Enum
+from enum import IntEnum
+from dataclasses import dataclass
 from . import agora_lib
+
 
 AGORA_HANDLE = ctypes.c_void_p
 AGORA_API_C_INT = ctypes.c_int
@@ -11,314 +13,23 @@ uid_t = ctypes.c_uint
 track_id_t = ctypes.c_uint
 k_max_codec_name_len = 100
 
-class LastmileProbeOneWayResult(ctypes.Structure):
-    _fields_ = [
-        ("packet_loss_rate", ctypes.c_uint),
-        ("jitter", ctypes.c_uint),
-        ("available_bandwidth", ctypes.c_uint)
-    ]
 
-class LastmileProbeResult(ctypes.Structure):
-    _fields_ = [
-        ("state", ctypes.c_int),
-        ("uplink_report", LastmileProbeOneWayResult),
-        ("downlink_report", LastmileProbeOneWayResult),
-        ("rtt", ctypes.c_uint)
-    ]
-
-class RTCStats(ctypes.Structure):
-    _fields_ = [
-        ("connection_id", ctypes.c_uint),
-        ("duration", ctypes.c_uint),
-        ("tx_bytes", ctypes.c_uint),
-        ("rx_bytes", ctypes.c_uint),
-        ("tx_audio_bytes", ctypes.c_uint),
-        ("tx_video_bytes", ctypes.c_uint),
-        ("rx_audio_bytes", ctypes.c_uint),
-        ("rx_video_bytes", ctypes.c_uint),
-        ("tx_k_bit_rate", ctypes.c_ushort),
-        ("rx_k_bit_rate", ctypes.c_ushort),
-        ("rx_audio_k_bit_rate", ctypes.c_ushort),
-        ("tx_audio_k_bit_rate", ctypes.c_ushort),
-        ("rx_video_k_bit_rate", ctypes.c_ushort),
-        ("tx_video_k_bit_rate", ctypes.c_ushort),
-        ("lastmile_delay", ctypes.c_ushort),
-        ("user_count", ctypes.c_uint),
-        ("cpu_app_usage", ctypes.c_double),
-        ("cpu_total_usage", ctypes.c_double),
-        ("gateway_rtt", ctypes.c_int),
-        ("memory_app_usage_ratio", ctypes.c_double),
-        ("memory_total_usage_ratio", ctypes.c_double),
-        ("memory_app_usage_in_kbytes", ctypes.c_int),
-        ("connect_time_ms", ctypes.c_int),
-        ("first_audio_packet_duration", ctypes.c_int),
-        ("first_video_packet_duration", ctypes.c_int),
-        ("first_video_key_frame_packet_duration", ctypes.c_int),
-        ("packets_before_first_key_frame_packet", ctypes.c_int),
-        ("first_audio_packet_duration_after_unmute", ctypes.c_int),
-        ("first_video_packet_duration_after_unmute", ctypes.c_int),
-        ("first_video_key_frame_packet_duration_after_unmute", ctypes.c_int),
-        ("first_video_key_frame_decoded_duration_after_unmute", ctypes.c_int),
-        ("first_video_key_frame_rendered_duration_after_unmute", ctypes.c_int),
-        ("tx_packet_loss_rate", ctypes.c_int),
-        ("rx_packet_loss_rate", ctypes.c_int)
-    ]    
-
-class VIDEO_STREAM_TYPE(ctypes.c_int):
-    VIDEO_STREAM_HIGH = 0
-    VIDEO_STREAM_LOW = 1
-
-class VideoSubscriptionOptions(ctypes.Structure):
-    _fields_ = [
-        ("type", ctypes.c_int),
-        ("encodedFrameOnly", ctypes.c_bool)
-    ]
-    def __init__(self, type = VIDEO_STREAM_TYPE.VIDEO_STREAM_HIGH, encodedFrameOnly = False) -> None:
-        self.type = type
-        self.encodedFrameOnly = encodedFrameOnly
-        
-
-class AudioPcmDataInfo(ctypes.Structure):
-    _fields_ = [
-        ("samplesPerChannel", ctypes.c_size_t),
-        ("channelNum", ctypes.c_int16),
-        ("samplesOut", ctypes.c_size_t),
-        ("elapsedTimeMs", ctypes.c_int64),
-        ("ntpTimeMs", ctypes.c_int64)
-    ]
-
-    def __init__(self):
-        self.samplesPerChannel = 0
-        self.channelNum = 0
-        self.samplesOut = 0
-        self.elapsedTimeMs = 0
-        self.ntpTimeMs = 0
-
-
-class LocalAudioStats(ctypes.Structure):
-    _fields_ = [
-        ("num_channels", ctypes.c_int),
-        ("sent_sample_rate", ctypes.c_int),
-        ("sent_bitrate", ctypes.c_int),
-        ("internal_codec", ctypes.c_int),
-        ("voice_pitch", ctypes.c_double)
-    ]
-
-
-class AudioProfileType(ctypes.c_int):
-    AUDIO_PROFILE_DEFAULT = 0
-    AUDIO_PROFILE_SPEECH_STANDARD = 1
-    AUDIO_PROFILE_MUSIC_STANDARD = 2
-    AUDIO_PROFILE_MUSIC_STANDARD_STEREO = 3
-    AUDIO_PROFILE_MUSIC_HIGH_QUALITY = 4
-    AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO = 5
-    AUDIO_PROFILE_IOT = 6
-    AUDIO_PROFILE_NUM = 7
-
-class AudioEncoderConfiguration(ctypes.Structure):
-    _fields_ = [
-        ("audioProfile", AudioProfileType)
-    ]
-
-    def __init__(self):
-        self.audioProfile = AudioProfileType.AUDIO_PROFILE_DEFAULT
-
-
-
-class VideoDimensions(ctypes.Structure):
-    _fields_ = [
-        ("width", ctypes.c_int),
-        ("height", ctypes.c_int)
-    ]
-
-class VideoEncoderConfig(ctypes.Structure):
-    _fields_ = [
-        ("codec_type", ctypes.c_int),
-        ("dimensions", VideoDimensions),
-        ("frame_rate", ctypes.c_int),
-        ("bitrate", ctypes.c_int),
-        ("min_bitrate", ctypes.c_int),
-        ("orientation_mode", ctypes.c_int),
-        ("degradation_preference", ctypes.c_int),
-        ("mirror_mode", ctypes.c_int)
-    ]    
-
-
-class LocalVideoTrackStats(ctypes.Structure):
-    _fields_ = [
-        ("number_of_streams", ctypes.c_uint64),
-        ("bytes_major_stream", ctypes.c_uint64),
-        ("bytes_minor_stream", ctypes.c_uint64),
-        ("frames_encoded", ctypes.c_uint32),
-        ("ssrc_major_stream", ctypes.c_uint32),
-        ("ssrc_minor_stream", ctypes.c_uint32),
-        ("capture_frame_rate", ctypes.c_int),
-        ("regulated_capture_frame_rate", ctypes.c_int),
-        ("input_frame_rate", ctypes.c_int),
-        ("encode_frame_rate", ctypes.c_int),
-        ("render_frame_rate", ctypes.c_int),
-        ("target_media_bitrate_bps", ctypes.c_int),
-        ("media_bitrate_bps", ctypes.c_int),
-        ("total_bitrate_bps", ctypes.c_int),
-        ("capture_width", ctypes.c_int),
-        ("capture_height", ctypes.c_int),
-        ("regulated_capture_width", ctypes.c_int),
-        ("regulated_capture_height", ctypes.c_int),
-        ("width", ctypes.c_int),
-        ("height", ctypes.c_int),
-        ("encoder_type", ctypes.c_uint32),
-        ("uplink_cost_time_ms", ctypes.c_uint32),
-        ("quality_adapt_indication", ctypes.c_int)
-    ]
-
-
-class SimulcastStreamConfig(ctypes.Structure):
-    _fields_ = [
-        ("dimensions", VideoDimensions),
-        ("bitrate", ctypes.c_int),
-        ("framerate", ctypes.c_int)
-    ]
-
-
-class AnaStats(ctypes.Structure):
-    _fields_ = [
-        ("bitrate_action_counter", ctypes.c_uint32),
-        ("channel_action_counter", ctypes.c_uint32),
-        ("dtx_action_counter", ctypes.c_uint32),
-        ("fec_action_counter", ctypes.c_uint32),
-        ("frame_length_increase_counter", ctypes.c_uint32),
-        ("frame_length_decrease_counter", ctypes.c_uint32),
-        ("uplink_packet_loss_fraction", ctypes.c_float)
-    ]
-
-class AudioProcessingStats(ctypes.Structure):
-    _fields_ = [
-        ("echo_return_loss", ctypes.c_double),
-        ("echo_return_loss_enhancement", ctypes.c_double),
-        ("divergent_filter_fraction", ctypes.c_double),
-        ("delay_median_ms", ctypes.c_int32),
-        ("delay_standard_deviation_ms", ctypes.c_int32),
-        ("residual_echo_likelihood", ctypes.c_double),
-        ("residual_echo_likelihood_recent_max", ctypes.c_double),
-        ("delay_ms", ctypes.c_int32)
-    ]
-
-class LocalAudioDetailedStatsInner(ctypes.Structure):
-    _fields_ = [
-        ("local_ssrc", ctypes.c_uint32),
-        ("bytes_sent", ctypes.c_int64),
-        ("packets_sent", ctypes.c_int32),
-        ("packets_lost", ctypes.c_int32),
-        ("fraction_lost", ctypes.c_float),
-        ("codec_name", ctypes.c_char * k_max_codec_name_len),
-        ("codec_payload_type", ctypes.c_int),
-        ("ext_seqnum", ctypes.c_int32),
-        ("jitter_ms", ctypes.c_int32),
-        ("rtt_ms", ctypes.c_int64),
-        ("audio_level", ctypes.c_int32),
-        ("total_input_energy", ctypes.c_double),
-        ("total_input_duration", ctypes.c_double),
-        ("typing_noise_detected", ctypes.c_int),
-        ("ana_statistics", AnaStats),
-        ("apm_statistics", AudioProcessingStats)
-    ]   
-    def _to_local_audio_detailed_stats(self): 
-        stats = LocalAudioDetailedStats()
-        stats.local_ssrc = self.local_ssrc
-        stats.bytes_sent = self.bytes_sent
-        stats.packets_sent = self.packets_sent
-        stats.packets_lost = self.packets_lost
-        stats.fraction_lost = self.fraction_lost
-        stats.codec_name = self.codec_name.decode('utf-8') if self.codec_name else None
-        stats.codec_payload_type = self.codec_payload_type
-        stats.ext_seqnum = self.ext_seqnum
-        stats.jitter_ms = self.jitter_ms
-        stats.rtt_ms = self.rtt_ms
-        stats.audio_level = self.audio_level
-        stats.total_input_energy = self.total_input_energy
-        stats.total_input_duration = self.total_input_duration
-        stats.typing_noise_detected = self.typing_noise_detected
-        stats.ana_statistics = self.ana_statistics
-        stats.apm_statistics = self.apm_statistics
-        return stats
-
-class LocalAudioDetailedStats():
-    def __init__(self) -> None:
-        self.local_ssrc = 0
-        self.bytes_sent = 0
-        self.packets_sent = 0
-        self.packets_lost = 0
-        self.fraction_lost = 0.0
-        self.codec_name = None
-        self.codec_payload_type = 0
-        self.ext_seqnum = 0
-        self.jitter_ms = 0
-        self.rtt_ms = 0
-        self.audio_level = 0
-        self.total_input_energy = 0.0
-        self.total_input_duration = 0.0
-        self.typing_noise_detected = 0
-        self.ana_statistics = AnaStats()
-        self.apm_statistics = AudioProcessingStats()
-        pass
-
-class VideoTrackInfo(ctypes.Structure):
-    def __init__(self) -> None:
-        self.is_local = 1
-        self.owner_uid = 0
-        self.track_id = 0
-        self.channel_id = None
-        self.stream_type = 0
-        self.codec_type = 0
-        self.encoded_frame_only = 0
-        self.source_type = 0
-        self.observation_position = 0
-
-class RawAudioFrameOpModeType(ctypes.c_int):
-    RAW_AUDIO_FRAME_OP_MODE_READ_ONLY = 0
-    RAW_AUDIO_FRAME_OP_MODE_READ_WRITE = 2
-
-class AudioFramePosition(ctypes.c_int):
-    AUDIO_FRAME_POSITION_PLAYBACK = 0x0001
-    AUDIO_FRAME_POSITION_RECORD = 0x0002
-    AUDIO_FRAME_POSITION_MIXED = 0x0004
-    AUDIO_FRAME_POSITION_BEFORE_MIXING = 0x0008
-
-class AudioFrame:
-    def __init__(self) -> None:
-        self.type = 0
-        self.samples_per_channel = 0
-        self.bytes_per_sample = 0
-        self.channels = 0
-        self.samples_per_sec = 0
-        self.buffer = None
-        self.render_time_ms = 0
-        self.avsync_type = 0
-        self.far_field_flag = 0
-        self.rms = 0
-        self.voice_prob = 0
-        self.music_prob = 0
-        self.pitch = 0
-    
-class AudioParams(ctypes.Structure):
-    _fields_ = [
-        ("sample_rate", ctypes.c_int),
-        ("channels", ctypes.c_int),
-        ("mode", ctypes.c_int),
-        ("samples_per_call", ctypes.c_int)
-    ]
-
-
-class ChannelProfileType(Enum):
+class ChannelProfileType(IntEnum):
     CHANNEL_PROFILE_COMMUNICATION = 0
     CHANNEL_PROFILE_LIVE_BROADCASTING = 1
 
-class ClientRoleType(Enum):
+
+class ClientRoleType(IntEnum):
     CLIENT_ROLE_BROADCASTER = 1
     CLIENT_ROLE_AUDIENCE = 2
 
 
-class AudioCodecType(Enum):
+class VideoStreamType(IntEnum):
+    VIDEO_STREAM_HIGH = 0
+    VIDEO_STREAM_LOW = 1
+
+
+class AudioCodecType(IntEnum):
     AUDIO_CODEC_OPUS = 1
     # AUDIO_CODEC_PCMA = 3
     AUDIO_CODEC_PCMA = 3
@@ -332,7 +43,8 @@ class AudioCodecType(Enum):
     AUDIO_CODEC_LPCNET = 12
     AUDIO_CODEC_OPUSMC = 13
 
-class AreaCode(Enum):
+
+class AreaCode(IntEnum):
     AREA_CODE_CN = 0x00000001
     AREA_CODE_NA = 0x00000002
     AREA_CODE_EU = 0x00000004
@@ -341,10 +53,426 @@ class AreaCode(Enum):
     AREA_CODE_IN = 0x00000020
     AREA_CODE_GLOB = 0xFFFFFFFF
 
-class AudioScenarioType(Enum):
+
+class AudioScenarioType(IntEnum):
     AUDIO_SCENARIO_DEFAULT = 0
     AUDIO_SCENARIO_GAME_STREAMING = 3
     AUDIO_SCENARIO_CHATROOM = 5
     AUDIO_SCENARIO_CHORUS = 7
     AUDIO_SCENARIO_MEETING = 8
     AUDIO_SCENARIO_NUM = 9
+
+
+class RawAudioFrameOpModeType(IntEnum):
+    RAW_AUDIO_FRAME_OP_MODE_READ_ONLY = 0
+    RAW_AUDIO_FRAME_OP_MODE_READ_WRITE = 2
+
+
+class AudioFramePosition(IntEnum):
+    AUDIO_FRAME_POSITION_PLAYBACK = 0x0001
+    AUDIO_FRAME_POSITION_RECORD = 0x0002
+    AUDIO_FRAME_POSITION_MIXED = 0x0004
+    AUDIO_FRAME_POSITION_BEFORE_MIXING = 0x0008
+
+
+class AudioProfileType(IntEnum):
+    AUDIO_PROFILE_DEFAULT = 0
+    AUDIO_PROFILE_SPEECH_STANDARD = 1
+    AUDIO_PROFILE_MUSIC_STANDARD = 2
+    AUDIO_PROFILE_MUSIC_STANDARD_STEREO = 3
+    AUDIO_PROFILE_MUSIC_HIGH_QUALITY = 4
+    AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO = 5
+    AUDIO_PROFILE_IOT = 6
+    AUDIO_PROFILE_NUM = 7
+
+
+@dataclass(frozen=True, kw_only=True)
+class LastmileProbeOneWayResult:
+    packet_loss_rate: int
+    jitter: int
+    available_bandwidth: int
+
+
+@dataclass(frozen=True, kw_only=True)
+class LastmileProbeResult:
+    state: int
+    uplink_report: LastmileProbeOneWayResult
+    downlink_report: LastmileProbeOneWayResult
+    rtt: int
+
+
+@dataclass(frozen=True, kw_only=True)
+class RTCStats:
+    connection_id: int
+    duration: int
+    tx_bytes: int
+    rx_bytes: int
+    tx_audio_bytes: int
+    tx_video_bytes: int
+    rx_audio_bytes: int
+    rx_video_bytes: int
+    tx_k_bit_rate: int
+    rx_k_bit_rate: int
+    rx_audio_k_bit_rate: int
+    tx_audio_k_bit_rate: int
+    rx_video_k_bit_rate: int
+    tx_video_k_bit_rate: int
+    lastmile_delay: int
+    user_count: int
+    cpu_app_usage: float
+    cpu_total_usage: float
+    gateway_rtt: int
+    memory_app_usage_ratio: float
+    memory_total_usage_ratio: float
+    memory_app_usage_in_kbytes: int
+    connect_time_ms: int
+    first_audio_packet_duration: int
+    first_video_packet_duration: int
+    first_video_key_frame_packet_duration: int
+    packets_before_first_key_frame_packet: int
+    first_audio_packet_duration_after_unmute: int
+    first_video_packet_duration_after_unmute: int
+    first_video_key_frame_packet_duration_after_unmute: int
+    first_video_key_frame_decoded_duration_after_unmute: int
+    first_video_key_frame_rendered_duration_after_unmute: int
+    tx_packet_loss_rate: int
+    rx_packet_loss_rate: int
+
+
+@dataclass(frozen=True, kw_only=True)
+class LocalAudioStats:
+    num_channels: int
+    sent_sample_rate: int
+    sent_bitrate: int
+    internal_codec: int
+    voice_pitch: float
+
+
+@dataclass(frozen=True, kw_only=True)
+class VideoTrackInfo:
+    is_local: int
+    owner_uid: int
+    track_id: int
+    channel_id: str
+    stream_type: int
+    codec_type: int
+    encoded_frame_only: int
+    source_type: int
+    observation_position: int
+
+
+@dataclass(frozen=True, kw_only=True)
+class RemoteVideoTrackStats:
+    uid: int
+    delay: int
+    width: int
+    height: int
+    received_bitrate: int
+    decoder_output_frame_rate: int
+    renderer_output_frame_rate: int
+    frame_loss_rate: int
+    packet_loss_rate: int
+    rx_stream_type: int
+    total_frozen_time: int
+    frozen_rate: int
+    total_decoded_frames: int
+    av_sync_time_ms: int
+    downlink_process_time_ms: int
+    frame_render_delay_ms: int
+    total_active_time: int
+    publish_duration: int
+
+
+@dataclass(frozen=True, kw_only=True)
+class RemoteAudioTrackStats:
+    uid: int
+    quality: int
+    network_transport_delay: int
+    jitter_buffer_delay: int
+    audio_loss_rate: int
+    num_channels: int
+    received_sample_rate: int
+    received_bitrate: int
+    total_frozen_time: int
+    frozen_rate: int
+    received_bytes: int
+
+
+@dataclass(frozen=True, kw_only=True)
+class AudioFrame:
+    type: int
+    samples_per_channel: int
+    bytes_per_sample: int
+    channels: int
+    samples_per_sec: int
+    buffer: bytearray
+    render_time_ms: int
+    avsync_type: int
+    far_field_flag: int
+    rms: int
+    voice_prob: int
+    music_prob: int
+    pitch: int
+
+
+@dataclass(frozen=True, kw_only=True)
+class AudioVolumeInfo:
+    user_id: int
+    volume: int
+    vad: int
+    voice_pitch: float
+
+
+@dataclass(frozen=True, kw_only=True)
+class LocalVideoTrackStats:
+    number_of_streams: int
+    bytes_major_stream: int
+    bytes_minor_stream: int
+    frames_encoded: int
+    ssrc_major_stream: int
+    ssrc_minor_stream: int
+    capture_frame_rate: int
+    regulated_capture_frame_rate: int
+    input_frame_rate: int
+    encode_frame_rate: int
+    render_frame_rate: int
+    target_media_bitrate_bps: int
+    media_bitrate_bps: int
+    total_bitrate_bps: int
+    capture_width: int
+    capture_height: int
+    regulated_capture_width: int
+    regulated_capture_height: int
+    width: int
+    height: int
+    encoder_type: int
+    uplink_cost_time_ms: int
+    quality_adapt_indication: int
+
+
+@dataclass(frozen=True, kw_only=True)
+class RemoteVideoStreamInfo:
+    uid: int
+    stream_type: int
+    current_downscale_level: int
+    total_downscale_level_counts: int
+
+
+@dataclass(frozen=True, kw_only=True)
+class RTCConnInfo():
+    id: int
+    channel_id: str
+    state: int
+    local_user_id: str
+    internal_uid: int
+
+
+@dataclass
+class AgoraServiceConfig:
+    log_path: str = ""
+    log_size: int = 0
+    enable_audio_processor: int = 1
+    enable_audio_device: int = 0
+    enable_video: int = 0
+    context: object = None
+    appid: str = ""
+    area_code: int = AreaCode.AREA_CODE_GLOB.value
+    channel_profile: ChannelProfileType = ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING
+    audio_scenario: AudioScenarioType = AudioScenarioType.AUDIO_SCENARIO_CHORUS
+    use_string_uid: int = 0
+
+
+@dataclass
+class RTCConnConfig():
+    auto_subscribe_audio: int = 0
+    auto_subscribe_video: int = 0
+    enable_audio_recording_or_playout: int = 0
+    max_send_bitrate: int = 0
+    min_port: int = 0
+    max_port: int = 0
+    audio_subs_options: 'AudioSubscriptionOptions' = 'AudioSubscriptionOptions'()
+    client_role_type: ClientRoleType = ClientRoleType.CLIENT_ROLE_BROADCASTER
+    channel_profile: ChannelProfileType = ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING
+    audio_recv_media_packet: int = 0
+    audio_recv_encoded_frame: int = 0
+    video_recv_media_packet: int = 0
+
+
+
+
+@dataclass
+class VideoSubscriptionOptions:
+    type: VideoStreamType = VideoStreamType.VIDEO_STREAM_HIGH
+    encodedFrameOnly: bool = False
+
+
+@dataclass
+class AudioPcmDataInfo:
+    samplesPerChannel: int
+    channelNum: int
+    samplesOut: int
+    elapsedTimeMs: int
+    ntpTimeMs: int
+
+
+@dataclass
+class AudioEncoderConfiguration:
+    audioProfile: AudioProfileType = AudioProfileType.AUDIO_PROFILE_DEFAULT
+
+
+@dataclass
+class AudioSubscriptionOptions:
+    packet_only: int = 0
+    pcm_data_only: int = 0
+    bytes_per_sample: int = 0
+    number_of_channels: int = 0
+    sample_rate_hz: int = 0
+
+
+@dataclass
+class EncodedAudioFrameInfo:
+    capture_timems: int = 0
+    codec: AudioCodecType = AudioCodecType.AUDIO_CODEC_AACLC
+    number_of_channels: int = 1
+    sample_rate: int = 16000
+    samples_per_channel: int = 1024
+    send_even_if_empty: int = 1
+    speech: int = 1
+
+
+@dataclass
+class AudioParams:
+    sample_rate: int
+    channels: int
+    mode: int
+    samples_per_call: int
+
+
+
+@dataclass
+class VideoDimensions:
+    width: int
+    height: int
+
+
+@dataclass
+class SenderOptions:
+    cc_mode: int
+    codec_type: int
+    target_bitrate: int
+
+
+@dataclass
+class OwnedEncodedVideoFrameInfo:
+    codec_type: int
+    width: int
+    height: int
+    frames_per_second: int
+    frame_type: int
+    rotation: int
+    track_id: int
+    capture_time_ms: int
+    decode_time_ms: int
+    uid: int
+    stream_type: int
+
+
+@dataclass
+class VideoEncoderConfig:
+    codec_type: int
+    dimensions: VideoDimensions
+    frame_rate: int
+    bitrate: int
+    min_bitrate: int
+    orientation_mode: int
+    degradation_preference: int
+    mirror_mode: int
+
+
+@dataclass
+class ExternalVideoFrame:
+    type: int = 1
+    format: int = 0
+    buffer: bytearray = None
+    stride: int = 0
+    height: int = 0
+    crop_left: int = 0
+    crop_top: int = 0
+    crop_right: int = 0
+    crop_bottom: int = 0
+    rotation: int = 0
+    timestamp: int = 0
+    egl_context: bytearray = None
+    egl_type: int = 0
+    texture_id: int = 0
+    matrix: list = None
+    metadata: str = ""
+    alpha_buffer: bytearray = None
+
+
+@dataclass
+class VadConfig:
+    fftSz: int = 1024
+    hopSz: int = 160
+    anaWindowSz: int = 768
+    frqInputAvailableFlag: int = 0
+    useCVersionAIModule: int = 0
+    voiceProbThr: float = 0.8
+    rmsThr: float = -40.0
+    jointThr: float = 0.0
+    aggressive: float = 5.0
+    startRecognizeCount: int = 10
+    stopRecognizeCount: int = 6
+    preStartRecognizeCount: int = 10
+    activePercent: float = 0.6
+    inactivePercent: float = 0.2
+
+
+@dataclass
+class SimulcastStreamConfig:
+    dimensions: VideoDimensions
+    bitrate: int
+    framerate: int
+
+
+@dataclass
+class AnaStats:
+    bitrate_action_counter: int
+    channel_action_counter: int
+    dtx_action_counter: int
+    fec_action_counter: int
+    frame_length_increase_counter: int
+    frame_length_decrease_counter: int
+    uplink_packet_loss_fraction: float
+
+
+@dataclass
+class AudioProcessingStats:
+    echo_return_loss: float
+    echo_return_loss_enhancement: float
+    divergent_filter_fraction: float
+    delay_median_ms: int
+    delay_standard_deviation_ms: int
+    residual_echo_likelihood: float
+    residual_echo_likelihood_recent_max: float
+    delay_ms: int
+
+
+@dataclass
+class LocalAudioDetailedStats:
+    local_ssrc: int
+    bytes_sent: int
+    packets_sent: int
+    packets_lost: int
+    fraction_lost: float
+    codec_name: str
+    codec_payload_type: int
+    ext_seqnum: int
+    jitter_ms: int
+    rtt_ms: int
+    audio_level: int
+    total_input_energy: float
+    total_input_duration: float
+    typing_noise_detected: int
+    ana_statistics: AnaStats
+    apm_statistics: AudioProcessingStats

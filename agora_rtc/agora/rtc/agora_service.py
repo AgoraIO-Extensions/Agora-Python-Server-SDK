@@ -11,67 +11,53 @@ from .video_frame_sender import *
 from .local_video_track import *
 import logging
 logger = logging.getLogger(__name__)
-class AgoraServiceConfig(ctypes.Structure):
-    def __init__(
-            self,
-            log_path: str = "",
-            log_size: int = 0,
-            enable_audio_processor: int = 1,
-            enable_audio_device: int = 0,
-            enable_video: int = 0,
-            context: object = None,
+# class AgoraServiceConfig:
+#     def __init__(
+#             self,
+#             log_path: str = "",
+#             log_size: int = 0,
+#             enable_audio_processor: int = 1,
+#             enable_audio_device: int = 0,
+#             enable_video: int = 0,
+#             context: object = None,
 
-            appid: str = "",
-            area_code: int = AreaCode.AREA_CODE_GLOB.value,
-            channel_profile: ChannelProfileType = ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
-            audio_scenario: AudioScenarioType = AudioScenarioType.AUDIO_SCENARIO_CHORUS,
-            use_string_uid: int = 0,
-        ) -> None:
-        self.log_path = log_path
-        self.log_size = log_size
+#             appid: str = "",
+#             area_code: int = AreaCode.AREA_CODE_GLOB.value,
+#             channel_profile: ChannelProfileType = ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
+#             audio_scenario: AudioScenarioType = AudioScenarioType.AUDIO_SCENARIO_CHORUS,
+#             use_string_uid: int = 0,
+#         ) -> None:
+#         self.log_path = log_path
+#         self.log_size = log_size
         
-        self.enable_audio_processor = enable_audio_processor
-        self.enable_audio_device = enable_audio_device
-        self.enable_video = enable_video
-        self.context = context
+#         self.enable_audio_processor = enable_audio_processor
+#         self.enable_audio_device = enable_audio_device
+#         self.enable_video = enable_video
+#         self.context = context
 
-        self.appid =  appid
-        self.area_code = area_code
-        self.channel_profile = channel_profile
-        self.audio_scenario = audio_scenario
-        self.use_string_uid = use_string_uid
+#         self.appid =  appid
+#         self.area_code = area_code
+#         self.channel_profile = channel_profile
+#         self.audio_scenario = audio_scenario
+#         self.use_string_uid = use_string_uid
 
-    def _to_inner(self):
-        inner = AgoraServiceConfigInner()
+    # def _to_inner(self):
+    #     inner = AgoraServiceConfigInner()
         
-        inner.enable_audio_processor = self.enable_audio_processor
-        inner.enable_audio_device = self.enable_audio_device
-        inner.enable_video = self.enable_video
-        inner.context = self.context
+    #     inner.enable_audio_processor = self.enable_audio_processor
+    #     inner.enable_audio_device = self.enable_audio_device
+    #     inner.enable_video = self.enable_video
+    #     inner.context = self.context
 
-        inner.app_id = self.appid.encode('utf-8')
-        inner.area_code = self.area_code
-        inner.channel_profile = self.channel_profile.value
-        inner.audio_scenario = self.audio_scenario.value
+    #     inner.app_id = self.appid.encode('utf-8')
+    #     inner.area_code = self.area_code
+    #     inner.channel_profile = self.channel_profile.value
+    #     inner.audio_scenario = self.audio_scenario.value
 
-        inner.use_string_uid = self.use_string_uid
-        return inner
+    #     inner.use_string_uid = self.use_string_uid
+    #     return inner
 
 
-class AgoraServiceConfigInner(ctypes.Structure):
-    _fields_ = [
-        ('enable_audio_processor', ctypes.c_int),
-        ('enable_audio_device', ctypes.c_int),
-        ('enable_video', ctypes.c_int),
-        ('context', ctypes.c_void_p),
-
-        ('app_id', ctypes.c_char_p),
-        ('area_code', ctypes.c_uint),
-        ('channel_profile', ctypes.c_int),
-        ('audio_scenario', ctypes.c_int),
-
-        ('use_string_uid', ctypes.c_int),
-    ]
 
     # def __init__(self) -> None:
     #     self.log_path = ""
@@ -131,15 +117,6 @@ agora_service_get_agora_parameter = agora_lib.agora_service_get_agora_parameter
 agora_service_get_agora_parameter.restype = AGORA_HANDLE
 agora_service_get_agora_parameter.argtypes = [AGORA_HANDLE]
 
-class SenderOptions(ctypes.Structure):
-    _fields_ = [
-        ("cc_mode", ctypes.c_int),
-        ("codec_type", ctypes.c_int),
-        ("target_bitrate", ctypes.c_int)
-    ]
-
-    def __init__(self, cc_mode, codec_type, target_bitrate):
-        super(SenderOptions, self).__init__(cc_mode, codec_type, target_bitrate)
 
 agora_service_create_custom_video_track_encoded = agora_lib.agora_service_create_custom_video_track_encoded
 agora_service_create_custom_video_track_encoded.restype = AGORA_HANDLE

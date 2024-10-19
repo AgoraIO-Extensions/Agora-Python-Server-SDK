@@ -7,23 +7,7 @@ from .rtc_connection_observer import *
 import logging
 logger = logging.getLogger(__name__)
 
-class RTCConnInfoInner(ctypes.Structure):
-    _fields_ = [
-        ("id", ctypes.c_uint64),
-        ("channel_id", ctypes.c_char_p),
-        ("state", ctypes.c_int),
-        ("local_user_id", ctypes.c_char_p),
-        ("internal_uid", ctypes.c_uint)
-    ]
-    def _convert_to_rtc_conn_info(self):
-        from .rtc_connection import RTCConnInfo
-        con_info = RTCConnInfo()
-        con_info.id = self.id
-        con_info.channel_id = self.channel_id.decode('utf-8') if self.channel_id else ''
-        con_info.state = self.state
-        con_info.local_user_id = self.local_user_id.decode('utf-8') if self.local_user_id else ''
-        con_info.internal_uid = self.internal_uid
-        return con_info
+
 
 ON_CONNECTED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCConnInfoInner), ctypes.c_int)
 ON_DISCONNECTED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCConnInfoInner), ctypes.c_int)

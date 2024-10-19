@@ -4,21 +4,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class RemoteAudioTrackStats(ctypes.Structure):
-    _fields_ = [
-        ("uid", ctypes.c_uint),
-        ("quality", ctypes.c_int),
-        ("network_transport_delay", ctypes.c_int),
-        ("jitter_buffer_delay", ctypes.c_int),
-        ("audio_loss_rate", ctypes.c_int),
-        ("num_channels", ctypes.c_int),
-        ("received_sample_rate", ctypes.c_int),
-        ("received_bitrate", ctypes.c_int),
-        ("total_frozen_time", ctypes.c_int),
-        ("frozen_rate", ctypes.c_int),
-        ("received_bytes", ctypes.c_int64)
-    ]
-
 agora_remote_audio_track_get_statistics = agora_lib.agora_remote_audio_track_get_statistics
 agora_remote_audio_track_get_statistics.restype = ctypes.POINTER(RemoteAudioTrackStats)
 agora_remote_audio_track_get_statistics.argtypes = [AGORA_HANDLE]

@@ -2,13 +2,19 @@ import ctypes
 from .agora_base import *
 
 class PcmAudioFrame:
-    def __init__(self):
-        self.data = None
-        self.timestamp = 0
-        self.samples_per_channel = 0
-        self.bytes_per_sample = 0
-        self.number_of_channels = 0
-        self.sample_rate = 0
+    def __init__(self,
+                 data: bytearray, 
+                 timestamp: int, 
+                 samples_per_channel: int, 
+                 bytes_per_sample: int, 
+                 number_of_channels: int, 
+                 sample_rate: int) -> None:
+        self.data = data
+        self.timestamp = timestamp
+        self.samples_per_channel = samples_per_channel
+        self.bytes_per_sample = bytes_per_sample
+        self.number_of_channels = number_of_channels
+        self.sample_rate = sample_rate
 
 agora_audio_pcm_data_sender_send = agora_lib.agora_audio_pcm_data_sender_send
 agora_audio_pcm_data_sender_send.restype = AGORA_API_C_INT

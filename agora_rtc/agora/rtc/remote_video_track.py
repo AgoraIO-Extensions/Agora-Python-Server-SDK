@@ -3,42 +3,6 @@ from .agora_base import *
 import logging
 logger = logging.getLogger(__name__)
 
-
-class RemoteVideoTrackStats(ctypes.Structure):
-    _fields_ = [
-        ("uid", uid_t),
-        ("delay", ctypes.c_int),
-        ("width", ctypes.c_int),
-        ("height", ctypes.c_int),
-        ("received_bitrate", ctypes.c_int),
-        ("decoder_output_frame_rate", ctypes.c_int),
-        ("renderer_output_frame_rate", ctypes.c_int),
-        ("frame_loss_rate", ctypes.c_int),
-        ("packet_loss_rate", ctypes.c_int),
-        ("rx_stream_type", ctypes.c_int),
-        ("total_frozen_time", ctypes.c_int),
-        ("frozen_rate", ctypes.c_int),
-        ("total_decoded_frames", ctypes.c_uint32),
-        ("av_sync_time_ms", ctypes.c_int),
-        ("downlink_process_time_ms", ctypes.c_uint32),
-        ("frame_render_delay_ms", ctypes.c_uint32),
-        ("totalActiveTime", ctypes.c_uint64),
-        ("publishDuration", ctypes.c_uint64)
-    ]
-
-class VideoTrackInfo(ctypes.Structure):
-    _fields_ = [
-        ("is_local", ctypes.c_int),
-        ("owner_uid", uid_t),
-        ("track_id", track_id_t),
-        ("channel_id", ctypes.c_char_p),
-        ("stream_type", ctypes.c_int),
-        ("codec_type", ctypes.c_int),
-        ("encoded_frame_only", ctypes.c_int),
-        ("source_type", ctypes.c_int),
-        ("observation_position", ctypes.c_uint32)
-    ]    
-
 agora_remote_video_track_get_statistics = agora_lib.agora_remote_video_track_get_statistics
 agora_remote_video_track_get_statistics.restype = ctypes.POINTER(RemoteVideoTrackStats)
 agora_remote_video_track_get_statistics.argtypes = [AGORA_HANDLE]
@@ -78,6 +42,7 @@ agora_remote_video_track_unregister_video_encoded_image_receiver.argtypes = [AGO
 # agora_remote_video_track_get_type = agora_lib.agora_remote_video_track_get_type
 # agora_remote_video_track_get_type.restype = ctypes.c_int
 # agora_remote_video_track_get_type.argtypes = [AGORA_HANDLE]
+
 
 class RemoteVideoTrack:
     def __init__(self, track_handle, user_id_str):
@@ -128,4 +93,3 @@ class RemoteVideoTrack:
     # def get_type(self):
     #     ret =  agora_remote_video_track_get_type(self.track_handle)
     #     return ret
-

@@ -311,7 +311,7 @@ class LocalUser:
         ret = agora_local_user_get_user_role(self.user_handle)
         return ret
 
-    def set_audio_encoder_configuration(self, config):
+    def set_audio_encoder_configuration(self, config:AudioEncoderConfiguration):
         ret = agora_local_user_set_audio_encoder_config(self.user_handle, config)
         return ret
 

@@ -1,23 +1,24 @@
+#MARK: TODO_CHECK
 class VideoFrame():
     def __init__(self,
-                type = 0,
-                width = 0,
-                height = 0,
-                y_stride = 0,
-                u_stride = 0,
-                v_stride = 0,
-                y_buffer = None,
-                u_buffer = None,
-                v_buffer = None,
-                rotation = 0,
-                render_time_ms = 0,
-                avsync_type = 0,
-                metadata_buffer = None,
-                metadata_size = 0,
-                shared_context = None,
-                texture_id = 0,
-                matrix = None,
-                alpha_buffer = None                
+                type:int = 0,
+                width:int = 0,
+                height:int = 0,
+                y_stride:int = 0,
+                u_stride:int = 0,
+                v_stride:int = 0,
+                y_buffer:bytearray = None,
+                u_buffer:bytearray = None,
+                v_buffer:bytearray = None,
+                rotation:int = 0,
+                render_time_ms:int = 0,
+                avsync_type:int = 0,
+                metadata_buffer:bytearray = None,
+                metadata_size:int = 0,
+                shared_context:str = None,
+                texture_id:int = 0,
+                matrix:list = [],
+                alpha_buffer:bytearray = None
                  ) -> None:
         self.type = type
         self.width = width
