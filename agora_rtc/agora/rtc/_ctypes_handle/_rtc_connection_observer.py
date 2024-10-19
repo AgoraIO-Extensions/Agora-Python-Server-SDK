@@ -2,7 +2,7 @@
 import ctypes
 from ..agora_base import *
 from ..local_user import *
-from ..globals import *
+from .._utils.globals import *
 from ..rtc_connection_observer import *
 import logging
 logger = logging.getLogger(__name__)
