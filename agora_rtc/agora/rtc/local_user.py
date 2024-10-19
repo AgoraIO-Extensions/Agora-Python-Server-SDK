@@ -327,7 +327,7 @@ class LocalUser:
     def get_local_audio_statistics(self):
         stats = agora_local_user_get_local_audio_statistics(self.user_handle)
         # and change it to python object：localaudiodetailedstats
-        detailed_stats = stats.contents._to_local_audio_detailed_stats()
+        detailed_stats = stats.contents.get()
         # and then release it
         agora_local_user_destroy_local_audio_statistics(self.user_handle, stats)
 

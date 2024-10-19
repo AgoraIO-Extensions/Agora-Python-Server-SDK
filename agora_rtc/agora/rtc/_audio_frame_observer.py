@@ -52,14 +52,14 @@ class AudioFrameObserverInner(ctypes.Structure):
     def _on_record_audio_frame(self, local_user_handle, channel_id, audio_frame_inner):
         logger.debug(f"AudioFrameObserverInner _on_record_audio_frame: {local_user_handle}, {channel_id}, {audio_frame_inner}")
         channel_id_str = channel_id.decode('utf-8')
-        frame = audio_frame_inner.contents._to_audio_frame()
+        frame = audio_frame_inner.contents.get()
         ret = self.observer.on_record_audio_frame(self.local_user, channel_id_str, frame)
         return ret
 
     def _on_playback_audio_frame(self, local_user_handle, channel_id, audio_frame_inner):
         logger.debug(f"AudioFrameObserverInner _on_playback_audio_frame: {local_user_handle}, {channel_id}, {audio_frame_inner}")
         channel_id_str = channel_id.decode('utf-8')
-        frame = audio_frame_inner.contents._to_audio_frame()
+        frame = audio_frame_inner.contents.get()
         ret = self.observer.on_playback_audio_frame(self.local_user, channel_id_str, frame)
         return ret
 
@@ -81,7 +81,7 @@ class AudioFrameObserverInner(ctypes.Structure):
             channel_id_str = channel_id.decode('utf-8')
 
         user_id_str = user_id.decode('utf-8')
-        frame = audio_frame_inner.contents._to_audio_frame()
+        frame = audio_frame_inner.contents.get()
         ret = self.observer.on_playback_audio_frame_before_mixing(self.local_user, channel_id_str, user_id_str, frame)
         return ret
 

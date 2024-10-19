@@ -132,7 +132,7 @@ class AgoraService:
         if self.inited == True:
             return 0
         config.app_id = config.appid.encode('utf-8')
-        result = agora_service_initialize(self.service_handle, ctypes.byref(AgoraServiceConfigInner.create_from(config=config)))
+        result = agora_service_initialize(self.service_handle, ctypes.byref(AgoraServiceConfigInner.create(config=config)))
         if result == 0:
             self.inited = True
         logger.debug(f'Initialization result: {result}')
@@ -186,7 +186,7 @@ class AgoraService:
         if not self.inited:
             logger.error("AgoraService is not initialized. Please call initialize() first.")
             return None
-        rtc_conn_handle = agora_rtc_conn_create(self.service_handle, ctypes.byref(con_config._to_inner()))
+        rtc_conn_handle = agora_rtc_conn_create(self.service_handle, ctypes.byref(RTCConnConfigInner.create(con_config)))
         if rtc_conn_handle is None:
             return None
         return RTCConnection(rtc_conn_handle)

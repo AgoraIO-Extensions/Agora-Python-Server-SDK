@@ -17,7 +17,7 @@ class AudioEncoderConfigurationInner(ctypes.Structure):
     ]
 
     @staticmethod
-    def create_from(config: AudioEncoderConfiguration) -> 'AudioEncoderConfigurationInner':
+    def create(config: AudioEncoderConfiguration) -> 'AudioEncoderConfigurationInner':
 
         return AudioEncoderConfigurationInner(config.audioProfile.value)
 
@@ -60,7 +60,7 @@ class RTCStatsInner(ctypes.Structure):
         ("rx_packet_loss_rate", ctypes.c_int)
     ]
 
-    def to_rtc_stats(self):
+    def get(self):
         return RTCStats(
             connection_id=self.connection_id,
             duration=self.duration,
@@ -106,7 +106,7 @@ class LastmileProbeOneWayResultInner(ctypes.Structure):
         ("available_bandwidth", ctypes.c_uint)
     ]
 
-    def to_lastmile_probe_one_way_result(self):
+    def get(self):
         return LastmileProbeOneWayResult(
             packet_loss_rate=self.packet_loss_rate,
             jitter=self.jitter,
@@ -136,7 +136,7 @@ class VideoFrameInner(ctypes.Structure):
         ("alpha_buffer", ctypes.POINTER(ctypes.c_uint8))
     ]
 
-    def to_video_frame(self):
+    def get(self):
         return VideoFrame(
             type=self.type,
             width=self.width,
@@ -173,7 +173,7 @@ class EncodedVideoFrameInfoInner(ctypes.Structure):
         ("stream_type", ctypes.c_int)
     ]
 
-    def _to_encoded_video_frame_info(self):
+    def get(self):
         return EncodedVideoFrameInfo(
             codec_type=self.codec_type,
             width=self.width,
@@ -197,11 +197,11 @@ class LastmileProbeResultInner(ctypes.Structure):
         ("rtt", ctypes.c_uint)
     ]
 
-    def to_lastmile_probe_result(self):
+    def get(self):
         return LastmileProbeResult(
             state=self.state,
-            uplink_report=self.uplink_report.contents.to_lastmile_probe_one_way_result(),
-            downlink_report=self.downlink_report.contents.to_lastmile_probe_one_way_result(),
+            uplink_report=self.uplink_report.contents.get(),
+            downlink_report=self.downlink_report.contents.get(),
             rtt=self.rtt
         )
 
@@ -212,14 +212,14 @@ class VideoSubscriptionOptionsInner(ctypes.Structure):
         ("encodedFrameOnly", ctypes.c_bool)
     ]
 
-    def to_video_subscription_options(self):
+    def get(self):
         return VideoSubscriptionOptions(
             type=self.type,
             encodedFrameOnly=self.encodedFrameOnly
         )
 
     @staticmethod
-    def create_from(options: VideoSubscriptionOptions) -> 'VideoSubscriptionOptionsInner':
+    def create(options: VideoSubscriptionOptions) -> 'VideoSubscriptionOptionsInner':
         return VideoSubscriptionOptionsInner(
             options.type.value,
             options.encodedFrameOnly
@@ -235,7 +235,7 @@ class AudioPcmDataInfoInner(ctypes.Structure):
         ("ntpTimeMs", ctypes.c_int64)
     ]
 
-    def to_audio_pcm_data_info(self):
+    def get(self):
         return AudioPcmDataInfo(
             samplesPerChannel=self.samplesPerChannel,
             channelNum=self.channelNum,
@@ -245,7 +245,7 @@ class AudioPcmDataInfoInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create_from(info: AudioPcmDataInfo) -> 'AudioPcmDataInfoInner':
+    def create(info: AudioPcmDataInfo) -> 'AudioPcmDataInfoInner':
         return AudioPcmDataInfoInner(
             info.samplesPerChannel,
             info.channelNum,
@@ -264,7 +264,7 @@ class LocalAudioStatsInner(ctypes.Structure):
         ("voice_pitch", ctypes.c_double)
     ]
 
-    def to_local_audio_stats(self):
+    def get(self):
         return LocalAudioStats(
             num_channels=self.num_channels,
             sent_sample_rate=self.sent_sample_rate,
@@ -274,7 +274,7 @@ class LocalAudioStatsInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create_from(stats: LocalAudioStats) -> 'LocalAudioStatsInner':
+    def create(stats: LocalAudioStats) -> 'LocalAudioStatsInner':
         return LocalAudioStatsInner(
             stats.num_channels,
             stats.sent_sample_rate,
@@ -291,7 +291,7 @@ class SenderOptionsInner(ctypes.Structure):
         ("target_bitrate", ctypes.c_int)
     ]
 
-    def to_sender_options(self):
+    def get(self):
         return SenderOptions(
             cc_mode=self.cc_mode,
             codec_type=self.codec_type,
@@ -299,7 +299,7 @@ class SenderOptionsInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create_from(options: SenderOptions) -> 'SenderOptionsInner':
+    def create(options: SenderOptions) -> 'SenderOptionsInner':
         return SenderOptionsInner(
             options.cc_mode,
             options.codec_type,
@@ -313,14 +313,14 @@ class VideoDimensionsInner(ctypes.Structure):
         ("height", ctypes.c_int)
     ]
 
-    def to_video_dimensions(self):
+    def get(self):
         return VideoDimensions(
             width=self.width,
             height=self.height
         )
 
     @staticmethod
-    def create_from(dimensions: VideoDimensions) -> 'VideoDimensionsInner':
+    def create(dimensions: VideoDimensions) -> 'VideoDimensionsInner':
         return VideoDimensionsInner(
             dimensions.width,
             dimensions.height
@@ -339,10 +339,10 @@ class VideoEncoderConfigInner(ctypes.Structure):
         ("mirror_mode", ctypes.c_int)
     ]
 
-    def to_video_encoder_config(self):
+    def get(self):
         return VideoEncoderConfig(
             codec_type=self.codec_type,
-            dimensions=self.dimensions.contents.to_video_dimensions(),
+            dimensions=self.dimensions.contents.get(),
             frame_rate=self.frame_rate,
             bitrate=self.bitrate,
             min_bitrate=self.min_bitrate,
@@ -352,10 +352,10 @@ class VideoEncoderConfigInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create_from(config: VideoEncoderConfig) -> 'VideoEncoderConfigInner':
+    def create(config: VideoEncoderConfig) -> 'VideoEncoderConfigInner':
         return VideoEncoderConfigInner(
             config.codec_type,
-            VideoDimensionsInner.create_from(config.dimensions),
+            VideoDimensionsInner.create(config.dimensions),
             config.frame_rate,
             config.bitrate,
             config.min_bitrate,
@@ -392,7 +392,7 @@ class LocalVideoTrackStatsInner(ctypes.Structure):
         ("quality_adapt_indication", ctypes.c_int)
     ]
 
-    def to_local_video_track_stats(self):
+    def get(self):
         return LocalVideoTrackStats(
             number_of_streams=self.number_of_streams,
             bytes_major_stream=self.bytes_major_stream,
@@ -420,7 +420,7 @@ class LocalVideoTrackStatsInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create_from(stats: LocalVideoTrackStats) -> 'LocalVideoTrackStatsInner':
+    def create(stats: LocalVideoTrackStats) -> 'LocalVideoTrackStatsInner':
         return LocalVideoTrackStatsInner(
             stats.number_of_streams,
             stats.bytes_major_stream,
@@ -455,17 +455,17 @@ class SimulcastStreamConfigInner(ctypes.Structure):
         ("framerate", ctypes.c_int)
     ]
 
-    def to_simulcast_stream_config(self):
+    def get(self):
         return SimulcastStreamConfig(
-            dimensions=self.dimensions.contents.to_video_dimensions(),
+            dimensions=self.dimensions.contents.get(),
             bitrate=self.bitrate,
             framerate=self.framerate
         )
 
     @staticmethod
-    def create_from(config: SimulcastStreamConfig) -> 'SimulcastStreamConfigInner':
+    def create(config: SimulcastStreamConfig) -> 'SimulcastStreamConfigInner':
         return SimulcastStreamConfigInner(
-            VideoDimensionsInner.create_from(config.dimensions),
+            VideoDimensionsInner.create(config.dimensions),
             config.bitrate,
             config.framerate
         )
@@ -482,7 +482,7 @@ class AnaStatsInner(ctypes.Structure):
         ("uplink_packet_loss_fraction", ctypes.c_float)
     ]
 
-    def to_ana_stats(self):
+    def get(self):
         return AnaStats(
             bitrate_action_counter=self.bitrate_action_counter,
             channel_action_counter=self.channel_action_counter,
@@ -494,7 +494,7 @@ class AnaStatsInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create_from(stats: AnaStats) -> 'AnaStatsInner':
+    def create(stats: AnaStats) -> 'AnaStatsInner':
         return AnaStatsInner(
             stats.bitrate_action_counter,
             stats.channel_action_counter,
@@ -518,7 +518,7 @@ class AudioProcessingStatsInner(ctypes.Structure):
         ("delay_ms", ctypes.c_int32)
     ]
 
-    def to_audio_processing_stats(self):
+    def get(self):
         return AudioProcessingStats(
             echo_return_loss=self.echo_return_loss,
             echo_return_loss_enhancement=self.echo_return_loss_enhancement,
@@ -531,7 +531,7 @@ class AudioProcessingStatsInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create_from(stats: AudioProcessingStats) -> 'AudioProcessingStatsInner':
+    def create(stats: AudioProcessingStats) -> 'AudioProcessingStatsInner':
         return AudioProcessingStatsInner(
             stats.echo_return_loss,
             stats.echo_return_loss_enhancement,
@@ -564,7 +564,7 @@ class LocalAudioDetailedStatsInner(ctypes.Structure):
         ("apm_statistics", AudioProcessingStatsInner)
     ]
 
-    def to_local_audio_detailed_stats(self):
+    def get(self):
         return LocalAudioDetailedStats(
             local_ssrc=self.local_ssrc,
             bytes_sent=self.bytes_sent,
@@ -580,12 +580,12 @@ class LocalAudioDetailedStatsInner(ctypes.Structure):
             total_input_energy=self.total_input_energy,
             total_input_duration=self.total_input_duration,
             typing_noise_detected=self.typing_noise_detected,
-            ana_statistics=self.ana_statistics.contents.to_ana_stats(),
-            apm_statistics=self.apm_statistics.contents.to_audio_processing_stats()
+            ana_statistics=self.ana_statistics.contents.get(),
+            apm_statistics=self.apm_statistics.contents.get()
         )
 
     @staticmethod
-    def create_from(stats: LocalAudioDetailedStats) -> 'LocalAudioDetailedStatsInner':
+    def create(stats: LocalAudioDetailedStats) -> 'LocalAudioDetailedStatsInner':
         return LocalAudioDetailedStatsInner(
             stats.local_ssrc,
             stats.bytes_sent,
@@ -601,8 +601,8 @@ class LocalAudioDetailedStatsInner(ctypes.Structure):
             stats.total_input_energy,
             stats.total_input_duration,
             stats.typing_noise_detected,
-            AnaStatsInner.create_from(stats.ana_statistics),
-            AudioProcessingStatsInner.create_from(stats.apm_statistics)
+            AnaStatsInner.create(stats.ana_statistics),
+            AudioProcessingStatsInner.create(stats.apm_statistics)
         )
 
 
@@ -619,7 +619,7 @@ class VideoTrackInfoInner(ctypes.Structure):
         ("observation_position", ctypes.c_uint32)
     ]
 
-    def to_video_track_info(self):
+    def get(self):
         return VideoTrackInfo(
             is_local=self.is_local,
             owner_uid=self.owner_uid,
@@ -633,7 +633,7 @@ class VideoTrackInfoInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create_from(info: VideoTrackInfo) -> 'VideoTrackInfoInner':
+    def create(info: VideoTrackInfo) -> 'VideoTrackInfoInner':
         return VideoTrackInfoInner(
             info.is_local,
             info.owner_uid,
@@ -669,7 +669,7 @@ class RemoteVideoTrackStatsInner(ctypes.Structure):
         ("publishDuration", ctypes.c_uint64)
     ]
 
-    def to_remote_video_track_stats(self):
+    def get(self):
         return RemoteVideoTrackStats(
             uid=self.uid,
             delay=self.delay,
@@ -692,7 +692,7 @@ class RemoteVideoTrackStatsInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create_from(stats: RemoteVideoTrackStats) -> 'RemoteVideoTrackStatsInner':
+    def create(stats: RemoteVideoTrackStats) -> 'RemoteVideoTrackStatsInner':
         return RemoteVideoTrackStatsInner(
             stats.uid,
             stats.delay,
@@ -737,7 +737,7 @@ class ExternalVideoFrameInner(ctypes.Structure):
         ("alpha_buffer", ctypes.c_void_p)
     ]
 
-    def to_external_video_frame(self):
+    def get(self):
         return ExternalVideoFrame(
             type=self.type,
             format=self.format,
@@ -760,7 +760,7 @@ class ExternalVideoFrameInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create_from(frame: ExternalVideoFrame) -> 'ExternalVideoFrameInner':
+    def create(frame: ExternalVideoFrame) -> 'ExternalVideoFrameInner':
 
         c_buffer = (ctypes.c_uint8 * len(frame.buffer)).from_buffer(frame.buffer)
         c_buffer_ptr = ctypes.cast(c_buffer, ctypes.c_void_p)
@@ -798,7 +798,7 @@ class RTCConnInfoInner(ctypes.Structure):
         ("internal_uid", ctypes.c_uint)
     ]
 
-    def to_rtc_conn_info(self):
+    def get(self):
         return RTCConnInfo(
             id=self.id,
             channel_id=self.channel_id.decode(),
@@ -808,7 +808,7 @@ class RTCConnInfoInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create_from(info: RTCConnInfo) -> 'RTCConnInfoInner':
+    def create(info: RTCConnInfo) -> 'RTCConnInfoInner':
         return RTCConnInfoInner(
             info.id,
             info.channel_id.encode(),
@@ -827,7 +827,7 @@ class AudioSubscriptionOptionsInner(ctypes.Structure):
         ('sample_rate_hz', ctypes.c_uint32),
     ]
 
-    def to_audio_subscription_options(self):
+    def get(self):
         return AudioSubscriptionOptions(
             packet_only=self.packet_only,
             pcm_data_only=self.pcm_data_only,
@@ -837,7 +837,7 @@ class AudioSubscriptionOptionsInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create_from(options: AudioSubscriptionOptions) -> 'AudioSubscriptionOptionsInner':
+    def create(options: AudioSubscriptionOptions) -> 'AudioSubscriptionOptionsInner':
         return AudioSubscriptionOptionsInner(
             options.packet_only,
             options.pcm_data_only,
@@ -863,7 +863,7 @@ class RTCConnConfigInner(ctypes.Structure):
         ('video_recv_media_packet', ctypes.c_int),
     ]
 
-    def to_rtc_conn_config(self):
+    def get(self):
         return RTCConnConfig(
             auto_subscribe_audio=self.auto_subscribe_audio,
             auto_subscribe_video=self.auto_subscribe_video,
@@ -871,7 +871,7 @@ class RTCConnConfigInner(ctypes.Structure):
             max_send_bitrate=self.max_send_bitrate,
             min_port=self.min_port,
             max_port=self.max_port,
-            audio_subs_options=self.audio_subs_options.contents.to_audio_subscription_options(),
+            audio_subs_options=self.audio_subs_options.contents.get(),
             client_role_type=self.client_role_type,
             channel_profile=self.channel_profile,
             audio_recv_media_packet=self.audio_recv_media_packet,
@@ -880,7 +880,7 @@ class RTCConnConfigInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create_from(config: RTCConnConfig) -> 'RTCConnConfigInner':
+    def create(config: RTCConnConfig) -> 'RTCConnConfigInner':
         return RTCConnConfigInner(
             config.auto_subscribe_audio,
             config.auto_subscribe_video,
@@ -888,7 +888,7 @@ class RTCConnConfigInner(ctypes.Structure):
             config.max_send_bitrate,
             config.min_port,
             config.max_port,
-            AudioSubscriptionOptionsInner.create_from(config.audio_subs_options),
+            AudioSubscriptionOptionsInner.create(config.audio_subs_options),
             config.client_role_type,
             config.channel_profile,
             config.audio_recv_media_packet,
@@ -912,7 +912,7 @@ class RemoteAudioTrackStatsInner(ctypes.Structure):
         ("received_bytes", ctypes.c_int64)
     ]
 
-    def to_remote_audio_track_stats(self):
+    def get(self):
         return RemoteAudioTrackStats(
             uid=self.uid,
             quality=self.quality,
@@ -928,7 +928,7 @@ class RemoteAudioTrackStatsInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create_from(stats: RemoteAudioTrackStats) -> 'RemoteAudioTrackStatsInner':
+    def create(stats: RemoteAudioTrackStats) -> 'RemoteAudioTrackStatsInner':
         return RemoteAudioTrackStatsInner(
             stats.uid,
             stats.quality,
@@ -955,7 +955,7 @@ class EncodedAudioFrameInfoInner(ctypes.Structure):
     ]
 
     @staticmethod
-    def create_from(info: EncodedAudioFrameInfo) -> 'EncodedAudioFrameInfoInner':
+    def create(info: EncodedAudioFrameInfo) -> 'EncodedAudioFrameInfoInner':
         return EncodedAudioFrameInfoInner(
             info.speech,
             info.codec,
@@ -974,7 +974,7 @@ class AudioVolumeInfoInner(ctypes.Structure):
         ("voicePitch", ctypes.c_double)
     ]
 
-    def to_audio_volume_info(self):
+    def get(self):
         return AudioVolumeInfo(
             user_id=self.user_id,
             volume=self.volume,
@@ -991,7 +991,7 @@ class RemoteVideoStreamInfoInner(ctypes.Structure):
         ("total_downscale_level_counts", ctypes.c_uint8)
     ]
 
-    def to_remote_video_stream_info(self):
+    def get(self):
         return RemoteVideoStreamInfo(
             uid=self.uid,
             stream_type=self.stream_type,
@@ -1017,7 +1017,7 @@ class AudioFrameInner(ctypes.Structure):
         ("pitch", ctypes.c_int)
     ]
 
-    def to_audio_frame(self):
+    def get(self):
         return AudioFrame(
             type=self.type,
             samples_per_channel=self.samples_per_channel,
@@ -1036,7 +1036,7 @@ class AudioFrameInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create_from(frame: AudioFrame) -> 'AudioFrameInner':
+    def create(frame: AudioFrame) -> 'AudioFrameInner':
         return AudioFrameInner(
             frame.type,
             frame.samples_per_channel,
@@ -1078,7 +1078,7 @@ class AgoraServiceConfigInner(ctypes.Structure):
         ('use_string_uid', ctypes.c_int),
     ]
 
-    def to_agora_service_config(self):
+    def get(self):
         return AgoraServiceConfig(
             enable_audio_processor=self.enable_audio_processor,
             enable_audio_device=self.enable_audio_device,
@@ -1092,13 +1092,13 @@ class AgoraServiceConfigInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create_from(config: AgoraServiceConfig) -> 'AgoraServiceConfigInner':
+    def create(config: AgoraServiceConfig) -> 'AgoraServiceConfigInner':
         return AgoraServiceConfigInner(
             config.enable_audio_processor,
             config.enable_audio_device,
             config.enable_video,
             config.context,
-            config.app_id.encode(),
+            config.appid.encode(),
             config.area_code,
             config.channel_profile,
             config.audio_scenario,
@@ -1121,7 +1121,7 @@ class OwnedEncodedVideoFrameInfoInner(ctypes.Structure):
         ("stream_type", ctypes.c_int)
     ]
 
-    def to_owned_encoded_video_frame_info(self):
+    def get(self):
         return EncodedVideoFrameInfo(
             codec_type=self.codec_type,
             width=self.width,
@@ -1137,7 +1137,7 @@ class OwnedEncodedVideoFrameInfoInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create_from(info: EncodedVideoFrameInfo) -> 'OwnedEncodedVideoFrameInfoInner':
+    def create(info: EncodedVideoFrameInfo) -> 'OwnedEncodedVideoFrameInfoInner':
         return OwnedEncodedVideoFrameInfoInner(
             info.codec_type,
             info.width,
@@ -1171,7 +1171,7 @@ class VadConfigInner(ctypes.Structure):
         ("inactivePercent", ctypes.c_float)
     ]
 
-    def to_vad_config(self) -> VadConfig:
+    def get(self) -> VadConfig:
         return VadConfig(
             fftSz=self.fftSz,
             hopSz=self.hopSz,
@@ -1190,7 +1190,7 @@ class VadConfigInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create_from(config: VadConfig) -> 'VadConfigInner':
+    def create(config: VadConfig) -> 'VadConfigInner':
         return VadConfigInner(
             config.fftSz,
             config.hopSz,

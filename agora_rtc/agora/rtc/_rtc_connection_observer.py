@@ -121,32 +121,33 @@ class RTCConnectionObserverInner(ctypes.Structure):
 
     def _on_connected(self, agora_rtc_conn, conn_info_inner, reason):
         logger.debug(f"ConnCB _on_connected: {agora_rtc_conn}, {conn_info_inner}, {reason}")
-        conn_info = conn_info_inner.contents._convert_to_rtc_conn_info()
+        conn_info = conn_info_inner.contents.get()
         self.conn_observer.on_connected(self.conn, conn_info, reason)
 
     def _on_disconnected(self, agora_rtc_conn, conn_info_inner, reason):
         logger.debug(f"ConnCB _on_disconnected: {agora_rtc_conn}, {conn_info_inner}, {reason}")
-        conn_info = conn_info_inner.contents._convert_to_rtc_conn_info()
+        conn_info = conn_info_inner.contents.get()
         self.conn_observer.on_disconnected(self.conn, conn_info, reason)
 
-    def _on_connecting(self, agora_rtc_conn, conn_info_inner, reason):
+    def _on_connecting(self, agora_rtc_conn, conn_info_inner: ctypes.POINTER(RTCConnInfoInner), reason):
         logger.debug(f"ConnCB _on_connecting: {agora_rtc_conn}, {conn_info_inner}, {reason}")
-        conn_info = conn_info_inner.contents._convert_to_rtc_conn_info()
+        # conn_info = conn_info_inner.contents.get()
+        conn_info = conn_info_inner.contents.get()
         self.conn_observer.on_connecting(self.conn, conn_info, reason)
 
     def _on_reconnecting(self, agora_rtc_conn, conn_info_inner, reason):
         logger.debug(f"ConnCB _on_reconnecting: {agora_rtc_conn}, {conn_info_inner}, {reason}")
-        conn_info = conn_info_inner.contents._convert_to_rtc_conn_info()
+        conn_info = conn_info_inner.contents.get()
         self.conn_observer.on_reconnecting(self.conn, conn_info, reason)
 
     def _on_reconnected(self, agora_rtc_conn, conn_info_inner, reason):
         logger.debug(f"ConnCB _on_reconnected: {agora_rtc_conn}, {conn_info_inner}, {reason}")
-        conn_info = conn_info_inner.contents._convert_to_rtc_conn_info()
+        conn_info = conn_info_inner.contents.get()
         self.conn_observer.on_reconnected(self.conn, conn_info, reason)
 
     def _on_connection_lost(self, agora_rtc_conn, conn_info_inner):
         logger.debug(f"ConnCB _on_connection_lost: {agora_rtc_conn}, {conn_info_inner}")
-        conn_info = conn_info_inner.contents._convert_to_rtc_conn_info()
+        conn_info = conn_info_inner.contents.get()
         self.conn_observer.on_connection_lost(self.conn, conn_info)
 
     def _on_lastmile_quality(self, agora_rtc_conn, quality):
@@ -173,7 +174,7 @@ class RTCConnectionObserverInner(ctypes.Structure):
 
     def _on_connection_failure(self, agora_rtc_conn, conn_info_inner, reason):
         logger.debug(f"ConnCB _on_connection_failure: {agora_rtc_conn}, {conn_info_inner}, {reason}")
-        conn_info = conn_info_inner.contents._convert_to_rtc_conn_info()
+        conn_info = conn_info_inner.contents.get()
         self.conn_observer.on_connection_failure(self.conn, conn_info, reason)
 
     def _on_user_joined(self, agora_rtc_conn, user_id):

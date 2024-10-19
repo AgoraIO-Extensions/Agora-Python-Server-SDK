@@ -332,6 +332,16 @@ class AudioPcmDataInfo:
 
 
 @dataclass
+class PcmAudioFrame:
+    data: bytearray
+    timestamp: int
+    samples_per_channel: int
+    bytes_per_sample: int
+    number_of_channels: int
+    sample_rate: int
+
+
+@dataclass
 class AudioEncoderConfiguration:
     audioProfile: AudioProfileType = AudioProfileType.AUDIO_PROFILE_DEFAULT
 
