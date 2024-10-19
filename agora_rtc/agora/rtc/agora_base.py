@@ -1,17 +1,5 @@
-import ctypes
 from enum import IntEnum
 from dataclasses import dataclass
-from . import agora_lib
-
-
-AGORA_HANDLE = ctypes.c_void_p
-AGORA_API_C_INT = ctypes.c_int
-AGORA_API_C_HDL = ctypes.c_void_p
-AGORA_API_C_VOID = None
-user_id_t = ctypes.c_char_p
-uid_t = ctypes.c_uint
-track_id_t = ctypes.c_uint
-k_max_codec_name_len = 100
 
 
 class ChannelProfileType(IntEnum):
@@ -298,8 +286,6 @@ class RTCConnConfig():
     video_recv_media_packet: int = 0
 
 
-
-
 @dataclass
 class VideoSubscriptionOptions:
     type: VideoStreamType = VideoStreamType.VIDEO_STREAM_HIGH
@@ -346,7 +332,6 @@ class AudioParams:
     channels: int
     mode: int
     samples_per_call: int
-
 
 
 @dataclass

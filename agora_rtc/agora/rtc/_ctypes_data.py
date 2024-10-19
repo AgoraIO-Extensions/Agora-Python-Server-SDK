@@ -1,5 +1,14 @@
 import ctypes
 from .agora_base import *
+from . import agora_lib
+AGORA_HANDLE = ctypes.c_void_p
+AGORA_API_C_INT = ctypes.c_int
+AGORA_API_C_HDL = ctypes.c_void_p
+AGORA_API_C_VOID = None
+user_id_t = ctypes.c_char_p
+uid_t = ctypes.c_uint
+track_id_t = ctypes.c_uint
+k_max_codec_name_len = 100
 
 
 class AudioEncoderConfigurationInner(ctypes.Structure):
@@ -794,7 +803,7 @@ class RTCConnConfigInner(ctypes.Structure):
             audio_recv_encoded_frame=self.audio_recv_encoded_frame,
             video_recv_media_packet=self.video_recv_media_packet
         )
-    
+
     @staticmethod
     def create_from(config: RTCConnConfig) -> 'RTCConnConfigInner':
         return RTCConnConfigInner(
@@ -811,6 +820,7 @@ class RTCConnConfigInner(ctypes.Structure):
             config.audio_recv_encoded_frame,
             config.video_recv_media_packet
         )
+
 
 class RemoteAudioTrackStatsInner(ctypes.Structure):
     _fields_ = [
