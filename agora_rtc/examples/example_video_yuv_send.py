@@ -24,7 +24,7 @@ class RTCProcessIMPL(RTCBaseProcess):
         media_node_factory = agora_service.create_media_node_factory()
         yuv_data_sender = media_node_factory.create_video_frame_sender()
         video_track = agora_service.create_custom_video_track_frame(yuv_data_sender)
-        video_config = VideoEncoderConfig(
+        video_config = VideoEncoderConfiguration(
             frame_rate=sample_options.fps,
             dimensions=VideoDimensions(
                 width=sample_options.width,

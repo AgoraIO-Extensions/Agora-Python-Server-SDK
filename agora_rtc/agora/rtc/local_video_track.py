@@ -11,7 +11,7 @@ agora_local_video_track_set_enabled.argtypes = [AGORA_HANDLE, ctypes.c_int]
 
 agora_local_video_track_set_video_encoder_config = agora_lib.agora_local_video_track_set_video_encoder_config
 agora_local_video_track_set_video_encoder_config.restype = ctypes.c_int
-agora_local_video_track_set_video_encoder_config.argtypes = [AGORA_HANDLE, ctypes.POINTER(VideoEncoderConfigInner)]
+agora_local_video_track_set_video_encoder_config.argtypes = [AGORA_HANDLE, ctypes.POINTER(VideoEncoderConfigurationInner)]
 
 agora_local_video_track_enable_simulcast_stream = agora_lib.agora_local_video_track_enable_simulcast_stream
 agora_local_video_track_enable_simulcast_stream.restype = ctypes.c_int
@@ -45,8 +45,8 @@ class LocalVideoTrack:
     def set_enabled(self, enable):
         agora_local_video_track_set_enabled(self.track_handle, enable)
 
-    def set_video_encoder_configuration(self, config):
-        ret = agora_local_video_track_set_video_encoder_config(self.track_handle, ctypes.byref(config))
+    def set_video_encoder_configuration(self, config: VideoEncoderConfiguration):
+        ret = agora_local_video_track_set_video_encoder_config(self.track_handle, ctypes.byref(VideoEncoderConfigurationInner.create(config)))
         return ret
 
     def enable_simulcast_stream(self, enabled, config):

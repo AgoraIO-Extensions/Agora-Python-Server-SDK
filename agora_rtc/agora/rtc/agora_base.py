@@ -1,5 +1,5 @@
 from enum import IntEnum
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 class ChannelProfileType(IntEnum):
@@ -30,6 +30,15 @@ class AudioCodecType(IntEnum):
     AUDIO_CODEC_HEAAC2 = 11
     AUDIO_CODEC_LPCNET = 12
     AUDIO_CODEC_OPUSMC = 13
+
+
+class VideoCodecType(IntEnum):
+    VIDEO_CODEC_NONE = 0
+    VIDEO_CODEC_VP8 = 1
+    VIDEO_CODEC_H264 = 2
+    VIDEO_CODEC_H265 = 3
+    VIDEO_CODEC_GENERIC = 6
+    VIDEO_CODEC_GENERIC_JPEG = 20
 
 
 class AreaCode(IntEnum):
@@ -394,15 +403,15 @@ class EncodedVideoFrameInfo:
 
 
 @dataclass
-class VideoEncoderConfig:
-    codec_type: int
+class VideoEncoderConfiguration:
     dimensions: VideoDimensions
-    frame_rate: int
-    bitrate: int
-    min_bitrate: int
-    orientation_mode: int
-    degradation_preference: int
-    mirror_mode: int
+    codec_type: VideoCodecType = VideoCodecType.VIDEO_CODEC_NONE
+    frame_rate: int = 15
+    bitrate: int = 0
+    min_bitrate: int = 0
+    orientation_mode: int = 0
+    degradation_preference: int = 0
+    mirror_mode: int = 0
 
 
 @dataclass
@@ -421,7 +430,7 @@ class ExternalVideoFrame:
     egl_context: bytearray = None
     egl_type: int = 0
     texture_id: int = 0
-    matrix: list = None
+    matrix: list = field(default_factory=list)
     metadata: str = ""
     alpha_buffer: bytearray = None
 

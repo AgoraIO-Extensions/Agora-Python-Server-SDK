@@ -327,7 +327,7 @@ class VideoDimensionsInner(ctypes.Structure):
         )
 
 
-class VideoEncoderConfigInner(ctypes.Structure):
+class VideoEncoderConfigurationInner(ctypes.Structure):
     _fields_ = [
         ("codec_type", ctypes.c_int),
         ("dimensions", VideoDimensionsInner),
@@ -340,7 +340,7 @@ class VideoEncoderConfigInner(ctypes.Structure):
     ]
 
     def get(self):
-        return VideoEncoderConfig(
+        return VideoEncoderConfiguration(
             codec_type=self.codec_type,
             dimensions=self.dimensions.contents.get(),
             frame_rate=self.frame_rate,
@@ -352,8 +352,8 @@ class VideoEncoderConfigInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create(config: VideoEncoderConfig) -> 'VideoEncoderConfigInner':
-        return VideoEncoderConfigInner(
+    def create(config: VideoEncoderConfiguration) -> 'VideoEncoderConfigurationInner':
+        return VideoEncoderConfigurationInner(
             config.codec_type,
             VideoDimensionsInner.create(config.dimensions),
             config.frame_rate,

@@ -24,4 +24,4 @@ class VideoFrameObserverInner(ctypes.Structure):
 
     def _on_frame(self, agora_handle, channel_id, remote_uid, frame: VideoFrameInner):
         vf = frame.contents
-        self.video_frame_observer.on_frame(channel_id.decode() if channel_id else None, remote_uid.decode(), vf.to_video_frame())
+        self.video_frame_observer.on_frame(channel_id.decode() if channel_id else None, remote_uid.decode(), vf.get())
