@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 #         ) -> None:
 #         self.log_path = log_path
 #         self.log_size = log_size
-        
+
 #         self.enable_audio_processor = enable_audio_processor
 #         self.enable_audio_device = enable_audio_device
 #         self.enable_video = enable_video
@@ -41,37 +41,35 @@ logger = logging.getLogger(__name__)
 #         self.audio_scenario = audio_scenario
 #         self.use_string_uid = use_string_uid
 
-    # def _to_inner(self):
-    #     inner = AgoraServiceConfigInner()
-        
-    #     inner.enable_audio_processor = self.enable_audio_processor
-    #     inner.enable_audio_device = self.enable_audio_device
-    #     inner.enable_video = self.enable_video
-    #     inner.context = self.context
+# def _to_inner(self):
+#     inner = AgoraServiceConfigInner()
 
-    #     inner.app_id = self.appid.encode('utf-8')
-    #     inner.area_code = self.area_code
-    #     inner.channel_profile = self.channel_profile.value
-    #     inner.audio_scenario = self.audio_scenario.value
+#     inner.enable_audio_processor = self.enable_audio_processor
+#     inner.enable_audio_device = self.enable_audio_device
+#     inner.enable_video = self.enable_video
+#     inner.context = self.context
 
-    #     inner.use_string_uid = self.use_string_uid
-    #     return inner
+#     inner.app_id = self.appid.encode('utf-8')
+#     inner.area_code = self.area_code
+#     inner.channel_profile = self.channel_profile.value
+#     inner.audio_scenario = self.audio_scenario.value
 
+#     inner.use_string_uid = self.use_string_uid
+#     return inner
 
-
-    # def __init__(self) -> None:
-    #     self.log_path = ""
-    #     self.log_size = 0    
-    #     self.appid = ""
-    #     self.enable_audio_processor = 1
-    #     self.enable_audio_device = 0
-    #     self.enable_video = 0
-    #     self.context = None
-    #     self.area_code = 0
-    #     # self.channel_profile = ChannelProfileType.CHANNEL_PROFILE_COMMUNICATION
-    #     self.channel_profile = 0
-    #     self.audio_scenario = 0
-    #     self.use_string_uid = 0
+# def __init__(self) -> None:
+#     self.log_path = ""
+#     self.log_size = 0
+#     self.appid = ""
+#     self.enable_audio_processor = 1
+#     self.enable_audio_device = 0
+#     self.enable_video = 0
+#     self.context = None
+#     self.area_code = 0
+#     # self.channel_profile = ChannelProfileType.CHANNEL_PROFILE_COMMUNICATION
+#     self.channel_profile = 0
+#     self.audio_scenario = 0
+#     self.use_string_uid = 0
 
 
 agora_service_create = agora_lib.agora_service_create
@@ -95,7 +93,7 @@ agora_service_set_log_file.argtypes = [AGORA_HANDLE, ctypes.c_char_p, ctypes.c_u
 
 agora_service_create_custom_audio_track_pcm = agora_lib.agora_service_create_custom_audio_track_pcm
 agora_service_create_custom_audio_track_pcm.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
-agora_service_create_custom_audio_track_pcm.restype = AGORA_HANDLE  
+agora_service_create_custom_audio_track_pcm.restype = AGORA_HANDLE
 
 agora_service_create_custom_audio_track_encoded = agora_lib.agora_service_create_custom_audio_track_encoded
 agora_service_create_custom_audio_track_encoded.argtypes = [AGORA_HANDLE, AGORA_HANDLE, ctypes.c_int]
@@ -120,33 +118,32 @@ agora_service_get_agora_parameter.argtypes = [AGORA_HANDLE]
 
 agora_service_create_custom_video_track_encoded = agora_lib.agora_service_create_custom_video_track_encoded
 agora_service_create_custom_video_track_encoded.restype = AGORA_HANDLE
-agora_service_create_custom_video_track_encoded.argtypes = [AGORA_HANDLE, AGORA_HANDLE, ctypes.POINTER(SenderOptions)]
-
+agora_service_create_custom_video_track_encoded.argtypes = [AGORA_HANDLE, AGORA_HANDLE, ctypes.POINTER(SenderOptionsInner)]
 
 
 class AgoraService:
     def __init__(self) -> None:
         self.service_handle = agora_service_create()
-       
+
         # set tag???
         self.inited = False
 
-    def initialize(self, config: AgoraServiceConfig):       
+    def initialize(self, config: AgoraServiceConfig):
         if self.inited == True:
             return 0
         config.app_id = config.appid.encode('utf-8')
-        result = agora_service_initialize(self.service_handle, ctypes.byref(config._to_inner()))
+        result = agora_service_initialize(self.service_handle, ctypes.byref(AgoraServiceConfigInner.create_from(config=config)))
         if result == 0:
             self.inited = True
         logger.debug(f'Initialization result: {result}')
 
-         # to enable plugin
+        # to enable plugin
         provider = "agora.builtin"
         generator = "agora_audio_label_generator"
         cprovider = provider.encode('utf-8')
         cgenerator = generator.encode('utf-8')
         ctrak = ctypes.c_char_p(None)
-        #agora_service_enable_extension(self.service_handle, "agora.builtin", "agora_audio_label_generator", None, 1)
+        # agora_service_enable_extension(self.service_handle, "agora.builtin", "agora_audio_label_generator", None, 1)
         agora_service_enable_extension(self.service_handle, cprovider, cgenerator, ctrak, 1)
         agora_parameter = self.get_agora_parameter()
         agora_parameter.set_int("rtc.set_app_type", 18)
@@ -154,23 +151,22 @@ class AgoraService:
         if config.log_path:
             log_size = 512 * 1024
             if config.log_size > 0:
-                log_size = config.log_size            
-            agora_service_set_log_file(self.service_handle, ctypes.create_string_buffer(config.log_path.encode('utf-8')),log_size)
-        
+                log_size = config.log_size
+            agora_service_set_log_file(self.service_handle, ctypes.create_string_buffer(config.log_path.encode('utf-8')), log_size)
+
         return result
-        
-    def release(self):                
+
+    def release(self):
         if self.inited == False:
             return
-        
 
         if self.service_handle:
             agora_service_release(self.service_handle)
-       
+
         self.inited = False
         self.service_handle = None
-    
-    #createMediaNodeFactory: to create a medianode factory object
+
+    # createMediaNodeFactory: to create a medianode factory object
     def create_media_node_factory(self):
         if not self.inited:
             logger.error("AgoraService is not initialized. Please call initialize() first.")
@@ -179,7 +175,6 @@ class AgoraService:
         if media_node_handle is None:
             return None
         return MediaNodeFactory(media_node_handle)
-    
 
     def get_agora_parameter(self):
         agora_parameter = agora_service_get_agora_parameter(self.service_handle)
@@ -187,7 +182,7 @@ class AgoraService:
             return None
         return AgoraParameter(agora_parameter)
 
-    def create_rtc_connection(self, con_config: RTCConnConfig):       
+    def create_rtc_connection(self, con_config: RTCConnConfig):
         if not self.inited:
             logger.error("AgoraService is not initialized. Please call initialize() first.")
             return None
@@ -196,9 +191,8 @@ class AgoraService:
             return None
         return RTCConnection(rtc_conn_handle)
 
-
-    #createCustomAudioTrackPcm: creatae a custom audio track from pcm data sender
-    def create_custom_audio_track_pcm(self, audio_pcm_data_sender:AudioPcmDataSender) -> LocalAudioTrack:
+    # createCustomAudioTrackPcm: creatae a custom audio track from pcm data sender
+    def create_custom_audio_track_pcm(self, audio_pcm_data_sender: AudioPcmDataSender) -> LocalAudioTrack:
         if not self.inited:
             logger.error("AgoraService is not initialized. Please call initialize() first.")
             return None
@@ -206,8 +200,9 @@ class AgoraService:
         if custom_audio_track is None:
             return None
         return LocalAudioTrack(custom_audio_track)
-    #mix_mode: MIX_ENABLED = 0, MIX_DISABLED = 1
-    def create_custom_audio_track_encoded(self, audio_encoded_frame_sender:AudioEncodedFrameSender, mix_mode:int):
+    # mix_mode: MIX_ENABLED = 0, MIX_DISABLED = 1
+
+    def create_custom_audio_track_encoded(self, audio_encoded_frame_sender: AudioEncodedFrameSender, mix_mode: int):
         if not self.inited:
             logger.error("AgoraService is not initialized. Please call initialize() first.")
             return None
@@ -215,8 +210,8 @@ class AgoraService:
         if custom_audio_track is None:
             return None
         return LocalAudioTrack(custom_audio_track)
-    
-    def create_custom_video_track_frame(self, video_frame_sender:VideoFrameSender):
+
+    def create_custom_video_track_frame(self, video_frame_sender: VideoFrameSender):
         if not self.inited:
             logger.error("AgoraService is not initialized. Please call initialize() first.")
             return None
@@ -224,8 +219,8 @@ class AgoraService:
         if custom_video_track is None:
             return None
         return LocalVideoTrack(custom_video_track)
-    
-    def create_custom_video_track_encoded(self, video_encoded_frame_sender:VideoEncodedImageSender, options:SenderOptions):
+
+    def create_custom_video_track_encoded(self, video_encoded_frame_sender: VideoEncodedImageSender, options: SenderOptions):
         if not self.inited:
             logger.error("AgoraService is not initialized. Please call initialize() first.")
             return None
@@ -233,7 +228,7 @@ class AgoraService:
         if custom_video_track is None:
             return None
         return LocalVideoTrack(custom_video_track)
-    
+
     def set_log_file(self, log_path: str, log_size: int = 512 * 1024):
         if not self.inited:
             logger.error("AgoraService is not initialized. Please call initialize() first.")
@@ -245,5 +240,3 @@ class AgoraService:
         else:
             logger.error(f"Failed to set log file. Error code: {result}")
         return result
-
-

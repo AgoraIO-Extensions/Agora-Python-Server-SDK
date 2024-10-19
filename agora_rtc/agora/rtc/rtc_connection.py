@@ -7,6 +7,7 @@ from ._audio_frame_observer import AudioFrameObserverInner
 from .agora_parameter import AgoraParameter
 from .globals import AgoraHandleInstanceMap
 from ._rtc_connection_observer import RTCConnectionObserverInner
+from ._ctypes_data import *
 import logging
 logger = logging.getLogger(__name__)
 

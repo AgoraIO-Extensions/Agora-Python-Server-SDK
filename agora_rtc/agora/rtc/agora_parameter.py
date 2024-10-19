@@ -1,25 +1,7 @@
 import time
 import ctypes
 from .agora_base import *
-
-"""
-AGORA_API_C_HDL agora_rtc_conn_get_agora_parameter(AGORA_HANDLE agora_rtc_conn);
-AGORA_API_C_INT agora_parameter_set_parameters(AGORA_HANDLE agora_parameter, const char* json_src);
-AGORA_API_C_INT agora_parameter_get_string(AGORA_HANDLE agora_parameter, const char* key, char* value, uint32_t* value_size);
-"""
-"""
-ut sample:
-jsonparam = "{"key1":"value1}"
-set_parameters(jsonparam)
-
-get_string("key1", value, value_size)
-
-if(value == "value1")
- PASS:
-else
-FAILED
-"""
-
+from ._ctypes_data import *
 
 agora_parameter_set_int = agora_lib.agora_parameter_set_int
 agora_parameter_set_int.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int]

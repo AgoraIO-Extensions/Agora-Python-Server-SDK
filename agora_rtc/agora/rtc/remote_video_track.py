@@ -1,27 +1,28 @@
+from ._ctypes_data import *
 import ctypes
 from .agora_base import *
 import logging
 logger = logging.getLogger(__name__)
 
 agora_remote_video_track_get_statistics = agora_lib.agora_remote_video_track_get_statistics
-agora_remote_video_track_get_statistics.restype = ctypes.POINTER(RemoteVideoTrackStats)
+agora_remote_video_track_get_statistics.restype = ctypes.POINTER(RemoteVideoTrackStatsInner)
 agora_remote_video_track_get_statistics.argtypes = [AGORA_HANDLE]
 
 agora_remote_video_track_destroy_statistics = agora_lib.agora_remote_video_track_destroy_statistics
 agora_remote_video_track_destroy_statistics.restype = None
-agora_remote_video_track_destroy_statistics.argtypes = [AGORA_HANDLE, ctypes.POINTER(RemoteVideoTrackStats)]
+agora_remote_video_track_destroy_statistics.argtypes = [AGORA_HANDLE, ctypes.POINTER(RemoteVideoTrackStatsInner)]
 
 agora_remote_video_track_get_state = agora_lib.agora_remote_video_track_get_state
 agora_remote_video_track_get_state.restype = ctypes.c_int
 agora_remote_video_track_get_state.argtypes = [AGORA_HANDLE]
 
 agora_remote_video_track_get_track_info = agora_lib.agora_remote_video_track_get_track_info
-agora_remote_video_track_get_track_info.restype = ctypes.POINTER(VideoTrackInfo)
+agora_remote_video_track_get_track_info.restype = ctypes.POINTER(VideoTrackInfoInner)
 agora_remote_video_track_get_track_info.argtypes = [AGORA_HANDLE]
 
 agora_remote_video_track_destroy_track_info = agora_lib.agora_remote_video_track_destroy_track_info
 agora_remote_video_track_destroy_track_info.restype = None
-agora_remote_video_track_destroy_track_info.argtypes = [AGORA_HANDLE, ctypes.POINTER(VideoTrackInfo)]
+agora_remote_video_track_destroy_track_info.argtypes = [AGORA_HANDLE, ctypes.POINTER(VideoTrackInfoInner)]
 
 agora_remote_video_track_register_video_encoded_image_receiver = agora_lib.agora_remote_video_track_register_video_encoded_image_receiver
 agora_remote_video_track_register_video_encoded_image_receiver.restype = ctypes.c_int

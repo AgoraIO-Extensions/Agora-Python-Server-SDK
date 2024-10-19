@@ -256,6 +256,27 @@ class RTCConnInfo():
 
 
 @dataclass
+class VideoFrame():
+    type: int = 0
+    width: int = 0
+    height: int = 0
+    y_stride: int = 0
+    u_stride: int = 0
+    v_stride: int = 0
+    y_buffer: bytearray = None
+    u_buffer: bytearray = None
+    v_buffer: bytearray = None
+    rotation: int = 0
+    render_time_ms: int = 0
+    avsync_type: int = 0
+    metadata: str = None
+    shared_context: str = None
+    texture_id: int = 0
+    matrix: list = None
+    alpha_buffer: bytearray = None
+
+
+@dataclass
 class AgoraServiceConfig:
     log_path: str = ""
     log_size: int = 0
@@ -271,6 +292,15 @@ class AgoraServiceConfig:
 
 
 @dataclass
+class AudioSubscriptionOptions:
+    packet_only: int = 0
+    pcm_data_only: int = 0
+    bytes_per_sample: int = 0
+    number_of_channels: int = 0
+    sample_rate_hz: int = 0
+
+
+@dataclass
 class RTCConnConfig():
     auto_subscribe_audio: int = 0
     auto_subscribe_video: int = 0
@@ -278,7 +308,7 @@ class RTCConnConfig():
     max_send_bitrate: int = 0
     min_port: int = 0
     max_port: int = 0
-    audio_subs_options: 'AudioSubscriptionOptions' = 'AudioSubscriptionOptions'()
+    audio_subs_options: 'AudioSubscriptionOptions' = AudioSubscriptionOptions()
     client_role_type: ClientRoleType = ClientRoleType.CLIENT_ROLE_BROADCASTER
     channel_profile: ChannelProfileType = ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING
     audio_recv_media_packet: int = 0
@@ -304,15 +334,6 @@ class AudioPcmDataInfo:
 @dataclass
 class AudioEncoderConfiguration:
     audioProfile: AudioProfileType = AudioProfileType.AUDIO_PROFILE_DEFAULT
-
-
-@dataclass
-class AudioSubscriptionOptions:
-    packet_only: int = 0
-    pcm_data_only: int = 0
-    bytes_per_sample: int = 0
-    number_of_channels: int = 0
-    sample_rate_hz: int = 0
 
 
 @dataclass
@@ -347,8 +368,8 @@ class SenderOptions:
     target_bitrate: int
 
 
-@dataclass
-class OwnedEncodedVideoFrameInfo:
+@dataclass(frozen=True, kw_only=True)
+class EncodedVideoFrameInfo:
     codec_type: int
     width: int
     height: int

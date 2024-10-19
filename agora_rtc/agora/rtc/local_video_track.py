@@ -1,3 +1,4 @@
+from ._ctypes_data import *
 import ctypes
 from .agora_base import *
 import logging
@@ -10,11 +11,11 @@ agora_local_video_track_set_enabled.argtypes = [AGORA_HANDLE, ctypes.c_int]
 
 agora_local_video_track_set_video_encoder_config = agora_lib.agora_local_video_track_set_video_encoder_config
 agora_local_video_track_set_video_encoder_config.restype = ctypes.c_int
-agora_local_video_track_set_video_encoder_config.argtypes = [AGORA_HANDLE, ctypes.POINTER(VideoEncoderConfig)]
+agora_local_video_track_set_video_encoder_config.argtypes = [AGORA_HANDLE, ctypes.POINTER(VideoEncoderConfigInner)]
 
 agora_local_video_track_enable_simulcast_stream = agora_lib.agora_local_video_track_enable_simulcast_stream
 agora_local_video_track_enable_simulcast_stream.restype = ctypes.c_int
-agora_local_video_track_enable_simulcast_stream.argtypes = [AGORA_HANDLE, ctypes.c_int, ctypes.POINTER(SimulcastStreamConfig)]
+agora_local_video_track_enable_simulcast_stream.argtypes = [AGORA_HANDLE, ctypes.c_int, ctypes.POINTER(SimulcastStreamConfigInner)]
 
 # agora_local_video_track_update_simulcast_stream = agora_lib.agora_local_video_track_update_simulcast_stream
 # agora_local_video_track_update_simulcast_stream.restype = ctypes.c_int
@@ -25,23 +26,24 @@ agora_local_video_track_get_state.restype = ctypes.c_int
 agora_local_video_track_get_state.argtypes = [AGORA_HANDLE]
 
 agora_local_video_track_get_statistics = agora_lib.agora_local_video_track_get_statistics
-agora_local_video_track_get_statistics.restype = ctypes.POINTER(LocalVideoTrackStats)
+agora_local_video_track_get_statistics.restype = ctypes.POINTER(LocalVideoTrackStatsInner)
 agora_local_video_track_get_statistics.argtypes = [AGORA_HANDLE]
 
 agora_local_video_track_destroy_statistics = agora_lib.agora_local_video_track_destroy_statistics
 agora_local_video_track_destroy_statistics.restype = None
-agora_local_video_track_destroy_statistics.argtypes = [AGORA_HANDLE, ctypes.POINTER(LocalVideoTrackStats)]
+agora_local_video_track_destroy_statistics.argtypes = [AGORA_HANDLE, ctypes.POINTER(LocalVideoTrackStatsInner)]
 
 # agora_local_video_track_get_type = agora_lib.agora_local_video_track_get_type
 # agora_local_video_track_get_type.restype = ctypes.c_int
 # agora_local_video_track_get_type.argtypes = [AGORA_HANDLE]
+
 
 class LocalVideoTrack:
     def __init__(self, track_handle):
         self.track_handle = track_handle
 
     def set_enabled(self, enable):
-        agora_local_video_track_set_enabled(self.track_handle, enable)        
+        agora_local_video_track_set_enabled(self.track_handle, enable)
 
     def set_video_encoder_configuration(self, config):
         ret = agora_local_video_track_set_video_encoder_config(self.track_handle, ctypes.byref(config))
@@ -72,6 +74,3 @@ class LocalVideoTrack:
 
     # def get_type(self):
     #     return agora_local_video_track_get_type(self.track_handle)
-
-
-

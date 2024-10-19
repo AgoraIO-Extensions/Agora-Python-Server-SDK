@@ -8,7 +8,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-
 ON_CONNECTED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCConnInfoInner), ctypes.c_int)
 ON_DISCONNECTED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCConnInfoInner), ctypes.c_int)
 ON_CONNECTING_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCConnInfoInner), ctypes.c_int)
@@ -17,7 +16,7 @@ ON_RECONNECTED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RT
 
 ON_CONNECTION_LOST_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCConnInfoInner))
 ON_LASTMILE_QUALITY_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_int)
-ON_LASTMILE_PROBE_RESULT_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(LastmileProbeResult))
+ON_LASTMILE_PROBE_RESULT_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(LastmileProbeResultInner))
 ON_TOKEN_PRIVILEGE_WILL_EXPIRE_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_char_p)
 ON_TOKEN_PRIVILEGE_DID_EXPIRE_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE)
 
@@ -25,7 +24,7 @@ ON_CONNECTION_LICENSE_VALIDATION_FAILURE_CALLBACK = ctypes.CFUNCTYPE(None, AGORA
 ON_CONNECTION_FAILURE_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCConnInfoInner), ctypes.c_int)
 ON_USER_JOINED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, user_id_t)
 ON_USER_LEFT_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, user_id_t, ctypes.c_int)
-ON_TRANSPORT_STATS_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCStats))
+ON_TRANSPORT_STATS_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(RTCStatsInner))
 
 ON_CHANGE_ROLE_SUCCESS_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_int, ctypes.c_int)
 ON_CHANGE_ROLE_FAILURE_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_int, ctypes.c_int)
@@ -45,6 +44,7 @@ ON_STREAM_MESSAGE_ERROR_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, user_id_
 ON_ENCRYPTION_ERROR_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_int)
 ON_UPLOAD_LOG_RESULT_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_char_p, ctypes.c_int, ctypes.c_int)
 
+
 class RTCConnectionObserverInner(ctypes.Structure):
     _fields_ = [
         ("on_connected", ON_CONNECTED_CALLBACK),
@@ -52,31 +52,31 @@ class RTCConnectionObserverInner(ctypes.Structure):
         ("on_connecting", ON_CONNECTING_CALLBACK),
         ("on_reconnecting", ON_RECONNECTING_CALLBACK),
         ("on_reconnected", ON_RECONNECTED_CALLBACK),
-        
+
         ("on_connection_lost", ON_CONNECTION_LOST_CALLBACK),
         ("on_lastmile_quality", ON_LASTMILE_QUALITY_CALLBACK),
         ("on_lastmile_probe_result", ON_LASTMILE_PROBE_RESULT_CALLBACK),
         ("on_token_privilege_will_expire", ON_TOKEN_PRIVILEGE_WILL_EXPIRE_CALLBACK),
         ("on_token_privilege_did_expire", ON_TOKEN_PRIVILEGE_DID_EXPIRE_CALLBACK),
-        
+
         ("on_connection_license_validation_failure", ON_CONNECTION_LICENSE_VALIDATION_FAILURE_CALLBACK),
         ("on_connection_failure", ON_CONNECTION_FAILURE_CALLBACK),
         ("on_user_joined", ON_USER_JOINED_CALLBACK),
         ("on_user_left", ON_USER_LEFT_CALLBACK),
         ("on_transport_stats", ON_TRANSPORT_STATS_CALLBACK),
-        
+
         ("on_change_role_success", ON_CHANGE_ROLE_SUCCESS_CALLBACK),
         ("on_change_role_failure", ON_CHANGE_ROLE_FAILURE_CALLBACK),
         ("on_user_network_quality", ON_USER_NETWORK_QUALITY_CALLBACK),
         ("on_network_type_changed", ON_NETWORK_TYPE_CHANGED_CALLBACK),
         ("on_api_call_executed", ON_API_CALL_EXECUTED_CALLBACK),
-        
+
         ("on_content_inspect_result", ON_CONTENT_INSPECT_RESULT_CALLBACK),
         ("on_snapshot_taken", ON_SNAPSHOT_TAKEN_CALLBACK),
         ("on_error", ON_ERROR_CALLBACK),
         ("on_warning", ON_WARNING_CALLBACK),
         ("on_channel_media_relay_state_changed", ON_CHANNEL_MEDIA_RELAY_STATE_CHANGED_CALLBACK),
-        
+
         ("on_local_user_registered", ON_LOCAL_USER_REGISTERED_CALLBACK),
         ("on_user_account_updated", ON_USER_ACCOUNT_UPDATED_CALLBACK),
         ("on_stream_message_error", ON_STREAM_MESSAGE_ERROR_CALLBACK),
@@ -84,7 +84,7 @@ class RTCConnectionObserverInner(ctypes.Structure):
         ("on_upload_log_result", ON_UPLOAD_LOG_RESULT_CALLBACK)
     ]
 
-    def __init__(self, conn_observer:IRTCConnectionObserver, connection: 'RTCConnection') -> None:
+    def __init__(self, conn_observer: IRTCConnectionObserver, connection: 'RTCConnection') -> None:
         from .rtc_connection import RTCConnection  # Moved import here to avoid circular import
         self.conn_observer = conn_observer
         self.conn = connection
@@ -155,12 +155,12 @@ class RTCConnectionObserverInner(ctypes.Structure):
 
     def _on_lastmile_probe_result(self, agora_rtc_conn, last_mile_prob_result_ptr):
         logger.debug(f"ConnCB _on_lastmile_probe_result: {agora_rtc_conn}, {last_mile_prob_result_ptr}")
-        last_mile_result = last_mile_prob_result_ptr.contents        
+        last_mile_result = last_mile_prob_result_ptr.contents
         self.conn_observer.on_lastmile_probe_result(self.conn, last_mile_result)
 
     def _on_token_privilege_will_expire(self, agora_rtc_conn, token):
         logger.debug(f"ConnCB _on_token_privilege_will_expire: {agora_rtc_conn}, {token}")
-        token_str = token.decode('utf-8') #decode will generate a new object
+        token_str = token.decode('utf-8')  # decode will generate a new object
         self.conn_observer.on_token_privilege_will_expire(self.conn, token_str)
 
     def _on_token_privilege_did_expire(self, agora_rtc_conn):
@@ -188,7 +188,7 @@ class RTCConnectionObserverInner(ctypes.Structure):
 
     def _on_transport_stats(self, agora_rtc_conn, stats):
         logger.debug(f"ConnCB _on_transport_stats: {agora_rtc_conn}, {stats}")
-        rtc_stats = stats.contents        
+        rtc_stats = stats.contents
         self.conn_observer.on_transport_stats(self.conn, rtc_stats)
 
     def _on_change_role_success(self, agora_rtc_conn, old_role, new_role):
@@ -240,7 +240,7 @@ class RTCConnectionObserverInner(ctypes.Structure):
 
     def _on_local_user_registered(self, agora_rtc_conn, uid, user_account):
         logger.debug(f"ConnCB _on_local_user_registered: {agora_rtc_conn}, {uid}, {user_account}")
-        #uid: ctype.int, user_account: ctype.c_char_p
+        # uid: ctype.int, user_account: ctype.c_char_p
         _user_account_str = user_account.decode('utf-8') if user_account else ""
         self.conn_observer.on_local_user_registered(self.conn, uid, _user_account_str)
 

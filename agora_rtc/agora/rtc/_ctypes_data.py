@@ -114,11 +114,86 @@ class LastmileProbeOneWayResultInner(ctypes.Structure):
         )
 
 
+class VideoFrameInner(ctypes.Structure):
+    _fields_ = [
+        ("type", ctypes.c_int),
+        ("width", ctypes.c_int),
+        ("height", ctypes.c_int),
+        ("y_stride", ctypes.c_int),
+        ("u_stride", ctypes.c_int),
+        ("v_stride", ctypes.c_int),
+        ("y_buffer", ctypes.POINTER(ctypes.c_uint8)),
+        ("u_buffer", ctypes.POINTER(ctypes.c_uint8)),
+        ("v_buffer", ctypes.POINTER(ctypes.c_uint8)),
+        ("rotation", ctypes.c_int),
+        ("render_time_ms", ctypes.c_int64),
+        ("avsync_type", ctypes.c_int),
+        ("metadata_buffer", ctypes.POINTER(ctypes.c_uint8)),
+        ("metadata_size", ctypes.c_int),
+        ("shared_context", ctypes.c_void_p),
+        ("texture_id", ctypes.c_int),
+        ("matrix", ctypes.c_float * 16),
+        ("alpha_buffer", ctypes.POINTER(ctypes.c_uint8))
+    ]
+
+    def to_video_frame(self):
+        return VideoFrame(
+            type=self.type,
+            width=self.width,
+            height=self.height,
+            y_stride=self.y_stride,
+            u_stride=self.u_stride,
+            v_stride=self.v_stride,
+            y_buffer=ctypes.string_at(self.y_buffer, self.y_stride * self.height) if self.y_buffer else None,
+            u_buffer=ctypes.string_at(self.u_buffer, self.u_stride * self.height // 2) if self.u_buffer else None,
+            v_buffer=ctypes.string_at(self.v_buffer, self.v_stride * self.height // 2) if self.v_buffer else None,
+            rotation=self.rotation,
+            render_time_ms=self.render_time_ms,
+            avsync_type=self.avsync_type,
+            shared_context=self.shared_context.decode() if self.shared_context else None,
+            texture_id=self.texture_id,
+            matrix=self.matrix,
+            alpha_buffer=self.alpha_buffer,
+            metadata=ctypes.string_at(self.metadata_buffer, self.metadata_size).decode() if self.metadata_buffer else None
+        )
+
+
+class EncodedVideoFrameInfoInner(ctypes.Structure):
+    _fields_ = [
+        ("codec_type", ctypes.c_int),
+        ("width", ctypes.c_int),
+        ("height", ctypes.c_int),
+        ("frames_per_second", ctypes.c_int),
+        ("frame_type", ctypes.c_int),
+        ("rotation", ctypes.c_int),
+        ("track_id", ctypes.c_int),
+        ("capture_time_ms", ctypes.c_int64),
+        ("decode_time_ms", ctypes.c_int64),
+        ("uid", ctypes.c_uint),
+        ("stream_type", ctypes.c_int)
+    ]
+
+    def _to_encoded_video_frame_info(self):
+        return EncodedVideoFrameInfo(
+            codec_type=self.codec_type,
+            width=self.width,
+            height=self.height,
+            frames_per_second=self.frames_per_second,
+            frame_type=self.frame_type,
+            rotation=self.rotation,
+            track_id=self.track_id,
+            capture_time_ms=self.capture_time_ms,
+            decode_time_ms=self.decode_time_ms,
+            uid=self.uid,
+            stream_type=self.stream_type
+        )
+
+
 class LastmileProbeResultInner(ctypes.Structure):
     _fields_ = [
         ("state", ctypes.c_int),
-        ("uplink_report", LastmileProbeOneWayResult),
-        ("downlink_report", LastmileProbeOneWayResult),
+        ("uplink_report", LastmileProbeOneWayResultInner),
+        ("downlink_report", LastmileProbeOneWayResultInner),
         ("rtt", ctypes.c_uint)
     ]
 
@@ -255,7 +330,7 @@ class VideoDimensionsInner(ctypes.Structure):
 class VideoEncoderConfigInner(ctypes.Structure):
     _fields_ = [
         ("codec_type", ctypes.c_int),
-        ("dimensions", VideoDimensions),
+        ("dimensions", VideoDimensionsInner),
         ("frame_rate", ctypes.c_int),
         ("bitrate", ctypes.c_int),
         ("min_bitrate", ctypes.c_int),
@@ -375,7 +450,7 @@ class LocalVideoTrackStatsInner(ctypes.Structure):
 
 class SimulcastStreamConfigInner(ctypes.Structure):
     _fields_ = [
-        ("dimensions", VideoDimensions),
+        ("dimensions", VideoDimensionsInner),
         ("bitrate", ctypes.c_int),
         ("framerate", ctypes.c_int)
     ]
@@ -485,8 +560,8 @@ class LocalAudioDetailedStatsInner(ctypes.Structure):
         ("total_input_energy", ctypes.c_double),
         ("total_input_duration", ctypes.c_double),
         ("typing_noise_detected", ctypes.c_int),
-        ("ana_statistics", AnaStats),
-        ("apm_statistics", AudioProcessingStats)
+        ("ana_statistics", AnaStatsInner),
+        ("apm_statistics", AudioProcessingStatsInner)
     ]
 
     def to_local_audio_detailed_stats(self):
@@ -780,7 +855,7 @@ class RTCConnConfigInner(ctypes.Structure):
         ('max_send_bitrate', ctypes.c_int),
         ('min_port', ctypes.c_int),
         ('max_port', ctypes.c_int),
-        ('audio_subs_options', AudioSubscriptionOptions),
+        ('audio_subs_options', AudioSubscriptionOptionsInner),
         ('client_role_type', ctypes.c_int),
         ('channel_profile', ctypes.c_int),
         ('audio_recv_media_packet', ctypes.c_int),
@@ -908,7 +983,7 @@ class AudioVolumeInfoInner(ctypes.Structure):
         )
 
 
-class RemoteVideoStreamInfo(ctypes.Structure):
+class RemoteVideoStreamInfoInner(ctypes.Structure):
     _fields_ = [
         ("uid", ctypes.c_uint),
         ("stream_type", ctypes.c_uint8),
@@ -1047,7 +1122,7 @@ class OwnedEncodedVideoFrameInfoInner(ctypes.Structure):
     ]
 
     def to_owned_encoded_video_frame_info(self):
-        return OwnedEncodedVideoFrameInfo(
+        return EncodedVideoFrameInfo(
             codec_type=self.codec_type,
             width=self.width,
             height=self.height,
@@ -1062,7 +1137,7 @@ class OwnedEncodedVideoFrameInfoInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create_from(info: OwnedEncodedVideoFrameInfo) -> 'OwnedEncodedVideoFrameInfoInner':
+    def create_from(info: EncodedVideoFrameInfo) -> 'OwnedEncodedVideoFrameInfoInner':
         return OwnedEncodedVideoFrameInfoInner(
             info.codec_type,
             info.width,

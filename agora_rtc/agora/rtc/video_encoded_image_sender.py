@@ -1,5 +1,6 @@
 import ctypes
 from .agora_base import *
+from ._ctypes_data import *
 from agora.rtc.video_frame_observer import *
 import logging
 logger = logging.getLogger(__name__)
@@ -7,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 agora_video_encoded_image_sender_send = agora_lib.agora_video_encoded_image_sender_send
 agora_video_encoded_image_sender_send.restype = AGORA_API_C_INT
-agora_video_encoded_image_sender_send.argtypes = [AGORA_HANDLE, ctypes.POINTER(ctypes.c_uint8), ctypes.c_uint32, ctypes.POINTER(OwnedEncodedVideoFrameInfo)]
+agora_video_encoded_image_sender_send.argtypes = [AGORA_HANDLE, ctypes.POINTER(ctypes.c_uint8), ctypes.c_uint32, ctypes.POINTER(EncodedVideoFrameInfoInner)]
 
 
 class VideoEncodedImageSender:
