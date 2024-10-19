@@ -1,9 +1,9 @@
 
 import ctypes
-from .agora_base import *
-from .local_user import *
-from .globals import *
-from .rtc_connection_observer import *
+from ..agora_base import *
+from ..local_user import *
+from ..globals import *
+from ..rtc_connection_observer import *
 import logging
 logger = logging.getLogger(__name__)
 
@@ -85,7 +85,7 @@ class RTCConnectionObserverInner(ctypes.Structure):
     ]
 
     def __init__(self, conn_observer: IRTCConnectionObserver, connection: 'RTCConnection') -> None:
-        from .rtc_connection import RTCConnection  # Moved import here to avoid circular import
+        from ..rtc_connection import RTCConnection  # Moved import here to avoid circular import
         self.conn_observer = conn_observer
         self.conn = connection
         self.on_connected = ON_CONNECTED_CALLBACK(self._on_connected)

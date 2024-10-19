@@ -1,7 +1,7 @@
 import ctypes
-from .agora_base import *
-from .local_user import *
-from .video_frame_observer import *
+from ..agora_base import *
+from ..local_user import *
+from ..video_frame_observer import *
 import logging
 logger = logging.getLogger(__name__)
 

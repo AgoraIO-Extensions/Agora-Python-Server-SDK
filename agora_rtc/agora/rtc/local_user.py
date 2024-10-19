@@ -5,14 +5,14 @@ from .agora_base import *
 from .local_video_track import *
 from .local_audio_track import *
 from .local_user_observer import IRTCLocalUserObserver
-from ._local_user_observer import RTCLocalUserObserverInner
-from ._audio_frame_observer import AudioFrameObserverInner
+from ._ctypes_handle._local_user_observer import RTCLocalUserObserverInner
+from ._ctypes_handle._audio_frame_observer import AudioFrameObserverInner
 from .audio_frame_observer import IAudioFrameObserver
-from ._video_frame_observer import VideoFrameObserverInner
+from ._ctypes_handle._video_frame_observer import VideoFrameObserverInner
 from .video_frame_observer import IVideoFrameObserver
 # from .video_encoded_image_receiver import IVideoEncodedImageReceiver
 from .video_encoded_frame_observer import IVideoEncodedFrameObserver
-from ._video_encoded_frame_observer import VideoEncodedFrameObserverInner
+from ._ctypes_handle._video_encoded_frame_observer import VideoEncodedFrameObserverInner
 from .remote_audio_track import *
 from .remote_video_track import *
 

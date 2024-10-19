@@ -55,6 +55,7 @@ class IRTCConnectionObserver():
 
     def on_network_type_changed(self, agora_rtc_conn, network_type):
         pass
+
     def on_api_call_executed(self, agora_rtc_conn, error, api_type, api_param):
         pass
 

@@ -6,6 +6,8 @@
 # state: int
 # agora_remote_audio_track: RemoteAudioTrack
 """
+
+
 class IRTCLocalUserObserver():
 
     def on_audio_track_publish_success(self, agora_local_user, agora_local_audio_track):

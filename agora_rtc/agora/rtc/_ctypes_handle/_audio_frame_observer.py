@@ -1,8 +1,8 @@
 import ctypes
-from .agora_base import *
-from .local_user import *
+from ..agora_base import *
+from ..local_user import *
 import ctypes
-from .audio_frame_observer import *
+from ..audio_frame_observer import *
 import logging
 logger = logging.getLogger(__name__)
 

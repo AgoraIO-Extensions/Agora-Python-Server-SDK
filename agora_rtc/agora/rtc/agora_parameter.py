@@ -1,7 +1,7 @@
 import time
 import ctypes
 from .agora_base import *
-from ._ctypes_data import *
+from ._ctypes_handle._ctypes_data import *
 
 agora_parameter_set_int = agora_lib.agora_parameter_set_int
 agora_parameter_set_int.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int]

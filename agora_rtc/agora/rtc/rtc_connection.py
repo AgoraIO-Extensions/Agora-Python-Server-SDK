@@ -3,11 +3,11 @@ import ctypes
 from .agora_base import *
 from .local_user import LocalUser
 from .rtc_connection_observer import IRTCConnectionObserver
-from ._audio_frame_observer import AudioFrameObserverInner
+from ._ctypes_handle._audio_frame_observer import AudioFrameObserverInner
 from .agora_parameter import AgoraParameter
 from .globals import AgoraHandleInstanceMap
-from ._rtc_connection_observer import RTCConnectionObserverInner
-from ._ctypes_data import *
+from ._ctypes_handle._rtc_connection_observer import RTCConnectionObserverInner
+from ._ctypes_handle._ctypes_data import *
 import logging
 logger = logging.getLogger(__name__)
 

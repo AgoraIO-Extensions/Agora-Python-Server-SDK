@@ -1,6 +1,6 @@
 import ctypes
-from .agora_base import *
-from . import agora_lib
+from ..agora_base import *
+from .. import agora_lib
 AGORA_HANDLE = ctypes.c_void_p
 AGORA_API_C_INT = ctypes.c_int
 AGORA_API_C_HDL = ctypes.c_void_p

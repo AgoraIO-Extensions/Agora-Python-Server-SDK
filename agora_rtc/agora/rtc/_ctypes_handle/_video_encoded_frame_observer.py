@@ -2,8 +2,8 @@
 
 from ._ctypes_data import *
 import ctypes
-from .agora_base import *
-from .video_encoded_frame_observer import IVideoEncodedFrameObserver, EncodedVideoFrameInfo
+from ..agora_base import *
+from ..video_encoded_frame_observer import IVideoEncodedFrameObserver, EncodedVideoFrameInfo
 import logging
 logger = logging.getLogger(__name__)
 

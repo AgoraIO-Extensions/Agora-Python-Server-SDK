@@ -1,9 +1,9 @@
 import ctypes
-from .agora_base import *
-from .local_user import *
+from ..agora_base import *
+from ..local_user import *
 from ._ctypes_data import VideoTrackInfoInner
-from .remote_audio_track import RemoteAudioTrack, RemoteAudioTrackStats
-from .remote_video_track import RemoteVideoTrack, RemoteVideoTrackStats
+from ..remote_audio_track import RemoteAudioTrack, RemoteAudioTrackStats
+from ..remote_video_track import RemoteVideoTrack, RemoteVideoTrackStats
 import logging
 logger = logging.getLogger(__name__)
 
@@ -89,7 +89,7 @@ class RTCLocalUserObserverInner(ctypes.Structure):
     ]
 
     def __init__(self, local_user_observer: IRTCLocalUserObserver, local_user: 'LocalUser') -> None:
-        from .local_user import LocalUser
+        from ..local_user import LocalUser
         self.local_user_observer = local_user_observer
         self.local_user = local_user
         self.on_audio_track_publish_success = ON_AUDIO_TRACK_PUBLISH_SUCCESS_CALLBACK(self._on_audio_track_publish_success)
