@@ -1,16 +1,16 @@
 #!env python
 
+import itertools
+import av
+from agora.rtc.agora_base import AudioCodecType
+from agora.rtc.video_encoded_image_sender import EncodedVideoFrameInfo, VideoEncodedImageSender
+from common.pacer import Pacer
 from asyncio import Event
 import logging
 logger = logging.getLogger(__name__)
-from common.pacer import Pacer
-from agora.rtc.video_encoded_image_sender import EncodedVideoFrameInfo, VideoEncodedImageSender
-from agora.rtc.agora_base import AudioCodecType
-import av
-import itertools
 
 
-async def push_encoded_video_from_file(video_sender:VideoEncodedImageSender, video_file_path, _exit:Event):
+async def push_encoded_video_from_file(video_sender: VideoEncodedImageSender, video_file_path, _exit: Event):
     frame_rate = 30
     pacer = Pacer(1.0/frame_rate)
     count = 0
@@ -30,7 +30,7 @@ async def push_encoded_video_from_file(video_sender:VideoEncodedImageSender, vid
             else:
                 print("frame_rate is None")
             break
-    while  True:
+    while True:
         for packet in itertools.cycle(container.demux()):
             if _exit.is_set():
                 logger.info("exit")
@@ -42,17 +42,17 @@ async def push_encoded_video_from_file(video_sender:VideoEncodedImageSender, vid
                     logger.info(f"Keyframe packet with size {packet.size} bytes, PTS {packet.pts}")
                 else:
                     logger.info(f"Non-keyframe packet with size {packet.size} bytes, PTS {packet.pts}")
-                encoded_video_frame_info = EncodedVideoFrameInfo()
-                encoded_video_frame_info.codec_type = 2            
-                encoded_video_frame_info.width = width
-                encoded_video_frame_info.height = height
-                encoded_video_frame_info.frames_per_second = frame_rate                        
+                encoded_video_frame_info = EncodedVideoFrameInfo(
+                    codec_type=2,
+                    width=width,
+                    height=height,
+                    frames_per_second=frame_rate
+                )
                 if is_keyframe:
                     encoded_video_frame_info.frame_type = 3
                 else:
-                    encoded_video_frame_info.frame_type = 4        
-                ret = video_sender.send_encoded_video_image(packet.buffer_ptr, packet.buffer_size ,encoded_video_frame_info)        
+                    encoded_video_frame_info.frame_type = 4
+                ret = video_sender.send_encoded_video_image(packet.buffer_ptr, packet.buffer_size, encoded_video_frame_info)
                 count += 1
                 logger.info(f"count,ret={count}, {ret}")
                 await pacer.apace_interval(1.0/frame_rate)
-

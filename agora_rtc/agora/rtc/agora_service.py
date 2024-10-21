@@ -224,7 +224,7 @@ class AgoraService:
         if not self.inited:
             logger.error("AgoraService is not initialized. Please call initialize() first.")
             return None
-        custom_video_track = agora_service_create_custom_video_track_encoded(self.service_handle, video_encoded_frame_sender.sender_handle, ctypes.byref(options))
+        custom_video_track = agora_service_create_custom_video_track_encoded(self.service_handle, video_encoded_frame_sender.sender_handle, ctypes.byref(SenderOptionsInner.create(options)))
         if custom_video_track is None:
             return None
         return LocalVideoTrack(custom_video_track)

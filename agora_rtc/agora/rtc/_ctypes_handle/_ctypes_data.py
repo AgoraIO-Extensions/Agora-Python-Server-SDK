@@ -1106,7 +1106,7 @@ class AgoraServiceConfigInner(ctypes.Structure):
         )
 
 
-class OwnedEncodedVideoFrameInfoInner(ctypes.Structure):
+class EncodedVideoFrameInfoInner(ctypes.Structure):
     _fields_ = [
         ("codec_type", ctypes.c_int),
         ("width", ctypes.c_int),
@@ -1137,8 +1137,8 @@ class OwnedEncodedVideoFrameInfoInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create(info: EncodedVideoFrameInfo) -> 'OwnedEncodedVideoFrameInfoInner':
-        return OwnedEncodedVideoFrameInfoInner(
+    def create(info: EncodedVideoFrameInfo) -> 'EncodedVideoFrameInfoInner':
+        return EncodedVideoFrameInfoInner(
             info.codec_type,
             info.width,
             info.height,

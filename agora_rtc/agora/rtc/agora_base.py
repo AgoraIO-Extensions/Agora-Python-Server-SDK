@@ -387,19 +387,19 @@ class SenderOptions:
     target_bitrate: int
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass
 class EncodedVideoFrameInfo:
-    codec_type: int
-    width: int
-    height: int
-    frames_per_second: int
-    frame_type: int
-    rotation: int
-    track_id: int
-    capture_time_ms: int
-    decode_time_ms: int
-    uid: int
-    stream_type: int
+    codec_type: VideoCodecType = VideoCodecType.VIDEO_CODEC_NONE
+    width: int = 0
+    height: int = 0
+    frames_per_second: int = 0
+    frame_type: int = 0
+    rotation: int = 0
+    track_id: int = 0
+    capture_time_ms: int = 0
+    decode_time_ms: int = 0
+    uid: int = 0
+    stream_type: int = 0
 
 
 @dataclass

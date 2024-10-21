@@ -22,8 +22,7 @@ class AudioEncodedFrameSender:
     #     ret = agora_audio_encoded_frame_sender_send(self.sender_handle, c_date, ctypes.c_uint32(len(frame.data)), ctypes.byref(ownedinfo))
     #     return ret
 
-    def send_encoded_audio_frame(self, buffer_ptr: int, buffer_size: int, frame: EncodedAudioFrameInfo):
+    def send_encoded_audio_frame(self, buffer_ptr: int, buffer_size: int, frame_info: EncodedAudioFrameInfo):
         buffer_ptr = ctypes.cast(buffer_ptr, ctypes.POINTER(ctypes.c_void_p))
-        ownedinfo = frame.to_owned_encoded_audio_frame()
-        ret = agora_audio_encoded_frame_sender_send(self.sender_handle, buffer_ptr, ctypes.c_uint32(buffer_size), ctypes.byref(ownedinfo))
+        ret = agora_audio_encoded_frame_sender_send(self.sender_handle, buffer_ptr, ctypes.c_uint32(buffer_size), ctypes.byref(EncodedAudioFrameInfoInner.create(frame_info)))
         return ret

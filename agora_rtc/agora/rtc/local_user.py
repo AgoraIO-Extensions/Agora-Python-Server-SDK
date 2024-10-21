@@ -476,7 +476,7 @@ class LocalUser:
         return ret
 
     def subscribe_all_video(self, options: VideoSubscriptionOptions):
-        ret = agora_local_user_subscribe_all_video(self.user_handle, ctypes.byref(options))
+        ret = agora_local_user_subscribe_all_video(self.user_handle, ctypes.byref(VideoSubscriptionOptionsInner.create(options)))
         return ret
 
     def unsubscribe_video(self, user_id):
