@@ -11,6 +11,7 @@ agora_local_audio_track_destroy = agora_lib.agora_local_audio_track_destroy
 agora_local_audio_track_destroy.argtypes = [AGORA_HANDLE]
 
 agora_audio_pcm_data_sender_destroy = agora_lib.agora_audio_pcm_data_sender_destroy
+agora_audio_pcm_data_sender_send.restype = AGORA_API_C_VOID
 agora_audio_pcm_data_sender_destroy.argtypes = [ctypes.c_void_p]
 
 
@@ -28,4 +29,6 @@ class AudioPcmDataSender:
         return ret
 
     def release(self):
-        agora_audio_pcm_data_sender_destroy(self.sender_handle)
+        if self.sender_handle:
+            agora_audio_pcm_data_sender_destroy(self.sender_handle)
+            self.sender_handle = None

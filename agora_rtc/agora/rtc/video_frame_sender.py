@@ -23,3 +23,8 @@ class VideoFrameSender:
         frame.buffer = None
         frame = None
         return ret
+
+    def release(self):
+        if self.sender_handle:
+            agora_video_frame_sender_destroy(self.sender_handle)
+            self.sender_handle = None

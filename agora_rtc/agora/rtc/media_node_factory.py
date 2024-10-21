@@ -65,6 +65,6 @@ class MediaNodeFactory():
         return VideoEncodedImageSender(handle)
 
     def release(self):
-        if self.media_node_factory is not None:
+        if self.media_node_factory:
             agora_media_node_factory_destroy(self.media_node_factory)
         self.media_node_factory = None

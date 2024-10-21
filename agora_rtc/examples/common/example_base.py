@@ -39,6 +39,9 @@ class RTCBaseProcess():
             connection.unregister_observer()
             connection.disconnect()
             connection.release()
+            conn_observer = None
+            local_user_observer = None
+            connection = None
             logger.info("connection release")
 
     def set_conn_config(self):

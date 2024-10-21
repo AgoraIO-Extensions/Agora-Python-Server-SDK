@@ -37,6 +37,10 @@ agora_local_video_track_destroy_statistics.argtypes = [AGORA_HANDLE, ctypes.POIN
 # agora_local_video_track_get_type.restype = ctypes.c_int
 # agora_local_video_track_get_type.argtypes = [AGORA_HANDLE]
 
+agora_local_video_track_destroy = agora_lib.agora_local_video_track_destroy
+agora_local_video_track_destroy.restype = AGORA_HANDLE
+agora_local_video_track_destroy.argtypes = [AGORA_HANDLE]
+
 
 class LocalVideoTrack:
     def __init__(self, track_handle):
@@ -74,3 +78,8 @@ class LocalVideoTrack:
 
     # def get_type(self):
     #     return agora_local_video_track_get_type(self.track_handle)
+
+    def release(self):
+        if self.track_handle:
+            agora_local_video_track_destroy(self.track_handle)
+            self.track_handle = None

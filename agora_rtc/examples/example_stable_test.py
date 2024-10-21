@@ -81,8 +81,23 @@ class RTCProcessIMPL(RTCBaseProcess):
         local_user.unpublish_video(video_track)
         audio_track.set_enabled(0)
         video_track.set_enabled(0)
+
+        pcm_data_sender.release()
+        audio_track.release()
+        yuv_data_sender.release()
+        video_track.release()
+
         local_user.unregister_audio_frame_observer()
         local_user.unregister_video_frame_observer()
+        media_node_factory.release()
+
+        pcm_data_sender = None
+        audio_track = None
+        yuv_data_sender = None
+        video_track = None
+        media_node_factory = None
+        video_frame_observer = None
+        audio_frame_observer = None
 
     async def send(self, sample_options: ExampleOptions, pcm_data_sender, yuv_data_sender):
         pcm_task = asyncio.create_task(push_pcm_data_from_file(sample_options.sample_rate, sample_options.num_of_channels, pcm_data_sender, sample_options.audio_file, self.conn_exit))
