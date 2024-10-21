@@ -91,9 +91,9 @@ class RTCProcessIMPL(RTCBaseProcess):
         await yuv_task
         logger.info("send finish")
 
-    def set_conn_config(self):
-        self._conn_config.auto_subscribe_video = 1
-        self._conn_config.auto_subscribe_audio = 1
+    # def set_conn_config(self):
+    #     self._conn_config.auto_subscribe_video = 1
+    #     self._conn_config.auto_subscribe_audio = 1
 
 
 async def run():
