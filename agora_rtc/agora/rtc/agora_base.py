@@ -390,9 +390,9 @@ class VideoDimensions:
 
 @dataclass(kw_only=True)
 class SenderOptions:
+    target_bitrate: int
     cc_mode: TCcMode = TCcMode.CC_ENABLED
     codec_type: VideoCodecType = VideoCodecType.VIDEO_CODEC_NONE
-    target_bitrate: int
 
 
 @dataclass(kw_only=True)
