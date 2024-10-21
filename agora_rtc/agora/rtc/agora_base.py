@@ -264,7 +264,7 @@ class RTCConnInfo():
     internal_uid: int
 
 
-@dataclass
+@dataclass(kw_only=True)
 class VideoFrame():
     type: int = 0
     width: int = 0
@@ -285,7 +285,7 @@ class VideoFrame():
     alpha_buffer: bytearray = None
 
 
-@dataclass
+@dataclass(kw_only=True)
 class AgoraServiceConfig:
     log_path: str = ""
     log_size: int = 0
@@ -300,7 +300,7 @@ class AgoraServiceConfig:
     use_string_uid: int = 0
 
 
-@dataclass
+@dataclass(kw_only=True)
 class AudioSubscriptionOptions:
     packet_only: int = 0
     pcm_data_only: int = 0
@@ -309,8 +309,8 @@ class AudioSubscriptionOptions:
     sample_rate_hz: int = 0
 
 
-@dataclass
-class RTCConnConfig():
+@dataclass(kw_only=True)
+class RTCConnConfig:
     auto_subscribe_audio: int = 0
     auto_subscribe_video: int = 0
     enable_audio_recording_or_playout: int = 0
@@ -325,13 +325,13 @@ class RTCConnConfig():
     video_recv_media_packet: int = 0
 
 
-@dataclass
+@dataclass(kw_only=True)
 class VideoSubscriptionOptions:
     type: VideoStreamType = VideoStreamType.VIDEO_STREAM_HIGH
     encodedFrameOnly: bool = False
 
 
-@dataclass
+@dataclass(kw_only=True)
 class AudioPcmDataInfo:
     samplesPerChannel: int
     channelNum: int
@@ -340,7 +340,7 @@ class AudioPcmDataInfo:
     ntpTimeMs: int
 
 
-@dataclass
+@dataclass(kw_only=True)
 class PcmAudioFrame:
     data: bytearray
     samples_per_channel: int
@@ -350,12 +350,12 @@ class PcmAudioFrame:
     timestamp: int = 0
 
 
-@dataclass
+@dataclass(kw_only=True)
 class AudioEncoderConfiguration:
     audioProfile: AudioProfileType = AudioProfileType.AUDIO_PROFILE_DEFAULT
 
 
-@dataclass
+@dataclass(kw_only=True)
 class EncodedAudioFrameInfo:
     capture_timems: int = 0
     codec: AudioCodecType = AudioCodecType.AUDIO_CODEC_AACLC
@@ -366,7 +366,7 @@ class EncodedAudioFrameInfo:
     speech: int = 1
 
 
-@dataclass
+@dataclass(kw_only=True)
 class AudioParams:
     sample_rate: int
     channels: int
@@ -374,20 +374,20 @@ class AudioParams:
     samples_per_call: int
 
 
-@dataclass
+@dataclass(kw_only=True)
 class VideoDimensions:
     width: int
     height: int
 
 
-@dataclass
+@dataclass(kw_only=True)
 class SenderOptions:
     cc_mode: int
     codec_type: int
     target_bitrate: int
 
 
-@dataclass
+@dataclass(kw_only=True)
 class EncodedVideoFrameInfo:
     codec_type: VideoCodecType = VideoCodecType.VIDEO_CODEC_NONE
     width: int = 0
@@ -402,7 +402,7 @@ class EncodedVideoFrameInfo:
     stream_type: int = 0
 
 
-@dataclass
+@dataclass(kw_only=True)
 class VideoEncoderConfiguration:
     dimensions: VideoDimensions
     codec_type: VideoCodecType = VideoCodecType.VIDEO_CODEC_NONE
@@ -414,7 +414,7 @@ class VideoEncoderConfiguration:
     mirror_mode: int = 0
 
 
-@dataclass
+@dataclass(kw_only=True)
 class ExternalVideoFrame:
     type: int = 1
     format: int = 0
@@ -435,7 +435,7 @@ class ExternalVideoFrame:
     alpha_buffer: bytearray = None
 
 
-@dataclass
+@dataclass(kw_only=True)
 class VadConfig:
     fftSz: int = 1024
     hopSz: int = 160
@@ -453,14 +453,14 @@ class VadConfig:
     inactivePercent: float = 0.2
 
 
-@dataclass
+@dataclass(kw_only=True)
 class SimulcastStreamConfig:
     dimensions: VideoDimensions
     bitrate: int
     framerate: int
 
 
-@dataclass
+@dataclass(kw_only=True)
 class AnaStats:
     bitrate_action_counter: int
     channel_action_counter: int
@@ -471,7 +471,7 @@ class AnaStats:
     uplink_packet_loss_fraction: float
 
 
-@dataclass
+@dataclass(kw_only=True)
 class AudioProcessingStats:
     echo_return_loss: float
     echo_return_loss_enhancement: float
@@ -483,7 +483,7 @@ class AudioProcessingStats:
     delay_ms: int
 
 
-@dataclass
+@dataclass(kw_only=True)
 class LocalAudioDetailedStats:
     local_ssrc: int
     bytes_sent: int

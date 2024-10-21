@@ -48,7 +48,7 @@ class ExampleAudioFrameObserver(IAudioFrameObserver):
         return 0
 
     def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, audio_frame: AudioFrame):
-        logger.info(f"on_playback_audio_frame_before_mixing: {type(audio_frame.buffer)}")
+        # logger.info(f"on_playback_audio_frame_before_mixing: {audio_frame}")
         frame = PcmAudioFrame(
             data=audio_frame.buffer,
             timestamp=0,
