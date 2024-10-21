@@ -1024,8 +1024,7 @@ class AudioFrameInner(ctypes.Structure):
             bytes_per_sample=self.bytes_per_sample,
             channels=self.channels,
             samples_per_sec=self.samples_per_sec,
-            buffer=ctypes.string_at(
-                self.buffer, self.samples_per_channel * self.bytes_per_sample * self.channels),
+            buffer=bytearray(ctypes.string_at(self.buffer, self.samples_per_channel * self.bytes_per_sample * self.channels)),
             render_time_ms=self.render_time_ms,
             avsync_type=self.avsync_type,
             far_field_flag=self.far_field_flag,

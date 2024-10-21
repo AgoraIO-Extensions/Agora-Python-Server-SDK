@@ -73,7 +73,7 @@ class AudioFrameObserverInner(ctypes.Structure):
         ret = self.observer.on_ear_monitoring_audio_frame(self.local_user, audio_frame_inner)
         return ret
 
-    def _on_playback_audio_frame_before_mixing(self, local_user_handle, channel_id, user_id, audio_frame_inner):
+    def _on_playback_audio_frame_before_mixing(self, local_user_handle, channel_id, user_id, audio_frame_inner: AudioFrameInner):
         # logger.debug(f"AudioFrameObserverInner _on_playback_audio_frame_before_mixing: {local_user_handle}, {channel_id}, {user_id}, {audio_frame_inner}")
         if channel_id is None:
             channel_id_str = ""
