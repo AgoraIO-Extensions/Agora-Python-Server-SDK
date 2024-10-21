@@ -2,18 +2,19 @@ import argparse
 import logging
 logger = logging.getLogger(__name__)
 
+
 class ExampleOptions:
     def __init__(self):
         self.app_id = None
         self.token = None
         self.channel_id = None
-        self.connection_number:int = 1
+        self.connection_number: int = 1
         self.user_id = "0"
         self.audio_file = None
         self.low_delay = False
         self.video_file = None
-        self.sample_rate:int = None
-        self.num_of_channels:int = None
+        self.sample_rate: int = None
+        self.num_of_channels: int = None
         self.fps = None
         self.width = None
         self.height = None
@@ -44,11 +45,12 @@ def parse_args():
     parser.add_argument("--message", help="The message to be sent")
     parser.add_argument("--hours", default="0", help="The time to run")
     parser.add_argument("--saveToDisk", default=0, help="The time to run")
-    #added by wei on 10/10
-    parser.add_argument("--mode", type=int, help="mode value",default=1)
-    parser.add_argument("--value", type=int, help="reversed value",default=0)
+    # added by wei on 10/10
+    parser.add_argument("--mode", type=int, help="mode value", default=1)
+    parser.add_argument("--value", type=int, help="reversed value", default=0)
 
     return parser.parse_args()
+
 
 def parse_args_example() -> ExampleOptions:
     args = parse_args()
@@ -58,7 +60,7 @@ def parse_args_example() -> ExampleOptions:
     if args.token:
         sample_options.token = args.token
     else:
-        sample_options.token = args.appId    
+        sample_options.token = args.appId
     sample_options.channel_id = args.channelId
     sample_options.connection_number = int(args.connectionNumber)
     sample_options.audio_file = args.audioFile

@@ -1,15 +1,15 @@
 #!env python
 
+from agora.rtc.video_encoded_frame_observer import IVideoEncodedFrameObserver
 import os
 import datetime
 import logging
 logger = logging.getLogger(__name__)
 
-from agora.rtc.video_encoded_frame_observer import IVideoEncodedFrameObserver
 
 source_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 filename, _ = os.path.splitext(os.path.basename(__file__))
-log_folder = os.path.join(source_dir, 'logs', filename ,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S"))
+log_folder = os.path.join(source_dir, 'logs', filename, datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S"))
 os.makedirs(log_folder, exist_ok=True)
 
 
@@ -26,4 +26,3 @@ class ExampleVideoEncodedFrameObserver(IVideoEncodedFrameObserver):
             with open(file_path, 'ab') as f:
                 f.write(image_buffer[:length])
         return 1
-    

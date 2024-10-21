@@ -7,12 +7,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-
 class AudioStreamConsumer:
-    def __init__(self,pcm_sender:AudioPcmDataSender) -> None:
+    def __init__(self, pcm_sender: AudioPcmDataSender) -> None:
         self._lock = threading.Lock()
         self._data = bytearray()
-        self._interval = 0.05 #50ms 
+        self._interval = 0.05  # 50ms
         self._timer = threading.Timer(self._interval, self._consume)
         self._timer.start()
         self._start_time = 0
@@ -20,11 +19,12 @@ class AudioStreamConsumer:
         self._run = True
         self._event = threading.Event()
         self._pcm_sender = pcm_sender
-        
+
     def push_pcm_data(self, data):
-        #add to buffer, lock
+        # add to buffer, lock
         with self._lock:
             self._data += data
+
     def _consume(self):
         wanted_packages = 0
         frame_buf = bytearray()
@@ -41,19 +41,19 @@ class AudioStreamConsumer:
             data_len = len(self._data)
             wanted_packages = min(wanted_packages, data_len//320)
             if self._data and wanted_packages > 0:
-                #pop data
+                # pop data
                 frame_size = 320*wanted_packages
                 frame_buf = bytearray(frame_size)
                 frame_buf[:] = self._data[:frame_size]
                 self._data = self._data[frame_size:]
-                self._consumed_packages += wanted_packages                
-            #restart timer
+                self._consumed_packages += wanted_packages
+            # restart timer
             if self._run:
                 self._timer = threading.Timer(self._interval, self._consume)
                 self._timer.start()
             else:
                 self._event.set()
-        
+
         if wanted_packages > 0:
             frame = PcmAudioFrame()
             frame.data = frame_buf
@@ -76,7 +76,7 @@ class AudioStreamConsumer:
         self._timer = None
         self._data = None
         self._event = None
+
     def clear(self):
         with self._lock:
             self._data = bytearray()
-            

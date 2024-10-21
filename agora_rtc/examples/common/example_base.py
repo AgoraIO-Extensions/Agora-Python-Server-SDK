@@ -9,6 +9,7 @@ from agora.rtc.agora_base import *
 import logging
 logger = logging.getLogger(__name__)
 
+
 class RTCBaseProcess():
     def __init__(self):
         self._exit = asyncio.Event()
@@ -17,8 +18,9 @@ class RTCBaseProcess():
             channel_profile=ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
         )
         self._serv_config = AgoraServiceConfig()
-    async def connect_and_release(self, agora_service:AgoraService, channel_id, sample_options:ExampleOptions):
-        #---------------2. Create Connection
+
+    async def connect_and_release(self, agora_service: AgoraService, channel_id, sample_options: ExampleOptions):
+        # ---------------2. Create Connection
         self.set_conn_config()
         logger.info(f"connect_and_release: {self._conn_config.auto_subscribe_video}, auto_subscribe_audio: {self._conn_config.auto_subscribe_audio}")
         connection = agora_service.create_rtc_connection(self._conn_config)
@@ -31,7 +33,7 @@ class RTCBaseProcess():
         local_user_observer = ExampleLocalUserObserver()
         local_user.register_local_user_observer(local_user_observer)
         try:
-            await self.setup_in_connection(agora_service, connection, local_user ,sample_options)        
+            await self.setup_in_connection(agora_service, connection, local_user, sample_options)
         finally:
             local_user.unregister_local_user_observer()
             connection.unregister_observer()
@@ -41,16 +43,17 @@ class RTCBaseProcess():
 
     def set_conn_config(self):
         pass
+
     def set_serv_config(self):
         pass
-    async def setup_in_connection(self,agora_service:AgoraService, connection:RTCConnection, local_user:LocalUser, sample_options:ExampleOptions):
+
+    async def setup_in_connection(self, agora_service: AgoraService, connection: RTCConnection, local_user: LocalUser, sample_options: ExampleOptions):
         pass
 
     def handle_signal(self):
         self._exit.set()
 
-    
-    async def run(self, sample_options:ExampleOptions, log_path:str):
+    async def run(self, sample_options: ExampleOptions, log_path: str):
         loop = asyncio.get_event_loop()
         loop.add_signal_handler(signal.SIGINT, self.handle_signal)
         loop.add_signal_handler(signal.SIGTERM, self.handle_signal)
@@ -67,7 +70,7 @@ class RTCBaseProcess():
         agora_service.release()
         logger.info("agora_service release")
 
-    async def create_connections(self, sample_options:ExampleOptions, agora_service):
+    async def create_connections(self, sample_options: ExampleOptions, agora_service):
         tasks = []
         for i in range(int(sample_options.connection_number)):
             if i == 0:

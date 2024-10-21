@@ -1,8 +1,9 @@
 #!env python
+from agora.rtc.local_user_observer import IRTCLocalUserObserver
 import logging
 logger = logging.getLogger(__name__)
 
-from agora.rtc.local_user_observer import IRTCLocalUserObserver
+
 class ExampleLocalUserObserver(IRTCLocalUserObserver):
     def __init__(self):
         super(ExampleLocalUserObserver, self).__init__()
