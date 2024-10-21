@@ -301,8 +301,8 @@ class SenderOptionsInner(ctypes.Structure):
     @staticmethod
     def create(options: SenderOptions) -> 'SenderOptionsInner':
         return SenderOptionsInner(
-            options.cc_mode,
-            options.codec_type,
+            options.cc_mode.value,
+            options.codec_type.value,
             options.target_bitrate
         )
 

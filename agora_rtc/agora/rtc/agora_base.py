@@ -86,6 +86,11 @@ class AudioProfileType(IntEnum):
     AUDIO_PROFILE_NUM = 7
 
 
+class TCcMode(IntEnum):
+    CC_ENABLED = 0
+    CC_DISABLED = 1
+
+
 @dataclass(frozen=True, kw_only=True)
 class LastmileProbeOneWayResult:
     packet_loss_rate: int
@@ -385,8 +390,8 @@ class VideoDimensions:
 
 @dataclass(kw_only=True)
 class SenderOptions:
-    cc_mode: int
-    codec_type: int
+    cc_mode: TCcMode = TCcMode.CC_ENABLED
+    codec_type: VideoCodecType = VideoCodecType.VIDEO_CODEC_NONE
     target_bitrate: int
 
 

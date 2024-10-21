@@ -29,8 +29,8 @@ class RTCProcessIMPL(RTCBaseProcess):
             logger.error("create video sender failed")
             exit(1)
         sender_options = SenderOptions(
-            cc_mode=0,
-            codec_type=2,
+            cc_mode=TCcMode.CC_ENABLED,
+            codec_type=VideoCodecType.VIDEO_CODEC_H264,
             target_bitrate=640)
         video_track = agora_service.create_custom_video_track_encoded(video_sender, sender_options)
         if not video_track:
