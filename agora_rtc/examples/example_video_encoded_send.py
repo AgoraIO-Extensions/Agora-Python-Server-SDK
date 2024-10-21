@@ -51,7 +51,11 @@ class RTCProcessIMPL(RTCBaseProcess):
         self._serv_config.enable_video = 1
 
 
-if __name__ == '__main__':
+async def run():
     sample_options = parse_args_example()
     rtc = RTCProcessIMPL()
-    asyncio.run(rtc.run(sample_options, get_log_path_with_filename(sample_options.channel_id, os.path.splitext(__file__)[0])))
+    await rtc.run(sample_options, get_log_path_with_filename(sample_options.channel_id, os.path.splitext(__file__)[0]))
+
+
+if __name__ == '__main__':
+    asyncio.run(run())
