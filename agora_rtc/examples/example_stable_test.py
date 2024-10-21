@@ -103,4 +103,5 @@ async def run():
 
 
 if __name__ == '__main__':
+    logger.warning(f"Main process ID: {os.getpid()}")
     asyncio.run(run())
