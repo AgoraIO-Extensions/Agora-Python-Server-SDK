@@ -42,6 +42,14 @@ class RTCProcessIMPL(RTCBaseProcess):
         local_user.unpublish_video(video_track)
         video_track.set_enabled(0)
 
+        yuv_data_sender.release()
+        video_track.release()
+        media_node_factory.release()
+
+        yuv_data_sender = None
+        video_track = None
+        media_node_factory = None
+
     async def send(self, sample_options: ExampleOptions, yuv_data_sender):
         yuv_task = asyncio.create_task(push_yuv_data_from_file(sample_options.width, sample_options.height, sample_options.fps, yuv_data_sender, sample_options.video_file, self._exit))
         await yuv_task

@@ -42,6 +42,14 @@ class RTCProcessIMPL(RTCBaseProcess):
         local_user.unpublish_video(video_track)
         video_track.set_enabled(0)
 
+        video_sender.release()
+        video_track.release()
+        media_node_factory.release()
+
+        video_sender = None
+        video_track = None
+        media_node_factory = None
+
     async def send(self, sample_options: ExampleOptions, video_sender):
         video_task = asyncio.create_task(push_encoded_video_from_file(video_sender, sample_options.video_file, self._exit))
         await video_task

@@ -36,6 +36,9 @@ class RTCProcessIMPL(RTCBaseProcess):
         local_user.unregister_audio_frame_observer()
         local_user.unregister_video_frame_observer()
 
+        audio_frame_observer = None
+        video_frame_observer = None
+
     def set_conn_config(self):
         self._conn_config.auto_subscribe_video = 1
         self._conn_config.auto_subscribe_audio = 1

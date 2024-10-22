@@ -132,12 +132,21 @@ async def run_example():
     await _exit
     local_user.unpublish_audio(audio_track)
     audio_track.set_enabled(0)
+
+    local_user.unregister_local_user_observer()
+    local_user.unregister_audio_frame_observer()
+
+    pcm_data_sender.release()
+    audio_track.release()
+    media_node_factory.release()
+
     connection.unregister_observer()
     connection.disconnect()
     connection.release()
     logger.info("connection release")
 
     agora_service.release()
+
     logger.info("agora_service release")
 
 

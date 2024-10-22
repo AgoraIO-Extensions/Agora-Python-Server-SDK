@@ -82,13 +82,13 @@ class RTCProcessIMPL(RTCBaseProcess):
         audio_track.set_enabled(0)
         video_track.set_enabled(0)
 
+        local_user.unregister_audio_frame_observer()
+        local_user.unregister_video_frame_observer()
+
         pcm_data_sender.release()
         audio_track.release()
         yuv_data_sender.release()
         video_track.release()
-
-        local_user.unregister_audio_frame_observer()
-        local_user.unregister_video_frame_observer()
         media_node_factory.release()
 
         pcm_data_sender = None

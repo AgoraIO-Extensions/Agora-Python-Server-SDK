@@ -28,6 +28,7 @@ class RTCProcessIMPL(RTCBaseProcess):
             return
         await self._exit.wait()
         local_user.unregister_video_frame_observer()
+        video_frame_observer = None
 
     def set_conn_config(self):
         self._conn_config.auto_subscribe_video = 1

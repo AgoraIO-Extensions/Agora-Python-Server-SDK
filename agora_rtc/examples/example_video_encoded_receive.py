@@ -33,6 +33,7 @@ class RTCProcessIMPL(RTCBaseProcess):
             return
         await self._exit.wait()
         local_user.unregister_video_encoded_frame_observer()
+        video_encoded_frame_observer = None
 
     def set_serv_config(self):
         self._serv_config.enable_video = 1

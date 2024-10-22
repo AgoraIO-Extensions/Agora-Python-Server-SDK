@@ -9,7 +9,13 @@ agora_audio_encoded_frame_sender_send.restype = AGORA_API_C_INT
 agora_audio_encoded_frame_sender_send.argtypes = [AGORA_HANDLE, ctypes.c_void_p, ctypes.c_uint32, ctypes.POINTER(EncodedAudioFrameInfoInner)]
 
 agora_local_audio_track_destroy = agora_lib.agora_local_audio_track_destroy
+agora_local_audio_track_destroy.restype = AGORA_API_C_VOID
 agora_local_audio_track_destroy.argtypes = [AGORA_HANDLE]
+
+
+agora_audio_encoded_frame_sender_destroy = agora_lib.agora_audio_encoded_frame_sender_destroy
+agora_audio_encoded_frame_sender_destroy.restype = AGORA_API_C_VOID
+agora_audio_encoded_frame_sender_destroy.argtypes = [AGORA_HANDLE]
 
 
 class AudioEncodedFrameSender:
@@ -26,3 +32,9 @@ class AudioEncodedFrameSender:
         buffer_ptr = ctypes.cast(buffer_ptr, ctypes.POINTER(ctypes.c_void_p))
         ret = agora_audio_encoded_frame_sender_send(self.sender_handle, buffer_ptr, ctypes.c_uint32(buffer_size), ctypes.byref(EncodedAudioFrameInfoInner.create(frame_info)))
         return ret
+
+    def release(self):
+        if self.sender_handle:
+            agora_audio_encoded_frame_sender_destroy(self.sender_handle)
+            self.sender_handle = None
+        return 0

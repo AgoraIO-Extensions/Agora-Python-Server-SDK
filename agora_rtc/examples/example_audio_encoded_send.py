@@ -38,6 +38,14 @@ class RTCProcessIMPL(RTCBaseProcess):
         local_user.unpublish_audio(audio_track)
         audio_track.set_enabled(0)
 
+        audio_sender.release()
+        audio_track.release()
+        media_node_factory.release()
+
+        audio_sender = None
+        audio_track = None
+        media_node_factory = None
+
     async def send(self, sample_options: ExampleOptions, audio_sender):
         audio_task = asyncio.create_task(push_encoded_audio_from_file(audio_sender, sample_options.audio_file, self._exit))
         await audio_task

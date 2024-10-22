@@ -40,6 +40,15 @@ class RTCProcessIMPL(RTCBaseProcess):
         audio_track.set_enabled(0)
         local_user.unregister_audio_frame_observer()
 
+        pcm_data_sender.release()
+        audio_track.release()
+        media_node_factory.release()
+
+        pcm_data_sender = None
+        audio_track = None
+        media_node_factory = None
+        audio_frame_observer = None
+
     async def send(self, sample_options: ExampleOptions, pcm_data_sender):
         pcm_task = asyncio.create_task(push_pcm_data_from_file(sample_options.sample_rate, sample_options.num_of_channels, pcm_data_sender, sample_options.audio_file, self._exit))
         await pcm_task

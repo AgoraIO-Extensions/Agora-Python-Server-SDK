@@ -29,6 +29,7 @@ class RTCProcessIMPL(RTCBaseProcess):
             return
         await self._exit.wait()
         local_user.unregister_audio_frame_observer()
+        audio_frame_observer = None
 
     def set_conn_config(self):
         self._conn_config.auto_subscribe_audio = 1
