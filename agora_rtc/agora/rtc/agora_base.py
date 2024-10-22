@@ -325,7 +325,7 @@ class RTCConnConfig:
     max_send_bitrate: int = 0
     min_port: int = 0
     max_port: int = 0
-    audio_subs_options: 'AudioSubscriptionOptions' = AudioSubscriptionOptions()
+    audio_subs_options: 'AudioSubscriptionOptions' = field(default_factory=AudioSubscriptionOptions)
     client_role_type: ClientRoleType = ClientRoleType.CLIENT_ROLE_BROADCASTER
     channel_profile: ChannelProfileType = ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING
     audio_recv_media_packet: int = 0
