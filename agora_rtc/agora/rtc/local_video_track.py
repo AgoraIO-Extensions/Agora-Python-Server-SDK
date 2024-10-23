@@ -46,6 +46,9 @@ class LocalVideoTrack:
     def __init__(self, track_handle):
         self.track_handle = track_handle
 
+    def __del__(self):
+        self.release()
+
     def set_enabled(self, enable):
         agora_local_video_track_set_enabled(self.track_handle, enable)
 

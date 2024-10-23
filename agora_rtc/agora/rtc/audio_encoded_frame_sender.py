@@ -22,6 +22,9 @@ class AudioEncodedFrameSender:
     def __init__(self, handle) -> None:
         self.sender_handle = handle
 
+    def __del__(self):
+        self.release()
+
     # def send_encoded_audio_frame(self, frame:EncodedAudioFrame):
     #     c_date = (ctypes.c_char * len(frame.data)).from_buffer(frame.data)
     #     ownedinfo = frame.to_owned_encoded_audio_frame()

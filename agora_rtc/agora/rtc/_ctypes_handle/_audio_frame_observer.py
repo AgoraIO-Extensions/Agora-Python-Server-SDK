@@ -34,6 +34,16 @@ class AudioFrameObserverInner(ctypes.Structure):
         ("on_get_ear_monitoring_audio_frame_param", ON_GET_EAR_MONITORING_AUDIO_FRAME_PARAM_CALLBACK)
     ]
 
+    def __del__(self):
+        self.observer = None
+        self.local_user = None
+        # self.on_record_audio_frame = None
+        # self.on_playback_audio_frame = None
+        # self.on_mixed_audio_frame = None
+        # self.on_ear_monitoring_audio_frame = None
+        # self.on_playback_audio_frame_before_mixing = None
+        # self.on_get_audio_frame_position = None
+
     def __init__(self, observer: IAudioFrameObserver, local_user: 'LocalUser'):
         self.observer = observer
         self.local_user = local_user

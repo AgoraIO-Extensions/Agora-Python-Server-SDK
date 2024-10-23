@@ -18,6 +18,9 @@ class VideoFrameSender:
     def __init__(self, handle) -> None:
         self.sender_handle = handle
 
+    def __del__(self):
+        self.release()
+
     def send_video_frame(self, frame: ExternalVideoFrame):
         ret = agora_video_frame_sender_send(self.sender_handle, ctypes.byref(ExternalVideoFrameInner.create(frame)))
         frame.buffer = None

@@ -68,8 +68,12 @@ class AgoraParameter:
     def __init__(self, handle) -> None:
         self.parameter_handle = handle
 
+    def __del__(self):
+        self.release()
+
     def release(self):
-        pass
+        if self.parameter_handle:
+            self.parameter_handle = None
 
     def set_int(self, key, value):
         return agora_parameter_set_int(self.parameter_handle, key.encode(), value)

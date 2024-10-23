@@ -19,6 +19,9 @@ class AudioPcmDataSender:
     def __init__(self, handle) -> None:
         self.sender_handle = handle
 
+    def __del__(self):
+        self.release()
+
     def send_audio_pcm_data(self, frame: PcmAudioFrame):
         c_data = (ctypes.c_char * len(frame.data)).from_buffer(frame.data)
         c_data_ptr = ctypes.cast(c_data, ctypes.POINTER(ctypes.c_void_p))

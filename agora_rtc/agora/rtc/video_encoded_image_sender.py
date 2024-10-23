@@ -19,6 +19,9 @@ class VideoEncodedImageSender:
     def __init__(self, handle) -> None:
         self.sender_handle = handle
 
+    def __del__(self):
+        self.release()
+
     def send_encoded_video_image(self, buffer_ptr: int, buffer_size: int, frame_info: EncodedVideoFrameInfo):
         buffer_pointer = ctypes.cast(buffer_ptr, ctypes.POINTER(ctypes.c_uint8))
         ret = agora_video_encoded_image_sender_send(self.sender_handle, buffer_pointer, buffer_size, EncodedVideoFrameInfoInner.create(frame_info))
@@ -30,4 +33,3 @@ class VideoEncodedImageSender:
         if self.sender_handle:
             agora_video_encoded_image_sender_destroy(self.sender_handle)
             self.sender_handle = None
-        return

@@ -124,9 +124,11 @@ agora_service_create_custom_video_track_encoded.argtypes = [AGORA_HANDLE, AGORA_
 class AgoraService:
     def __init__(self) -> None:
         self.service_handle = agora_service_create()
-
         # set tag???
         self.inited = False
+
+    def __del__(self):
+        self.release()
 
     def initialize(self, config: AgoraServiceConfig):
         if self.inited == True:

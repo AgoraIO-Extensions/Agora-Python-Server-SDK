@@ -16,6 +16,10 @@ class VideoEncodedFrameObserverInner(ctypes.Structure):
         ("on_encoded_video_frame", ON_ENCODED_VIDEO_FRAME)
     ]
 
+    def __del__(self):
+        self.video_encoded_frame_observer = None
+        # self.on_encoded_video_frame = None
+
     def __init__(self, video_encoded_frame_observer: 'IVideoEncodedFrameObserver'):
         self.video_encoded_frame_observer = video_encoded_frame_observer
         self.on_encoded_video_frame = ON_ENCODED_VIDEO_FRAME(self._on_encoded_video_frame)

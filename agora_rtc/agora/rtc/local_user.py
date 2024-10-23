@@ -227,6 +227,9 @@ class LocalUser:
     def __init__(self, local_user_handle):
         self.user_handle = local_user_handle
 
+    def __del__(self):
+        self.release()
+
     def set_user_role(self, role):
         ret = agora_local_user_set_user_role(self.user_handle, role)
         return ret
@@ -420,11 +423,7 @@ class LocalUser:
         return ret
 
     def release(self):
-        # clean all
-        pass
-
-    def get_rtc_connection(self):
-        return self.connection
+        self.user_handle = None
 
     def set_audio_scenario(self, scenario_type: AudioScenarioType):
         ret = agora_local_user_set_audio_scenario(self.user_handle, scenario_type.value)

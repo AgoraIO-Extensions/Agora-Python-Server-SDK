@@ -22,9 +22,12 @@ agora_remote_audio_track_get_state.argtypes = [AGORA_HANDLE]
 
 
 class RemoteAudioTrack:
-    def __init__(self, track_handle, user_id):  # user_id is a string
+    def __init__(self, track_handle, user_id: str = "0"):  # user_id is a string
         self.track_handle = track_handle
         self.user_id = user_id  # string
+
+    def __del__(self):
+        self.release()
 
     def get_statistics(self):
         stats_ptr = agora_remote_audio_track_get_statistics(self.track_handle)
@@ -46,4 +49,4 @@ class RemoteAudioTrack:
     # so just return None here and do nothing
 
     def release(self):
-        pass
+        self.track_handle = None

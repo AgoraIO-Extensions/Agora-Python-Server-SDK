@@ -120,7 +120,17 @@ class RTCConnection:
         self.conn_handle = conn_handle
         self.con_observer = None
 
-    #
+    def __del__(self):
+        self.release()
+
+    def release(self):
+        if self.con_observer:
+            self.unregister_observer()
+            self.conn_handle = None
+        if self.conn_handle:
+            agora_rtc_conn_release(self.conn_handle)
+            self.conn_handle = None
+
     def connect(self, token: str, chan_id: str, user_id: str) -> int:
         ret = agora_rtc_conn_connect(self.conn_handle, ctypes.create_string_buffer(token.encode('utf-8')), ctypes.create_string_buffer(chan_id.encode('utf-8')), ctypes.create_string_buffer(user_id.encode('utf-8')))
         return ret
@@ -181,8 +191,3 @@ class RTCConnection:
     def get_local_user(self):
         local_user_handle = agora_rtc_conn_get_local_user(self.conn_handle)
         return LocalUser(local_user_handle)
-
-    def release(self):
-        self.local_user = None
-        agora_rtc_conn_release(self.conn_handle)
-        self.conn_handle = None

@@ -17,6 +17,11 @@ class VideoFrameObserverInner(ctypes.Structure):
         ("on_frame", ON_FRAME_CALLBACK)
     ]
 
+    def __del__(self):
+        self.video_frame_observer = None
+        self.local_user = None
+        # self.on_frame = None
+
     def __init__(self, video_frame_observer: IVideoFrameObserver, local_user: 'LocalUser'):
         self.video_frame_observer = video_frame_observer
         self.local_user = local_user

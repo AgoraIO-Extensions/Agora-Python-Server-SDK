@@ -83,6 +83,40 @@ class RTCConnectionObserverInner(ctypes.Structure):
         ("on_upload_log_result", ON_UPLOAD_LOG_RESULT_CALLBACK)
     ]
 
+    def __del__(self):
+        self.conn_observer = None
+        self.conn = None
+        # self.on_connected = None
+        # self.on_disconnected = None
+        # self.on_connecting = None
+        # self.on_reconnecting = None
+        # self.on_reconnected = None
+        # self.on_connection_lost = None
+        # self.on_lastmile_quality = None
+        # self.on_lastmile_probe_result = None
+        # self.on_token_privilege_will_expire = None
+        # self.on_token_privilege_did_expire = None
+        # self.on_connection_license_validation_failure = None
+        # self.on_connection_failure = None
+        # self.on_user_joined = None
+        # self.on_user_left = None
+        # self.on_transport_stats = None
+        # self.on_change_role_success = None
+        # self.on_change_role_failure = None
+        # self.on_user_network_quality = None
+        # self.on_network_type_changed = None
+        # self.on_api_call_executed = None
+        # self.on_content_inspect_result = None
+        # self.on_snapshot_taken = None
+        # self.on_error = None
+        # self.on_warning = None
+        # self.on_channel_media_relay_state_changed = None
+        # self.on_local_user_registered = None
+        # self.on_user_account_updated = None
+        # self.on_stream_message_error = None
+        # self.on_encryption_error = None
+        # self.on_upload_log_result = None
+
     def __init__(self, conn_observer: IRTCConnectionObserver, connection: 'RTCConnection') -> None:
         from ..rtc_connection import RTCConnection  # Moved import here to avoid circular import
         self.conn_observer = conn_observer

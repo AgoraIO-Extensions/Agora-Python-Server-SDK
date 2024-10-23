@@ -46,9 +46,15 @@ agora_remote_video_track_unregister_video_encoded_image_receiver.argtypes = [AGO
 
 
 class RemoteVideoTrack:
-    def __init__(self, track_handle, user_id_str):
+    def __init__(self, track_handle, user_id_str: str = "0"):
         self.user_id_str = user_id_str
         self.track_handle = track_handle
+
+    def __del__(self):
+        self.release()
+
+    def release(self):
+        self.track_handle = None
 
     def get_statistics(self):
         stats_ptr = agora_remote_video_track_get_statistics(self.track_handle)
