@@ -5,7 +5,6 @@ from .local_user import LocalUser
 from .rtc_connection_observer import IRTCConnectionObserver
 from ._ctypes_handle._audio_frame_observer import AudioFrameObserverInner
 from .agora_parameter import AgoraParameter
-from ._utils.globals import AgoraHandleInstanceMap
 from ._ctypes_handle._rtc_connection_observer import RTCConnectionObserverInner
 from ._ctypes_handle._ctypes_data import *
 import logging
@@ -120,13 +119,6 @@ class RTCConnection:
     def __init__(self, conn_handle) -> None:
         self.conn_handle = conn_handle
         self.con_observer = None
-        self.local_user = None
-        self.local_user_handle = agora_rtc_conn_get_local_user(conn_handle)
-        if self.local_user_handle:
-            self.local_user = LocalUser(self.local_user_handle, self)
-        # add to map
-        AgoraHandleInstanceMap().set_local_user_map(self.conn_handle, self)
-        AgoraHandleInstanceMap().set_con_map(self.conn_handle, self)
 
     #
     def connect(self, token: str, chan_id: str, user_id: str) -> int:
@@ -187,16 +179,10 @@ class RTCConnection:
     #
 
     def get_local_user(self):
-        return self.local_user
+        local_user_handle = agora_rtc_conn_get_local_user(self.conn_handle)
+        return LocalUser(local_user_handle)
 
     def release(self):
-        # release local user map
-        if self.conn_handle:
-            AgoraHandleInstanceMap().del_local_user_map(self.conn_handle)
-
-        # release local handle
-
         self.local_user = None
-
         agora_rtc_conn_release(self.conn_handle)
         self.conn_handle = None

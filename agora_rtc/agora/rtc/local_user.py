@@ -1,6 +1,5 @@
 import time
 import ctypes
-from threading import RLock, Lock
 from .agora_base import *
 from .local_video_track import *
 from .local_audio_track import *
@@ -225,92 +224,8 @@ agora_local_user_set_audio_scenario.argtypes = [AGORA_HANDLE, ctypes.c_int]
 
 
 class LocalUser:
-    def __init__(self, local_user_handle, connection):
+    def __init__(self, local_user_handle):
         self.user_handle = local_user_handle
-        self.connection = connection
-        # for AudioTrack/videoTrack in local_user, we need to keep the reference of them
-        self._audio_track_lock = Lock()
-        self._video_track_lock = Lock()
-        # map
-        self._audio_track_map = {}
-        self._video_track_map = {}
-
-        self._remote_audio_track_lock = Lock()
-        self._remote_video_track_lock = Lock()
-        self._remote_audio_track_map = {}
-        self._remote_video_track_map = {}
-
-        self.video_frame_observer_handler = None
-        self.video_encoded_frame_observer_handler = None
-
-    def _set_audio_map(self, track_handle, track: LocalAudioTrack):
-        with self._audio_track_lock:
-            # no need to theck key is existed or not,just do replace
-            self._audio_track_map[track_handle] = track
-
-    def get_audio_map(self, track_handle):
-        with self._audio_track_lock:
-            return self._audio_track_map.get(track_handle)
-
-    def _del_audio_map(self, track_handle):
-        with self._audio_track_lock:
-            if track_handle not in self._audio_track_map:
-                return
-            del self._audio_track_map[track_handle]
-
-    def _set_video_map(self, track_handle, track: LocalVideoTrack):
-        with self._video_track_lock:
-            # no need to theck key is existed or not,just do replace
-            self._video_track_map[track_handle] = track
-
-    def get_video_map(self, track_handle):
-        with self._video_track_lock:
-            return self._video_track_map.get(track_handle)
-
-    def del_video_map(self, track_handle):
-        with self._video_track_lock:
-            if track_handle not in self._video_track_map:
-                return
-            del self._video_track_map[track_handle]
-
-    def set_remote_audio_map(self, track_handle, track: RemoteAudioTrack, user_id_str):
-        with self._remote_audio_track_lock:
-            # to check key is existed or not,just do replace
-            # userid is unique in a channel
-            self._remote_audio_track_map[track_handle] = track
-
-    def get_remote_audio_map(self, track_handle):
-        with self._remote_audio_track_lock:
-            return self._remote_audio_track_map.get(track_handle)
-
-    def del_remote_audio_map(self, user_id_str):
-        with self._remote_audio_track_lock:
-            if user_id_str is None:
-                self._remote_audio_track_map.clear()
-            else:
-                for key, value in self._remote_audio_track_map.items():
-                    if value.user_id == user_id_str:
-                        del self._remote_audio_track_map[key]
-
-    def set_remote_video_map(self, track_handle, track: RemoteVideoTrack):
-        with self._remote_video_track_lock:
-            # no need to theck key is existed or not,just do replace
-            self._remote_video_track_map[track_handle] = track
-
-    def get_remote_video_map(self, track_handle):
-        with self._remote_video_track_lock:
-            return self._remote_video_track_map.get(track_handle)
-
-    def del_remote_video_map(self, user_id_str):
-        with self._remote_video_track_lock:
-            if user_id_str is None:
-                self._remote_video_track_map.clear()
-                return
-
-            for key, value in self._remote_video_track_map.items():
-                if value.user_id == user_id_str:
-                    del self._remote_video_track_map[key]
-            return
 
     def set_user_role(self, role):
         ret = agora_local_user_set_user_role(self.user_handle, role)
@@ -335,10 +250,6 @@ class LocalUser:
 
     def publish_audio(self, agora_local_audio_track: LocalAudioTrack):
         ret = agora_local_user_publish_audio(self.user_handle, agora_local_audio_track.track_handle)
-        if ret < 0:
-            logger.error("Failed to publish audio")
-        else:
-            self._set_audio_map(agora_local_audio_track.track_handle, agora_local_audio_track)
         return ret
 
     def unpublish_audio(self, agora_local_audio_track: LocalAudioTrack):
@@ -347,10 +258,6 @@ class LocalUser:
 
     def publish_video(self, agora_local_video_track: LocalVideoTrack):
         ret = agora_local_user_publish_video(self.user_handle, agora_local_video_track.track_handle)
-        if ret < 0:
-            logger.error("Failed to publish video")
-        else:
-            self._set_video_map(agora_local_video_track.track_handle, agora_local_video_track)
         return ret
 
     def unpublish_video(self, agora_local_video_track: LocalVideoTrack):
@@ -367,18 +274,10 @@ class LocalUser:
 
     def unsubscribe_audio(self, user_id):
         ret = agora_local_user_unsubscribe_audio(self.user_handle, ctypes.c_char_p(user_id.encode()))
-        if ret < 0:
-            logger.error("Failed to unsubscribe audio")
-        else:
-            self.del_remote_audio_map(user_id)
         return ret
 
     def unsubscribe_all_audio(self):
         ret = agora_local_user_unsubscribe_all_audio(self.user_handle)
-        if ret < 0:
-            logger.error("Failed to unsubscribe all audio")
-        else:
-            self.del_remote_audio_map(None)
         return ret
 
     def adjust_playback_signal_volume(self, volume):
@@ -482,18 +381,10 @@ class LocalUser:
     def unsubscribe_video(self, user_id):
         user_id_t = user_id.encode('utf-8')
         ret = agora_local_user_unsubscribe_video(self.user_handle, user_id_t)
-        if ret < 0:
-            logger.error("Failed to unsubscribe video")
-        else:
-            self.del_remote_video_map(user_id)
         return ret
 
     def unsubscribe_all_video(self):
         ret = agora_local_user_unsubscribe_all_video(self.user_handle)
-        if ret < 0:
-            logger.error("Failed to unsubscribe all video")
-        else:
-            self.del_remote_video_map_all(None)
         return ret
 
     def set_audio_volume_indication_parameters(self, interval_in_ms, smooth, report_vad):
@@ -530,26 +421,10 @@ class LocalUser:
 
     def release(self):
         # clean all
-        with self._remote_audio_track_lock:
-            self._remote_audio_track_map.clear()
-        with self._remote_video_track_lock:
-            self._remote_video_track_map.clear()
-        with self._audio_track_lock:
-            self._audio_track_map.clear()
-        with self._video_track_lock:
-            self._video_track_map.clear()
         pass
 
     def get_rtc_connection(self):
         return self.connection
-
-    def get_remote_audio_track(self, uid):
-        # enum & get audio track
-        with self._remote_audio_track_lock:
-            for handle, remote_audio_track in self.remote_audio_tracks.items():
-                if remote_audio_track.user_id == uid:
-                    return remote_audio_track
-        return None
 
     def set_audio_scenario(self, scenario_type: AudioScenarioType):
         ret = agora_local_user_set_audio_scenario(self.user_handle, scenario_type.value)

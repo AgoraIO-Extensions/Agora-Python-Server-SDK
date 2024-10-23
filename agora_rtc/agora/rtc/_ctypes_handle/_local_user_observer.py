@@ -129,52 +129,34 @@ class RTCLocalUserObserverInner(ctypes.Structure):
         self.on_stream_message = ON_STREAM_MESSAGE_CALLBACK(self._on_stream_message)
         self.on_user_state_changed = ON_USER_STATE_CHANGED_CALLBACK(self._on_user_state_changed)
 
-    """
-    it seems that this interface does not provide much value to the user's business, 
-    therefore, there is no need to convert audio_track(ctypes.handle type) into LocalAudioTrack.
-    If convert is necessary, it would require recording the LocalAudioTrack during LocalUser.pub_audio, and support a get methond in LocalAudioTrack to
-    get LocalAudioTrack instance from handle.
-    codes may  like: LocalAudioTrack = self.local_user.get(local_audio_track_handle)
-    Avoid to create a global LocalAudioTrack map table as it can significantly impact performance .
-    """
-
     def _on_audio_track_publish_success(self, local_user_handle, local_audio_track_handle):
         logger.debug(f"LocalUserCB _on_audio_track_publish_success: {local_user_handle}, {local_audio_track_handle}")
         # note: to get
-        audio_track = self.local_user.get_audio_map(local_audio_track_handle)
-        self.local_user_observer.on_audio_track_publish_success(self.local_user, audio_track)
+        self.local_user_observer.on_audio_track_publish_success(self.local_user, local_audio_track_handle)
 
     def _on_video_track_publish_success(self, local_user_handle, local_video_track_handle):
         logger.debug(f"LocalUserCB _on_video_track_publish_success: {local_user_handle}, {local_video_track_handle}")
-        video_track = self.local_user.get_video_map(local_video_track_handle)
-        self.local_user_observer.on_video_track_publish_success(self.local_user, video_track)
+        self.local_user_observer.on_video_track_publish_success(self.local_user, local_video_track_handle)
 
     def _on_video_track_publish_start(self, local_user_handle, local_video_track_handle):
         logger.debug(f"LocalUserCB _on_video_track_publish_start: {local_user_handle}, {local_video_track_handle}")
-        video_track = self.local_user.get_video_map(local_video_track_handle)
-        self.local_user_observer.on_video_track_publish_start(self.local_user, video_track)
+        self.local_user_observer.on_video_track_publish_start(self.local_user, local_video_track_handle)
 
     def _on_audio_track_publish_start(self, local_user_handle, local_audio_track_handle):
         logger.debug(f"LocalUserCB _on_audio_track_publish_start: {local_user_handle}, {local_audio_track_handle}")
-        audio_track = self.local_user.get_audio_map(local_audio_track_handle)
-        self.local_user_observer.on_audio_track_publish_start(self.local_user, audio_track)
+        self.local_user_observer.on_audio_track_publish_start(self.local_user, local_audio_track_handle)
 
     def _on_audio_track_unpublished(self, local_user_handle, local_audio_track_handle):
         logger.debug(f"LocalUserCB _on_audio_track_unpublished: {local_user_handle}, {local_audio_track_handle}")
-        audio_track = self.local_user.get_audio_map(local_audio_track_handle)
-        self.local_user._del_audio_map(local_audio_track_handle)
-        self.local_user_observer.on_audio_track_unpublished(self.local_user, audio_track)
+        self.local_user_observer.on_audio_track_unpublished(self.local_user, local_audio_track_handle)
 
     def _on_audio_track_publication_failure(self, local_user_handle, local_audio_track_handle, error_code):
         logger.debug(f"LocalUserCB _on_audio_track_publication_failure: {local_user_handle}, {local_audio_track_handle}, {error_code}")
-        audio_track = self.local_user.get_audio_map(local_audio_track_handle)
-        self.local_user.del_audio_map(local_audio_track_handle)
-        self.local_user_observer.on_audio_track_publication_failure(self.local_user, audio_track, error_code)
+        self.local_user_observer.on_audio_track_publication_failure(self.local_user, local_audio_track_handle, error_code)
 
     def _on_local_audio_track_state_changed(self, local_user_handle, local_audio_track_handle, state, error):
         logger.debug(f"LocalUserCB _on_local_audio_track_state_changed: {local_user_handle}, {local_audio_track_handle}, {state}, {error}")
-        audio_track = self.local_user.get_audio_map(local_audio_track_handle)
-        self.local_user_observer.on_local_audio_track_state_changed(self.local_user, audio_track, state, error)
+        self.local_user_observer.on_local_audio_track_state_changed(self.local_user, local_audio_track_handle, state, error)
 
     def _on_local_audio_track_statistics(self, local_user_handle, stats):
         local_audio_stats = stats.contents
@@ -185,21 +167,17 @@ class RTCLocalUserObserverInner(ctypes.Structure):
         user_id_str = user_id.decode('utf-8') if user_id else ""
         # note: this is a pointer to agora::rtc::IRemoteAudioTrack
         remote_audio_track = RemoteAudioTrack(remote_audio_track_handle, user_id_str)
-        # map to localuser to save reference
-        self.local_user.set_remote_audio_map(remote_audio_track_handle, remote_audio_track, user_id_str)
         self.local_user_observer.on_user_audio_track_subscribed(self.local_user, user_id_str, remote_audio_track)
 
     def _on_remote_audio_track_statistics(self, local_user_handle, remote_audio_track_handle, stats):
         logger.debug(f"LocalUserCB _on_remote_audio_track_statistics: {local_user_handle}, {remote_audio_track_handle}, {stats}")
         audio_stats = stats.contents  # RemoteAudioTrackStats
-        remote_audio_track = self.local_user.get_remote_audio_map(remote_audio_track_handle)
-        self.local_user_observer.on_remote_audio_track_statistics(self.local_user, remote_audio_track, audio_stats)
+        self.local_user_observer.on_remote_audio_track_statistics(self.local_user, remote_audio_track_handle, audio_stats)
 
     def _on_user_audio_track_state_changed(self, local_user_handle, user_id, remote_audio_track_handle, state, reason, elapsed):
         logger.debug(f"LocalUserCB _on_user_audio_track_state_changed: {local_user_handle}, {user_id}, {remote_audio_track_handle}, {state}, {reason}, {elapsed}")
         user_id_str = user_id.decode('utf-8') if user_id else ""
-        remote_audio_track = self.local_user.get_remote_audio_map(remote_audio_track_handle)
-        self.local_user_observer.on_user_audio_track_state_changed(self.local_user, user_id_str, remote_audio_track, state, reason, elapsed)
+        self.local_user_observer.on_user_audio_track_state_changed(self.local_user, user_id_str, remote_audio_track_handle, state, reason, elapsed)
 
     def _on_audio_subscribe_state_changed(self, local_user_handle, channel_id, user_id, state, reason, elapsed):
         logger.debug(f"LocalUserCB _on_audio_subscribe_state_changed: {local_user_handle}, {channel_id}, {user_id}, {state}, {reason}, {elapsed}")
@@ -224,27 +202,21 @@ class RTCLocalUserObserverInner(ctypes.Structure):
 
     def _on_video_track_unpublished(self, local_user_handle, local_video_track_handle):
         logger.debug(f"LocalUserCB _on_video_track_unpublished: {local_user_handle}, {local_video_track_handle}")
-        local_video_track = self.local_user.get_video_map(local_video_track_handle)
-        # and then remove it from the local user
-        self.local_user.del_video_map(local_video_track_handle)
-        self.local_user_observer.on_video_track_unpublished(self.local_user, local_video_track)
+        self.local_user_observer.on_video_track_unpublished(self.local_user, local_video_track_handle)
 
     def _on_video_track_publication_failure(self, local_user_handle, local_video_track_handle, error_code):
         logger.debug(f"LocalUserCB _on_video_track_publication_failure: {local_user_handle}, {local_video_track_handle}, {error_code}")
-        local_video_track = self.local_user.get_video_map(local_video_track_handle)
-        self.local_user_observer.on_video_track_publication_failure(self.local_user, local_video_track, error_code)
+        self.local_user_observer.on_video_track_publication_failure(self.local_user, local_video_track_handle, error_code)
 
     def _on_local_video_track_state_changed(self, local_user_handle, local_video_track_handle, state, error):
         logger.debug(f"LocalUserCB _on_local_video_track_state_changed: {local_user_handle}, {local_video_track_handle}, {state}, {error}")
-        local_video_track = self.local_user.get_video_map(local_video_track_handle)
-        self.local_user_observer.on_local_video_track_state_changed(self.local_user, local_video_track, state, error)
+        self.local_user_observer.on_local_video_track_state_changed(self.local_user, local_video_track_handle, state, error)
 
     def _on_local_video_track_statistics(self, local_user_handle, local_video_track_handle, stats):
         logger.debug(f"LocalUserCB _on_local_video_track_statistics: {local_user_handle}, {local_video_track_handle}, {stats}")
         # stats: ctypes.pointer to LocalVideoTrackStats
-        local_video_track = self.local_user.get_video_map(local_video_track_handle)
         video_stats = stats.contents
-        self.local_user_observer.on_local_video_track_statistics(self.local_user, local_video_track, video_stats)
+        self.local_user_observer.on_local_video_track_statistics(self.local_user, local_video_track_handle, video_stats)
 
     def _on_user_video_track_subscribed(self, local_user_handle, user_id, video_track_info, remote_video_track_handle):
         logger.debug(f"LocalUserCB _on_user_video_track_subscribed: {local_user_handle}, {user_id}, {remote_video_track_handle}, {video_track_info}")
@@ -254,21 +226,18 @@ class RTCLocalUserObserverInner(ctypes.Structure):
         remote_video_track = RemoteVideoTrack(remote_video_track_handle, user_id_str)
         # note: for video, one user can publish multiple video tracks, so the identifier is the remote_video_track_handle,
         # its diff to audiotrack
-        self.local_user.set_remote_video_map(remote_video_track_handle, remote_video_track)
         track_info = video_track_info.contents.get()
         self.local_user_observer.on_user_video_track_subscribed(self.local_user, user_id_str, track_info, remote_video_track)
 
     def _on_user_video_track_state_changed(self, local_user_handle, user_id, remote_video_track_handle, state, reason, elapsed):
         logger.debug(f"LocalUserCB _on_user_video_track_state_changed: {local_user_handle}, {user_id}, {remote_video_track_handle}, {state}, {reason}, {elapsed}")
         user_id_str = user_id.decode('utf-8') if user_id else ""
-        video_track = self.local_user.get_remote_video_map(remote_video_track_handle)
-        self.local_user_observer.on_user_video_track_state_changed(self.local_user, user_id_str, video_track, state, reason, elapsed)
+        self.local_user_observer.on_user_video_track_state_changed(self.local_user, user_id_str, remote_video_track_handle, state, reason, elapsed)
 
     def _on_remote_video_track_statistics(self, local_user_handle, remote_video_track_handle, stats_ptr):
         logger.debug(f"LocalUserCB _on_remote_video_track_statistics: {local_user_handle}, {remote_video_track_handle}, {stats_ptr}")
         remote_stats = stats_ptr.contents  # RemoteVideoTrackStats
-        video_track = self.local_user.get_remote_video_map(remote_video_track_handle)
-        self.local_user_observer.on_remote_video_track_statistics(self.local_user, video_track, remote_stats)
+        self.local_user_observer.on_remote_video_track_statistics(self.local_user, remote_video_track_handle, remote_stats)
 
     def _on_audio_volume_indication(self, local_user_handle, audio_volume_info_ptr, speaker_number, total_volume):
         logger.debug(f"LocalUserCB _on_audio_volume_indication: {local_user_handle}, {audio_volume_info_ptr}, {speaker_number}, {total_volume}")
