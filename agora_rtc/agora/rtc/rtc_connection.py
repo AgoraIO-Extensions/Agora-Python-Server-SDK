@@ -26,69 +26,15 @@ agora_rtc_conn_disconnect.argtypes = [AGORA_HANDLE]
 agora_rtc_conn_register_observer = agora_lib.agora_rtc_conn_register_observer
 agora_rtc_conn_register_observer.restype = AGORA_API_C_INT
 agora_rtc_conn_register_observer.argtypes = [AGORA_HANDLE, ctypes.POINTER(RTCConnectionObserverInner)]
-# unregister
+
 agora_rtc_conn_unregister_observer = agora_lib.agora_rtc_conn_unregister_observer
 agora_rtc_conn_unregister_observer.restype = AGORA_API_C_INT
 agora_rtc_conn_unregister_observer.argtypes = [AGORA_HANDLE]
 
-# release
 agora_rtc_conn_release = agora_lib.agora_rtc_conn_destroy
-# note: for c void return type, we use default
 agora_rtc_conn_release.restype = AGORA_API_C_VOID
 agora_rtc_conn_release.argtypes = [AGORA_HANDLE]
 
-agora_media_node_factory_create_audio_pcm_data_sender = agora_lib.agora_media_node_factory_create_audio_pcm_data_sender
-agora_media_node_factory_create_audio_pcm_data_sender.restype = AGORA_HANDLE
-agora_media_node_factory_create_audio_pcm_data_sender.argtypes = [AGORA_HANDLE]
-
-agora_local_user_subscribe_audio = agora_lib.agora_local_user_subscribe_audio
-agora_local_user_subscribe_audio.restype = AGORA_API_C_INT
-agora_local_user_subscribe_audio.argtypes = [AGORA_HANDLE, user_id_t]
-
-agora_local_user_unsubscribe_audio = agora_lib.agora_local_user_unsubscribe_audio
-agora_local_user_unsubscribe_audio.restype = AGORA_API_C_INT
-agora_local_user_unsubscribe_audio.argtypes = [AGORA_HANDLE, user_id_t]
-
-# sub&unsub all audio
-agora_local_user_subscribe_all_audio = agora_lib.agora_local_user_subscribe_all_audio
-agora_local_user_subscribe_all_audio.restype = AGORA_API_C_INT
-agora_local_user_subscribe_all_audio.argtypes = [AGORA_HANDLE]
-
-agora_local_user_unsubscribe_all_audio = agora_lib.agora_local_user_unsubscribe_all_audio
-agora_local_user_unsubscribe_all_audio.restype = AGORA_API_C_INT
-agora_local_user_unsubscribe_all_audio.argtypes = [AGORA_HANDLE]
-
-agora_media_node_factory_create_video_frame_sender = agora_lib.agora_media_node_factory_create_video_frame_sender
-agora_media_node_factory_create_video_frame_sender.restype = AGORA_HANDLE
-agora_media_node_factory_create_video_frame_sender.argtypes = [AGORA_HANDLE]
-
-agora_service_create_custom_video_track_frame = agora_lib.agora_service_create_custom_video_track_frame
-agora_service_create_custom_video_track_frame.restype = AGORA_HANDLE
-agora_service_create_custom_video_track_frame.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
-
-agora_local_video_track_destroy = agora_lib.agora_local_video_track_destroy
-agora_local_video_track_destroy.restype = AGORA_HANDLE
-agora_local_video_track_destroy.argtypes = [AGORA_HANDLE]
-
-agora_video_frame_sender_destroy = agora_lib.agora_video_frame_sender_destroy
-agora_video_frame_sender_destroy.restype = AGORA_HANDLE
-agora_video_frame_sender_destroy.argtypes = [AGORA_HANDLE]
-
-
-agora_local_user_register_audio_frame_observer = agora_lib.agora_local_user_register_audio_frame_observer
-agora_local_user_register_audio_frame_observer.restype = AGORA_API_C_INT
-agora_local_user_register_audio_frame_observer.argtypes = [AGORA_HANDLE, ctypes.POINTER(AudioFrameObserverInner)]
-
-agora_local_user_unregister_audio_frame_observer = agora_lib.agora_local_user_unregister_audio_frame_observer
-agora_local_user_unregister_audio_frame_observer.restype = AGORA_API_C_INT
-agora_local_user_unregister_audio_frame_observer.argtypes = [AGORA_HANDLE]
-
-
-agora_local_user_set_playback_audio_frame_before_mixing_parameters = agora_lib.agora_local_user_set_playback_audio_frame_before_mixing_parameters
-agora_local_user_set_playback_audio_frame_before_mixing_parameters.restype = AGORA_API_C_INT
-agora_local_user_set_playback_audio_frame_before_mixing_parameters.argtypes = [AGORA_HANDLE, ctypes.c_uint32, ctypes.c_uint32]
-
-# 定义datastream 有关的函数
 agora_rtc_conn_create_data_stream = agora_lib.agora_rtc_conn_create_data_stream
 agora_rtc_conn_create_data_stream.restype = AGORA_API_C_INT
 agora_rtc_conn_create_data_stream.argtypes = [AGORA_HANDLE, ctypes.POINTER(ctypes.c_int), ctypes.c_int, ctypes.c_int]
@@ -97,20 +43,10 @@ agora_rtc_conn_send_stream_message = agora_lib.agora_rtc_conn_send_stream_messag
 agora_rtc_conn_send_stream_message.restype = AGORA_API_C_INT
 agora_rtc_conn_send_stream_message.argtypes = [AGORA_HANDLE, ctypes.c_int, ctypes.c_char_p, ctypes.c_uint32]
 
-
-# set paramter
-# AGORA_API_C_HDL agora_rtc_conn_get_agora_parameter(AGORA_HANDLE agora_rtc_conn);
 agora_rtc_conn_get_agora_parameter = agora_lib.agora_rtc_conn_get_agora_parameter
 agora_rtc_conn_get_agora_parameter.restype = ctypes.c_void_p
 agora_rtc_conn_get_agora_parameter.argtypes = [AGORA_HANDLE]
 
-# AGORA_API_C_INT agora_parameter_set_parameters(AGORA_HANDLE agora_parameter, const char* json_src);
-agora_parameter_set_parameters = agora_lib.agora_parameter_set_parameters
-agora_parameter_set_parameters.restype = AGORA_API_C_INT
-agora_parameter_set_parameters.argtypes = [AGORA_HANDLE, ctypes.c_char_p]
-
-# renew token
-# AGORA_API_C_INT agora_rtc_conn_renew_token(AGORA_HANDLE agora_rtc_conn, const char* token);
 agora_rtc_conn_renew_token = agora_lib.agora_rtc_conn_renew_token
 agora_rtc_conn_renew_token.restype = AGORA_API_C_INT
 agora_rtc_conn_renew_token.argtypes = [AGORA_HANDLE, ctypes.c_char_p]
