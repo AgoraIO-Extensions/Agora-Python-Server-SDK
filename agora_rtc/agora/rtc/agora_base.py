@@ -420,6 +420,7 @@ class VideoEncoderConfiguration:
     orientation_mode: int = 0
     degradation_preference: int = 0
     mirror_mode: int = 0
+    encode_alpha: int = 0
 
 
 @dataclass(kw_only=True)
@@ -440,7 +441,7 @@ class ExternalVideoFrame:
     texture_id: int = 0
     matrix: list = field(default_factory=list)
     metadata: str = ""
-    alpha_buffer: bytearray = None
+    alpha_buffer: bytearray = field(default_factory=bytearray)
 
 
 @dataclass(kw_only=True)

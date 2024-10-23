@@ -18,7 +18,9 @@ class ExampleVideoFrameObserver(IVideoFrameObserver):
         self._save_to_disk = save_to_disk
 
     def on_frame(self, channel_id, remote_uid, frame: VideoFrame):
-        logger.info(f"on_frame, channel_id={channel_id}, remote_uid={remote_uid}, width={frame.width}, height={frame.height}, y_stride={frame.y_stride}, u_stride={frame.u_stride}, v_stride={frame.v_stride}, len_y={len(frame.y_buffer)}, len_u={len(frame.u_buffer)}, len_v={len(frame.v_buffer)}")
+        # logger.info(f"on_frame, channel_id={channel_id}, remote_uid={remote_uid}, width={frame.width}, height={frame.height}, y_stride={frame.y_stride}, u_stride={frame.u_stride}, v_stride={frame.v_stride}, len_y={len(frame.y_buffer)}, len_u={len(frame.u_buffer)}, len_v={len(frame.v_buffer)}")
+
+        logger.info(f"on_frame, channel_id={channel_id}, remote_uid={remote_uid},len_alpha_buffer={len(frame.alpha_buffer) if frame.alpha_buffer else 0}")
 
         if self._save_to_disk:
             file_path = os.path.join(log_folder, channel_id + "_" + remote_uid + '.yuv')

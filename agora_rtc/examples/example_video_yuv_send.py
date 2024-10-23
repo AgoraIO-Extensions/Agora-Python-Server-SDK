@@ -30,8 +30,8 @@ class RTCProcessIMPL(RTCBaseProcess):
                 width=sample_options.width,
                 height=sample_options.height
             ),
+            encode_alpha=1
         )
-
         video_track.set_video_encoder_configuration(video_config)
 
         video_track.set_enabled(1)

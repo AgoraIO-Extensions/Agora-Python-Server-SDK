@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 async def push_yuv_data_from_file(width, height, fps, video_sender: VideoFrameSender, video_file_path, _exit: Event):
     # logger.warning(f'push_yuv_data_from_file time:{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]}')
 
+    first_frame = None
     with open(video_file_path, "rb") as video_file:
         yuv_sendinterval = 1.0/fps
         pacer_yuv = Pacer(yuv_sendinterval)
@@ -24,6 +25,8 @@ async def push_yuv_data_from_file(width, height, fps, video_sender: VideoFrameSe
             if not success:
                 video_file.seek(0)
                 continue
+            if first_frame is None:
+                first_frame = frame_buf
             frame = ExternalVideoFrame()
             frame.buffer = frame_buf
             frame.type = 1
@@ -32,6 +35,7 @@ async def push_yuv_data_from_file(width, height, fps, video_sender: VideoFrameSe
             frame.height = height
             frame.timestamp = 0
             frame.metadata = "hello metadata"
+            frame.alpha_buffer = first_frame
             ret = video_sender.send_video_frame(frame)
             yuv_count += 1
             logger.info("send yuv: count,ret=%d, %s", yuv_count, ret)

@@ -153,7 +153,7 @@ class VideoFrameInner(ctypes.Structure):
             shared_context=self.shared_context.decode() if self.shared_context else None,
             texture_id=self.texture_id,
             matrix=self.matrix,
-            alpha_buffer=self.alpha_buffer,
+            alpha_buffer=ctypes.string_at(self.alpha_buffer, self.width * self.height) if self.alpha_buffer else None,
             metadata=ctypes.string_at(self.metadata_buffer, self.metadata_size).decode() if self.metadata_buffer else None
         )
 
@@ -336,7 +336,8 @@ class VideoEncoderConfigurationInner(ctypes.Structure):
         ("min_bitrate", ctypes.c_int),
         ("orientation_mode", ctypes.c_int),
         ("degradation_preference", ctypes.c_int),
-        ("mirror_mode", ctypes.c_int)
+        ("mirror_mode", ctypes.c_int),
+        ("encode_alpha", ctypes.c_int)
     ]
 
     def get(self):
@@ -348,7 +349,8 @@ class VideoEncoderConfigurationInner(ctypes.Structure):
             min_bitrate=self.min_bitrate,
             orientation_mode=self.orientation_mode,
             degradation_preference=self.degradation_preference,
-            mirror_mode=self.mirror_mode
+            mirror_mode=self.mirror_mode,
+            encode_alpha=self.encode_alpha
         )
 
     @staticmethod
@@ -361,7 +363,8 @@ class VideoEncoderConfigurationInner(ctypes.Structure):
             config.min_bitrate,
             config.orientation_mode,
             config.degradation_preference,
-            config.mirror_mode
+            config.mirror_mode,
+            config.encode_alpha
         )
 
 
@@ -761,12 +764,12 @@ class ExternalVideoFrameInner(ctypes.Structure):
 
     @staticmethod
     def create(frame: ExternalVideoFrame) -> 'ExternalVideoFrameInner':
-
         c_buffer = (ctypes.c_uint8 * len(frame.buffer)).from_buffer(frame.buffer)
         c_buffer_ptr = ctypes.cast(c_buffer, ctypes.c_void_p)
         c_metadata = bytearray(frame.metadata.encode('utf-8'))
         c_metadata_ptr = (ctypes.c_uint8 * len(c_metadata)).from_buffer(c_metadata)
-
+        c_alpha_buffer = (ctypes.c_uint8 * len(frame.alpha_buffer)).from_buffer(frame.alpha_buffer)
+        c_alpha_buffer_ptr = ctypes.cast(c_alpha_buffer, ctypes.c_void_p)
         return ExternalVideoFrameInner(
             frame.type,
             frame.format,
@@ -785,7 +788,7 @@ class ExternalVideoFrameInner(ctypes.Structure):
             (ctypes.c_float * 16)(*frame.matrix),
             c_metadata_ptr,
             len(c_metadata),
-            frame.alpha_buffer
+            c_alpha_buffer_ptr
         )
 
 
