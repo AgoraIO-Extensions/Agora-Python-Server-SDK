@@ -739,7 +739,7 @@ class ExternalVideoFrameInner(ctypes.Structure):
         ("matrix", ctypes.c_float * 16),
         ("metadata_buffer", ctypes.POINTER(ctypes.c_uint8)),
         ("metadata_size", ctypes.c_int),
-        ("alpha_buffer", ctypes.c_void_p)
+        ("alpha_buffer", ctypes.c_void_p),
         ("fill_alpha_buffer", ctypes.c_uint8),
         ("alpha_mode", ctypes.c_int)
     ]
