@@ -81,15 +81,17 @@ class RTCConnection:
 
     #
     def register_observer(self, conn_observer: IRTCConnectionObserver) -> int:
-        self.con_observer = conn_observer
-        con_observer_inner = RTCConnectionObserverInner(self.con_observer, self)
-        self.con_observer_inner = con_observer_inner
-        ret = agora_rtc_conn_register_observer(self.conn_handle, con_observer_inner)
+        if self.con_observer:
+            self.unregister_observer()
+        self.con_observer = RTCConnectionObserverInner(conn_observer, self)
+        ret = agora_rtc_conn_register_observer(self.conn_handle, self.con_observer)
         return ret
 
     #
     def unregister_observer(self) -> int:
-        ret = agora_rtc_conn_unregister_observer(self.conn_handle)
+        ret = 0
+        if self.con_observer:
+            ret = agora_rtc_conn_unregister_observer(self.conn_handle)
         self.con_observer = None
         return ret
 
@@ -129,10 +131,6 @@ class RTCConnection:
         # release local user map
         if self.conn_handle:
             AgoraHandleInstanceMap().del_local_user_map(self.conn_handle)
-
-        # release local handle
-
-        self.local_user = None
-
-        agora_rtc_conn_release(self.conn_handle)
+            agora_rtc_conn_release(self.conn_handle)
         self.conn_handle = None
+        self.local_user = None

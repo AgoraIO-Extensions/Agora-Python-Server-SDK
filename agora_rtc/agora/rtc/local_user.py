@@ -240,8 +240,11 @@ class LocalUser:
         self._remote_audio_track_map = {}
         self._remote_video_track_map = {}
 
+        self.audio_frame_observer = None
         self.video_frame_observer_handler = None
+        self.video_frame_observer = None
         self.video_encoded_frame_observer_handler = None
+        self.video_encoded_frame_observer = None
 
     def _set_audio_map(self, track_handle, track: LocalAudioTrack):
         with self._audio_track_lock:
@@ -411,13 +414,17 @@ class LocalUser:
         return ret
 
     def register_audio_frame_observer(self, observer: IAudioFrameObserver):
-        audio_frame_observer = AudioFrameObserverInner(observer, self)
-        self.audio_frame_observer = audio_frame_observer
-        ret = agora_local_user_register_audio_frame_observer(self.user_handle, audio_frame_observer)
+        if self.audio_frame_observer:
+            self.unregister_audio_frame_observer()
+        self.audio_frame_observer = AudioFrameObserverInner(observer, self)
+        ret = agora_local_user_register_audio_frame_observer(self.user_handle, self.audio_frame_observer)
         return ret
 
     def unregister_audio_frame_observer(self):
-        ret = agora_local_user_unregister_audio_frame_observer(self.user_handle)
+        ret = 0
+        if self.audio_frame_observer:
+            ret = agora_local_user_unregister_audio_frame_observer(self.user_handle)
+        self.audio_frame_observer = None
         return ret
 
     # def enable_audio_spectrum_monitor(self, interval_in_ms):
@@ -436,33 +443,39 @@ class LocalUser:
     #     ret = agora_local_user_unregister_audio_spectrum_observer(self.user_handle, observer)
     #     return ret
 
-    # def register_video_encoded_frame_observer(self, agora_video_encoded_frame_observer:IVideoEncodedImageReceiver):
     def register_video_encoded_frame_observer(self, agora_video_encoded_frame_observer: IVideoEncodedFrameObserver):
-        # TO-DO: Inner
-        # self.video_encoded_frame_observer = VideoEncodedImageReceiverInner(agora_video_encoded_frame_observer)
+        if self.video_encoded_frame_observer_handler:
+            self.unregister_video_encoded_frame_observer()
+
         self.video_encoded_frame_observer = VideoEncodedFrameObserverInner(agora_video_encoded_frame_observer)
-        # self.video_encoded_frame_observer_handler = agora_video_encoded_image_receiver_create(self.video_encoded_frame_observer)
         self.video_encoded_frame_observer_handler = agora_video_encoded_frame_observer_create(self.video_encoded_frame_observer)
         ret = agora_local_user_register_video_encoded_frame_observer(self.user_handle, self.video_encoded_frame_observer_handler)
         return ret
 
     def unregister_video_encoded_frame_observer(self):
-        if not self.video_encoded_frame_observer_handler:
-            return 0
-        ret = agora_local_user_unregister_video_encoded_frame_observer(self.user_handle, self.video_encoded_frame_observer_handler)
+        ret = 0
+        if self.video_encoded_frame_observer_handler:
+            ret = agora_local_user_unregister_video_encoded_frame_observer(self.user_handle, self.video_encoded_frame_observer_handler)
+            agora_video_encoded_frame_observer_destroy(self.video_encoded_frame_observer_handler)
+        self.video_encoded_frame_observer_handler = None
+        self.video_encoded_frame_observer = None
         return ret
 
     def register_video_frame_observer(self, agora_video_frame_observer2: IVideoFrameObserver):
+        if self.video_frame_observer_handler:
+            self.unregister_video_frame_observer()
         self.video_frame_observer = VideoFrameObserverInner(agora_video_frame_observer2, self)
         self.video_frame_observer_handler = agora_video_frame_observer2_create(self.video_frame_observer)
         ret = agora_local_user_register_video_frame_observer(self.user_handle, self.video_frame_observer_handler)
         return ret
 
     def unregister_video_frame_observer(self):
-        if not self.video_frame_observer_handler:
-            return 0
-        agora_video_frame_observer2_destroy(self.video_frame_observer_handler)
-        ret = agora_local_user_unregister_video_frame_observer(self.user_handle, self.video_frame_observer_handler)
+        ret = 0
+        if self.video_frame_observer_handler:
+            ret = agora_local_user_unregister_video_frame_observer(self.user_handle, self.video_frame_observer_handler)
+            agora_video_frame_observer2_destroy(self.video_frame_observer_handler)
+        self.video_frame_observer_handler = None
+        self.video_frame_observer = None
         return ret
 
     # def set_video_subscription_options(self, user_id, options):
