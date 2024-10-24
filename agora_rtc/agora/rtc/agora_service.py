@@ -11,66 +11,6 @@ from .video_frame_sender import *
 from .local_video_track import *
 import logging
 logger = logging.getLogger(__name__)
-# class AgoraServiceConfig:
-#     def __init__(
-#             self,
-#             log_path: str = "",
-#             log_size: int = 0,
-#             enable_audio_processor: int = 1,
-#             enable_audio_device: int = 0,
-#             enable_video: int = 0,
-#             context: object = None,
-
-#             appid: str = "",
-#             area_code: int = AreaCode.AREA_CODE_GLOB.value,
-#             channel_profile: ChannelProfileType = ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
-#             audio_scenario: AudioScenarioType = AudioScenarioType.AUDIO_SCENARIO_CHORUS,
-#             use_string_uid: int = 0,
-#         ) -> None:
-#         self.log_path = log_path
-#         self.log_size = log_size
-
-#         self.enable_audio_processor = enable_audio_processor
-#         self.enable_audio_device = enable_audio_device
-#         self.enable_video = enable_video
-#         self.context = context
-
-#         self.appid =  appid
-#         self.area_code = area_code
-#         self.channel_profile = channel_profile
-#         self.audio_scenario = audio_scenario
-#         self.use_string_uid = use_string_uid
-
-# def _to_inner(self):
-#     inner = AgoraServiceConfigInner()
-
-#     inner.enable_audio_processor = self.enable_audio_processor
-#     inner.enable_audio_device = self.enable_audio_device
-#     inner.enable_video = self.enable_video
-#     inner.context = self.context
-
-#     inner.app_id = self.appid.encode('utf-8')
-#     inner.area_code = self.area_code
-#     inner.channel_profile = self.channel_profile.value
-#     inner.audio_scenario = self.audio_scenario.value
-
-#     inner.use_string_uid = self.use_string_uid
-#     return inner
-
-# def __init__(self) -> None:
-#     self.log_path = ""
-#     self.log_size = 0
-#     self.appid = ""
-#     self.enable_audio_processor = 1
-#     self.enable_audio_device = 0
-#     self.enable_video = 0
-#     self.context = None
-#     self.area_code = 0
-#     # self.channel_profile = ChannelProfileType.CHANNEL_PROFILE_COMMUNICATION
-#     self.channel_profile = 0
-#     self.audio_scenario = 0
-#     self.use_string_uid = 0
-
 
 agora_service_create = agora_lib.agora_service_create
 agora_service_create.restype = AGORA_HANDLE
@@ -114,7 +54,6 @@ agora_service_enable_extension.argtypes = [AGORA_HANDLE, ctypes.c_char_p, ctypes
 agora_service_get_agora_parameter = agora_lib.agora_service_get_agora_parameter
 agora_service_get_agora_parameter.restype = AGORA_HANDLE
 agora_service_get_agora_parameter.argtypes = [AGORA_HANDLE]
-
 
 agora_service_create_custom_video_track_encoded = agora_lib.agora_service_create_custom_video_track_encoded
 agora_service_create_custom_video_track_encoded.restype = AGORA_HANDLE
