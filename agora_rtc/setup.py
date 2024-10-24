@@ -1,3 +1,6 @@
+from setuptools.command.install import install
+from setuptools import setup
+import site
 import os
 import sys
 import zipfile
@@ -5,9 +8,7 @@ import zipfile
 from urllib import request
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
-import site
-from setuptools import setup
-from setuptools.command.install import install
+
 
 class CustomInstallCommand(install):
     def run(self):
@@ -20,12 +21,12 @@ class CustomInstallCommand(install):
         sdk_dir = os.path.join(agora_service_path, "agora_sdk")
         zip_path = os.path.join(agora_service_path, "agora_rtc_sdk.zip")
 
-        url = "https://download.agora.io/sdk/release/agora_rtc_sdk-linux-gnu-v4.4.30-20241012_114642-379681.zip"
+        url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.30-20241024_101940-398537.zip"
         if sys.platform == 'darwin':
-            url = "https://download.agora.io/sdk/release/agora_rtc_sdk_mac_v4.4.30_22304_FULL_20241015_1616_384496.zip"
-        
+            url = "https: // download.agora.io/sdk/release/agora_rtc_sdk_mac_rel.v4.4.30_22472_FULL_20241024_1224_398653.zip"
+
         if os.path.exists(sdk_dir):
-            os.system(f"rm -rf {sdk_dir}")        
+            os.system(f"rm -rf {sdk_dir}")
         os.makedirs(agora_service_path, exist_ok=True)
         if os.path.exists(zip_path):
             os.remove(zip_path)
@@ -43,14 +44,14 @@ class CustomInstallCommand(install):
 
 
 setup(
-    name='agora_python_server_sdk', 
+    name='agora_python_server_sdk',
     version='2.0.8',
-    description='A Python SDK for Agora Server',  
-    long_description=open('README.md').read(),  
-    long_description_content_type='text/markdown',  
-    url='https://github.com/AgoraIO-Extensions/Agora-Python-Server-SDK',  
-    packages=["agora.rtc"],          
-    classifiers=[                      
+    description='A Python SDK for Agora Server',
+    long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
+    url='https://github.com/AgoraIO-Extensions/Agora-Python-Server-SDK',
+    packages=["agora.rtc"],
+    classifiers=[
         "Intended Audience :: Developers",
         'License :: OSI Approved :: MIT License',
         "Topic :: Multimedia :: Sound/Audio",
@@ -59,9 +60,9 @@ setup(
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3 :: Only",
     ],
-    python_requires='>=3.10',          
+    python_requires='>=3.10',
     cmdclass={
-    'install': CustomInstallCommand,
+        'install': CustomInstallCommand,
     },
 )
 
