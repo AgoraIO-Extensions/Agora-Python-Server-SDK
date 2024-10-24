@@ -23,7 +23,7 @@ class CustomInstallCommand(install):
 
         url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.30-20241024_101940-398537.zip"
         if sys.platform == 'darwin':
-            url = "https: // download.agora.io/sdk/release/agora_rtc_sdk_mac_rel.v4.4.30_22472_FULL_20241024_1224_398653.zip"
+            url = "https://download.agora.io/sdk/release/agora_rtc_sdk_mac_rel.v4.4.30_22472_FULL_20241024_1224_398653.zip"
 
         if os.path.exists(sdk_dir):
             os.system(f"rm -rf {sdk_dir}")
@@ -45,7 +45,7 @@ class CustomInstallCommand(install):
 
 setup(
     name='agora_python_server_sdk',
-    version='2.0.8',
+    version='2.1.0',
     description='A Python SDK for Agora Server',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
