@@ -291,6 +291,7 @@ class VideoFrame():
     texture_id: int = 0
     matrix: list = None
     alpha_buffer: bytearray = None
+    alpha_mode: int = 0
 
 
 @dataclass(kw_only=True)
@@ -442,6 +443,8 @@ class ExternalVideoFrame:
     matrix: list = field(default_factory=list)
     metadata: str = ""
     alpha_buffer: bytearray = field(default_factory=bytearray)
+    fill_alpha_buffer: int = 0
+    alpha_mode: int = 0
 
 
 @dataclass(kw_only=True)

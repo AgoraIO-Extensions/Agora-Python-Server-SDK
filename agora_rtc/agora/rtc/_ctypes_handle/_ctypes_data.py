@@ -133,7 +133,8 @@ class VideoFrameInner(ctypes.Structure):
         ("shared_context", ctypes.c_void_p),
         ("texture_id", ctypes.c_int),
         ("matrix", ctypes.c_float * 16),
-        ("alpha_buffer", ctypes.POINTER(ctypes.c_uint8))
+        ("alpha_buffer", ctypes.POINTER(ctypes.c_uint8)),
+        ("alpha_mode", ctypes.c_int)
     ]
 
     def get(self):
@@ -150,11 +151,12 @@ class VideoFrameInner(ctypes.Structure):
             rotation=self.rotation,
             render_time_ms=self.render_time_ms,
             avsync_type=self.avsync_type,
+            metadata=ctypes.string_at(self.metadata_buffer, self.metadata_size).decode() if self.metadata_buffer else None,
             shared_context=self.shared_context.decode() if self.shared_context else None,
             texture_id=self.texture_id,
             matrix=self.matrix,
             alpha_buffer=ctypes.string_at(self.alpha_buffer, self.width * self.height) if self.alpha_buffer else None,
-            metadata=ctypes.string_at(self.metadata_buffer, self.metadata_size).decode() if self.metadata_buffer else None
+            alpha_mode=self.alpha_mode
         )
 
 
@@ -738,6 +740,8 @@ class ExternalVideoFrameInner(ctypes.Structure):
         ("metadata_buffer", ctypes.POINTER(ctypes.c_uint8)),
         ("metadata_size", ctypes.c_int),
         ("alpha_buffer", ctypes.c_void_p)
+        ("fill_alpha_buffer", ctypes.c_uint8),
+        ("alpha_mode", ctypes.c_int)
     ]
 
     def get(self):
@@ -759,7 +763,9 @@ class ExternalVideoFrameInner(ctypes.Structure):
             matrix=[self.matrix[i] for i in range(16)],
             metadata_buffer=ctypes.string_at(self.metadata_buffer, self.metadata_size) if self.metadata_buffer else None,
             metadata_size=self.metadata_size,
-            alpha_buffer=self.alpha_buffer
+            alpha_buffer=self.alpha_buffer,
+            fill_alpha_buffer=self.fill_alpha_buffer,
+            alpha_mode=self.alpha_mode
         )
 
     @staticmethod
@@ -788,7 +794,9 @@ class ExternalVideoFrameInner(ctypes.Structure):
             (ctypes.c_float * 16)(*frame.matrix),
             c_metadata_ptr,
             len(c_metadata),
-            c_alpha_buffer_ptr
+            c_alpha_buffer_ptr,
+            frame.fill_alpha_buffer,
+            frame.alpha_mode
         )
 
 
