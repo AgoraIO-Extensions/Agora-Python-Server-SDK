@@ -351,11 +351,11 @@ class AudioPcmDataInfo:
 
 @dataclass(kw_only=True)
 class PcmAudioFrame:
-    data: bytearray
-    samples_per_channel: int
-    bytes_per_sample: int
-    number_of_channels: int
-    sample_rate: int
+    data: bytearray = None
+    samples_per_channel: int = 0
+    bytes_per_sample: int = 0
+    number_of_channels: int = 0
+    sample_rate: int = 0
     timestamp: int = 0
 
 
@@ -445,24 +445,6 @@ class ExternalVideoFrame:
     alpha_buffer: bytearray = field(default_factory=bytearray)
     fill_alpha_buffer: int = 0
     alpha_mode: int = 0
-
-
-@dataclass(kw_only=True)
-class VadConfig:
-    fftSz: int = 1024
-    hopSz: int = 160
-    anaWindowSz: int = 768
-    frqInputAvailableFlag: int = 0
-    useCVersionAIModule: int = 0
-    voiceProbThr: float = 0.8
-    rmsThr: float = -40.0
-    jointThr: float = 0.0
-    aggressive: float = 5.0
-    startRecognizeCount: int = 10
-    stopRecognizeCount: int = 6
-    preStartRecognizeCount: int = 10
-    activePercent: float = 0.6
-    inactivePercent: float = 0.2
 
 
 @dataclass(kw_only=True)
