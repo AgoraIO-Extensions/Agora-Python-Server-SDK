@@ -236,7 +236,9 @@ class VoiceSentenceDetection():
             voice_prob = self._vad_configure.start_voiceprob
             rms_prob = self._vad_configure.start_rms
 
-        if data.far_field_flag == 1 and data.voice_prob > voice_prob :#and data.pitch > 0 : #voice: from 75 to 50
-        #if data.far_field_flag == 1:
+        #case2
+        #if data.far_field_flag == 1 and data.voice_prob > voice_prob :#and data.pitch > 0 : #voice: from 75 to 50
+        #case4: rms > -40
+        if data.far_field_flag == 1 and data.voice_prob > voice_prob and data.rms > rms_prob :#and data.pitch > 0 : #voice: from 75 to 50
             return True
         return False
