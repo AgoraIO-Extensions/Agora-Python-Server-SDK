@@ -66,7 +66,7 @@ class MyAudioFrameObserver(IAudioFrameObserver):
         需要把信息打印出来，这样才好判断
         
         """
-        self._vad_instance = VoiceSentenceDetection(VadConfigV2(16, 30, 30, 0.7, 0.5, 70, 70, -40))
+        self._vad_instance = VoiceSentenceDetection(VadConfigV2(16, 30, 20, 0.7, 0.2, 70, 70, -50))
         self._vad_counts = 0
         #vad v1 related
         self.v1_configure = VadConfig()
@@ -120,7 +120,7 @@ class MyAudioFrameObserver(IAudioFrameObserver):
             if state ==1:
                 #open and write to file
                 cur_time = int(time.time()*1000)
-                name = f"./vad_{self._vad_counts}_{cur_time}.pcm"
+                name = f"./vad_{self._vad_counts}.pcm"
                 self._vad_file = open(name, "wb")
                 self._vad_file.write(bytes)
             elif state == 2:
@@ -137,7 +137,7 @@ class MyAudioFrameObserver(IAudioFrameObserver):
         if ret == 0 and flag == 1:
             #start speaking
             cur_time = int(time.time()*1000)
-            name = f"./vad1_{self._vad_v1_counts}_{cur_time}.pcm"
+            name = f"./vad1_{self._vad_v1_counts}.pcm"
             self._vad_v1_file = open(name, "wb")
             self._vad_v1_file.write(frameout)
         elif ret == 0 and flag == 2:
@@ -528,7 +528,10 @@ def main():
         enable_audio_recording_or_playout = 0,
     )
 
-
+    #enable audio label: do not commit htis
+    parameters = agora_service.get_agora_parameter()
+    parameters.set_bool("che.audio.label.enable", 1)
+    
 
 
     connection = agora_service.create_rtc_connection(con_config)
@@ -558,6 +561,7 @@ def main():
     localuser.register_audio_frame_observer(audio_observer)
 
 
+
     #ret = localuser.get_user_role()
     #localuser.set_user_role(con_config.client_role_type)
 
@@ -568,9 +572,10 @@ def main():
     localuser.subscribe_all_audio()
 
     #test
-
-    detailed_stat = localuser.get_local_audio_statistics()
-    print("detailed_stat:", detailed_stat.local_ssrc, detailed_stat.codec_name)
+#todo:  ??? ERROR!!
+    
+    #detailed_stat = localuser.get_local_audio_statistics()
+    #print("detailed_stat:", detailed_stat.local_ssrc, detailed_stat.codec_name)
 
     #stream msg 
     stream_id = connection.create_data_stream(0, 0)
