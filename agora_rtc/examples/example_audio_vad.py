@@ -56,17 +56,15 @@ class MyAudioFrameObserver(IAudioFrameObserver):
         self._vad_file = None #open("./vad_file.pcm", "wb")
         self._log_file = None #open("./vad_log.txt", "w")
         """
-        #vad test
-        #判断开始说话的时候，条件要严格点，否则会出现很多无意义的说话。比如voice prob<= 60就不可以。更新为70
-        case1: #10, 20, 30, 0.7, 0.5, 70, 60, -40
-        基本可以工作，但中间会出现一段没有说话的情况，需要优化。
-        发现问题点应该是前面判断说话的间隔太短
-        Case2: #16, 30, 30, 0.7, 0.5, 70, 60, -40
-        这样的问题就是结束太快，应该连接在一起的被拆分开了
-        需要把信息打印出来，这样才好判断
+        # Recommended  configurations:  
+            # For not-so-noisy environments, use this configuration: (16, 30, 20, 0.7, 0.5, 70, 70, -50)  
+            # For noisy environments, use this configuration: (16, 30, 20, 0.7, 0.5, 70, 70, -40)  
+            # For high-noise environments, use this configuration: (16, 30, 20, 0.7, 0.5, 70, 70, -30)
+
+         """
         
-        """
-        self._vad_instance = VoiceSentenceDetection(VadConfigV2(16, 30, 20, 0.7, 0.2, 70, 70, -50))
+       
+        self._vad_instance = AudioVadV2(AudioVadConfigV2(16, 30, 20, 0.7, 0.5, 70, 70, -50))
         self._vad_counts = 0
         #vad v1 related
         self.v1_configure = VadConfig()
@@ -119,6 +117,7 @@ class MyAudioFrameObserver(IAudioFrameObserver):
         if bytes != None:
             if state ==1:
                 #open and write to file
+                print("vad v2 start speaking:",self._vad_counts)
                 cur_time = int(time.time()*1000)
                 name = f"./vad_{self._vad_counts}.pcm"
                 self._vad_file = open(name, "wb")
@@ -129,6 +128,7 @@ class MyAudioFrameObserver(IAudioFrameObserver):
                 self._vad_file.write(bytes)
                 self._vad_file.close()
                 self._vad_counts += 1
+                print("vad v2 stop speaking:", self._vad_counts-1)
             else:
                 logger.info("unknown state")
         #vad v1
@@ -136,6 +136,7 @@ class MyAudioFrameObserver(IAudioFrameObserver):
         print(f"vad v1 ret = {ret}, flag = {flag}")
         if ret == 0 and flag == 1:
             #start speaking
+            print("vad v1 start speaking:", self._vad_v1_counts)
             cur_time = int(time.time()*1000)
             name = f"./vad1_{self._vad_v1_counts}.pcm"
             self._vad_v1_file = open(name, "wb")
@@ -148,11 +149,12 @@ class MyAudioFrameObserver(IAudioFrameObserver):
             self._vad_v1_file.write(frameout)
             self._vad_v1_file.close()
             self._vad_v1_counts += 1
+            print("vad v1 stop speaking:", self._vad_v1_counts-1)
         
        
         
         """
-        case3: 效果不好，有截断
+        
         """
 
         #case 1
