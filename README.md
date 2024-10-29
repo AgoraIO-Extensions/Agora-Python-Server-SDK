@@ -34,3 +34,12 @@ pip install agora_python_server_sdk
 python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.pcm --sampleRate=16000 --numOfChannels=1
 ```
 
+# Change log
+
+## 2024.10.29 release 2.1.1
+
+Add audio VAD interface of version 2 and corresponding example.
+
+## 2024.10.24 release 2.1.0
+
+Fixed some bug.

@@ -35,3 +35,12 @@ pip install agora_python_server_sdk
 python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.pcm --sampleRate=16000 --numOfChannels=1
 ```
 
+# 更新日志
+
+## 2024.10.29 发布 2.1.1
+
+- 添加V2版本的音频 VAD 接口及相应的示例。
+
+## 2024.10.24 发布 2.1.0
+
+- 修复了一些 bug
