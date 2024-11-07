@@ -383,7 +383,7 @@ class AudioParams:
     samples_per_call: int
 
 
-@dataclass(kw_only=True)
+7
 class VideoDimensions:
     width: int
     height: int

@@ -59,12 +59,16 @@ class MyAudioFrameObserver(IAudioFrameObserver):
         # Recommended  configurations:  
             # For not-so-noisy environments, use this configuration: (16, 30, 20, 0.7, 0.5, 70, 70, -50)  
             # For noisy environments, use this configuration: (16, 30, 20, 0.7, 0.5, 70, 70, -40)  
-            # For high-noise environments, use this configuration: (16, 30, 20, 0.7, 0.5, 70, 70, -30)
+            # For high-noise environments, use this configuration: (16, 30, 20, 0.7, 0.5, 70, 70, -35)
 
          """
         
        
-        self._vad_instance = AudioVadV2(AudioVadConfigV2(16, 30, 20, 0.7, 0.5, 70, 70, -50))
+        #self._vad_instance = AudioVadV2(AudioVadConfigV2(16, 30, 20, 0.7, 0.5, 70, 70, -50))
+        #ok， 但延迟有点大
+        #self._vad_instance = AudioVadV2(AudioVadConfigV2(16, 30, 20, 0.7, 0.5, 60, 60, -65))
+        #ok，延迟符合预期，没有截断，推荐这个
+        self._vad_instance = AudioVadV2(AudioVadConfigV2(16, 30, 20, 0.7, 0.5, 60, 70, -60))
         self._vad_counts = 0
         #vad v1 related
         self.v1_configure = VadConfig()
