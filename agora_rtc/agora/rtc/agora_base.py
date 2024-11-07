@@ -222,7 +222,7 @@ class AudioFrame:
 
 @dataclass(frozen=True, kw_only=True)
 class AudioVolumeInfo:
-    user_id: int
+    user_id: str
     volume: int
     vad: int
     voice_pitch: float

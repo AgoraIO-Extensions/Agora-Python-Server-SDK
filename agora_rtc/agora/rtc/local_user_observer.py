@@ -76,7 +76,7 @@ class IRTCLocalUserObserver():
     def on_remote_video_track_statistics(self, agora_local_user, agora_remote_video_track, stats):
         pass
 
-    def on_audio_volume_indication(self, agora_local_user, speakers, speaker_number, total_volume):
+    def on_audio_volume_indication(self, agora_local_user, speakers_list, speaker_number, total_volume):
         pass
 
     def on_active_speaker(self, agora_local_user, userId):

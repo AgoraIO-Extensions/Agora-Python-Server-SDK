@@ -979,7 +979,7 @@ class EncodedAudioFrameInfoInner(ctypes.Structure):
 
 class AudioVolumeInfoInner(ctypes.Structure):
     _fields_ = [
-        ("user_id", ctypes.c_uint),
+        ("user_id", user_id_t),
         ("volume", ctypes.c_uint),
         ("vad", ctypes.c_uint),
         ("voicePitch", ctypes.c_double)
@@ -987,10 +987,10 @@ class AudioVolumeInfoInner(ctypes.Structure):
 
     def get(self):
         return AudioVolumeInfo(
-            user_id=self.user_id,
+            user_id=self.user_id.decode() if self.user_id else "",
             volume=self.volume,
             vad=self.vad,
-            voicePitch=self.voicePitch
+            voice_pitch=self.voicePitch
         )
 
 

@@ -53,26 +53,29 @@ class AudioFrameObserverInner(ctypes.Structure):
 
     def _on_record_audio_frame(self, local_user_handle, channel_id, audio_frame_inner):
         logger.debug(f"AudioFrameObserverInner _on_record_audio_frame: {local_user_handle}, {channel_id}, {audio_frame_inner}")
-        channel_id_str = channel_id.decode('utf-8')
+        channel_id_str = channel_id.decode('utf-8') if channel_id else ""
         frame = audio_frame_inner.contents.get()
         ret = self.observer.on_record_audio_frame(self.local_user, channel_id_str, frame)
         return ret
 
     def _on_playback_audio_frame(self, local_user_handle, channel_id, audio_frame_inner):
         logger.debug(f"AudioFrameObserverInner _on_playback_audio_frame: {local_user_handle}, {channel_id}, {audio_frame_inner}")
-        channel_id_str = channel_id.decode('utf-8')
+        channel_id_str = channel_id.decode('utf-8') if channel_id else ""
         frame = audio_frame_inner.contents.get()
         ret = self.observer.on_playback_audio_frame(self.local_user, channel_id_str, frame)
         return ret
 
     def _on_mixed_audio_frame(self, local_user_handle, channel_id, audio_frame_inner):
         logger.debug(f"AudioFrameObserverInner _on_mixed_audio_frame: {local_user_handle}, {channel_id}, {audio_frame_inner}")
-        ret = self.observer.on_mixed_audio_frame(self.local_user, audio_frame_inner)
+        channel_id_str = channel_id.decode('utf-8') if channel_id else ""
+        frame = audio_frame_inner.contents.get()
+        ret = self.observer.on_mixed_audio_frame(self.local_user, channel_id_str, frame)
         return ret
 
     def _on_ear_monitoring_audio_frame(self, local_user_handle, audio_frame_inner):
         logger.debug(f"AudioFrameObserverInner _on_ear_monitoring_audio_frame: {local_user_handle}, {audio_frame_inner}")
-        ret = self.observer.on_ear_monitoring_audio_frame(self.local_user, audio_frame_inner)
+        frame = audio_frame_inner.contents.get()
+        ret = self.observer.on_ear_monitoring_audio_frame(self.local_user, frame)
         return ret
 
     def _on_playback_audio_frame_before_mixing(self, local_user_handle, channel_id, user_id, audio_frame_inner):

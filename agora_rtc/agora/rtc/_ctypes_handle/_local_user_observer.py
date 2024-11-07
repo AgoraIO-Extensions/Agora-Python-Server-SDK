@@ -272,8 +272,14 @@ class RTCLocalUserObserverInner(ctypes.Structure):
 
     def _on_audio_volume_indication(self, local_user_handle, audio_volume_info_ptr, speaker_number, total_volume):
         logger.debug(f"LocalUserCB _on_audio_volume_indication: {local_user_handle}, {audio_volume_info_ptr}, {speaker_number}, {total_volume}")
-        audio_volume_info = audio_volume_info_ptr.contents
-        self.local_user_observer.on_audio_volume_indication(self.local_user, audio_volume_info, speaker_number, total_volume)
+         
+        # enum 
+        audio_volume_info_list = []
+        for i in range(speaker_number):
+             speaker_info = audio_volume_info_ptr[i]
+             audio_volume_info = audio_volume_info_ptr[i].get()
+             audio_volume_info_list.append(audio_volume_info)
+        self.local_user_observer.on_audio_volume_indication(self.local_user, audio_volume_info_list, speaker_number, total_volume)
 
     def _on_active_speaker(self, local_user_handle, user_id):
         logger.debug(f"LocalUserCB _on_active_speaker: {local_user_handle}, {user_id}")
