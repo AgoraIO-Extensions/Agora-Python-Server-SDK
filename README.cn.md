@@ -36,6 +36,11 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # 更新日志
+## 2024.11.07 发布 2.1.2
+
+- 对AudioVolumeInfoInner 以及 AudioVolumeInfo 结构中的user_id更新为str 类型
+- 修复了_on_audio_volume_indication中回调的bug，原来只能回调一个；修改成可以回调speaker_number个 ():
+- 修复了IRTCLocalUserObserver::on_audio_volume_indication中回调的参数类型为list类型
 
 ## 2024.10.29 发布 2.1.1
 

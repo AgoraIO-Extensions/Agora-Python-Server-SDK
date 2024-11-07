@@ -36,6 +36,11 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 
 # Change log
 
+## 2024.11.07 release 2.1.2
+// Updates `user_id` in the `AudioVolumeInfoInner and AudioVolumeInfo` structure to `str` type.
+// Fixes the bug in `_on_audio_volume_indication` callback, where it could only handle one callback to speaker_number 
+// Corrects the parameter type in `IRTCLocalUserObserver::on_audio_volume_indication` callback to `list` type.
+
 ## 2024.10.29 release 2.1.1
 
 Add audio VAD interface of version 2 and corresponding example.
