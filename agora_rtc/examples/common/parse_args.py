@@ -23,6 +23,7 @@ class ExampleOptions:
         self.hours = 0
         self.mode = 1
         self.value = 0
+        self.dir_path = None #directory path
         self.msg = "hello agora python sdk"
 
 
@@ -48,6 +49,8 @@ def parse_args():
     # added by wei on 10/10
     parser.add_argument("--mode", type=int, help="mode value", default=1)
     parser.add_argument("--value", type=int, help="reversed value", default=0)
+
+    parser.add_argument("--dir", help="The dir  to be sent")
 
     return parser.parse_args()
 
@@ -78,5 +81,6 @@ def parse_args_example() -> ExampleOptions:
     sample_options.save_to_disk = args.saveToDisk
     sample_options.mode = args.mode
     sample_options.value = args.value
+    sample_options.dir_path = args.dir
 
     return sample_options
