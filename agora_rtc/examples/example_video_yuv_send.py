@@ -30,7 +30,14 @@ class RTCProcessIMPL(RTCBaseProcess):
                 width=sample_options.width,
                 height=sample_options.height
             ),
-            encode_alpha=1
+            #disable or enable alpha encoding 
+            #case1: enable alpha encoding:
+                # 1. encode_alpha = 1 
+                # 2. set ExternalVideoFrame::alpha_buffer to a buffer
+            #case2: disable alpha encoding:
+                #1. encode_alpha = 0
+                #2. set ExternalVideoFrame::alpha_buffer = None
+            encode_alpha=0
         )
         video_track.set_video_encoder_configuration(video_config)
 
