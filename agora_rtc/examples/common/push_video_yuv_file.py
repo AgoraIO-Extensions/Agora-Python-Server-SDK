@@ -84,22 +84,47 @@ async def push_yuv_data_from_file2(width, height, fps, video_sender: VideoFrameS
             await pacer_yuv.apace_interval(yuv_sendinterval)
         frame_buf = None
 
+""""
+# some data for jpeg_to_bytearray:
+#NOTE:1
+    # Assuming `image_data` is a byte stream containing image data,
+    # you can avoid writing to a file and instead operate directly in memory by using the following approach:
+    
+    # `BytesIO` is used to create an in-memory file-like object from the byte stream.
+    from io import BytesIO
+    from PIL import Image
+ 
+    # `image_data` should be a bytes object containing the JPEG image data.
+    # Create an in-memory file-like object from the byte stream.
+    image_stream = BytesIO(image_data)
+    image = Image.open(image_stream)
+    # Now you can use the `image` object as you would with an image loaded from a file.
+#NOTE2:
+    # test data from file: the jpeg file is 1920*1080 
+    open time: 0.8271484375, convert: 7.343017578125, px time: 0.0009765625, np: 1.93701171875, byte: 1.255859375, total: 11.364013671875
+    ----sufix:  .jpeg, 1731293372695.532
+    open time: 0.3173828125, convert: 7.106689453125, px time: 0.0009765625, np: 1.93994140625, byte: 1.2353515625, total: 10.600341796875
+    ----sufix:  .jpeg, 1731293372706.36
+    open time: 0.328125, convert: 8.114013671875, px time: 0.0009765625, np: 1.912109375, byte: 1.033935546875, total: 11.38916015625
+    ----sufix:  .jpeg, 1731293372717.9739
+    open time: 0.324951171875, convert: 7.613037109375, px time: 0.001953125, np: 1.737060546875, byte: 1.010009765625, total: 10.68701171875
+    ----sufix:  .jpeg, 1731293372728.8909
+    open time: 0.35205078125, convert: 7.2861328125, px time: 0.0009765625, np: 2.15185546875, byte: 0.88818359375, total: 10.67919921875
+"""
 def jpeg_to_bytearray(file_path):
         start = time.time()*1000
         image = Image.open(file_path)  
         open_time = time.time()*1000
             
         # 将图像转换为RGB模式（如果需要）  
-        image = image.convert('RGBA')  
+        image = image.convert('RGBA')  #RGBA
         convert_time = time.time()*1000
         
         # 访问图像数据（例如，获取像素值）  
-        #pixels = image.load()  
-        pixels = list(image.getdata())
         width, height = image.size  
         pix_time = time.time()*1000
 
-        
+        #convert to bytearray
         np_array = np.array(image)  # 将图像转换为numpy数组  
         np_time = time.time()*1000
         #byte_data = np_array.tobytes()  # 直接将numpy数组转换为bytearray（实际上是bytes，但可以转换为bytearray）  
@@ -107,8 +132,9 @@ def jpeg_to_bytearray(file_path):
         byte_data = bytearray(np_array.tobytes())  
         bytes_time = time.time()*1000
         image.close()
-        print(f"open time: {open_time-start}, convert: {convert_time-open_time}, px time: {pix_time - convert_time}, np: {np_time - pix_time}, byte: {bytes_time - np_time}")
+        print(f"open time: {open_time-start}, convert: {convert_time-open_time}, px time: {pix_time - convert_time}, np: {np_time - pix_time}, byte: {bytes_time - np_time}, total: {bytes_time - start}")
         return width, height, byte_data
+
 
 async def push_jpeg_from_file(path, video_sender, fps, _exit:Event):
     #file_path = '/Users/weihognqin/Downloads/zhipusource/image_67208e95d8c26bb498989948_1730186920.788217.jpeg'
@@ -126,7 +152,7 @@ async def push_jpeg_from_file(path, video_sender, fps, _exit:Event):
     # 获取文件名列表  
     #file_names = [f.name for f in files_only]  
     rgb_count = 0
-    interval = 1.0/30
+    interval = 1.0/fps
 
     pacer = Pacer(interval)
 
@@ -146,18 +172,18 @@ async def push_jpeg_from_file(path, video_sender, fps, _exit:Event):
 
 
 
-    while  not  _exit.set():
+    while  not  _exit.is_set():
         for bytes in bytes_data :
             
             rgb_len = int(width*height*4)
             frame_buf = bytes
-            #while not _exit.is_set():
+            
             
                 
             frame = ExternalVideoFrame()
             frame.buffer = frame_buf
             frame.type = 1
-            frame.format = 4 #RGBA
+            frame.format = 4 #RGBA,I420
             frame.stride = width
             frame.height = height
             frame.timestamp = 0

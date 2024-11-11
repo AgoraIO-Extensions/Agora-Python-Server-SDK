@@ -69,7 +69,9 @@ class RTCProcessIMPL(RTCBaseProcess):
     def set_serv_config(self):
         self._serv_config.enable_video = 1
 
-
+def handle_signal():
+    global _exit
+    _exit.set_result(None)
 async def run():
     sample_options = parse_args_example()
     rtc = RTCProcessIMPL()
