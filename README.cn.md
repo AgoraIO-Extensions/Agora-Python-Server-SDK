@@ -36,6 +36,9 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # 更新日志
+## 2024.11.11 发布 2.1.3
+- 增加了一个sample：example_jpeg_send.py 可以将jpeg文件或者jpeg 流 推送到频道中
+- 性能耗费参考example中的注释，可以简单总结为对1920*1080对jpeg文件，从读取文件到转换为RGBA bytearry，耗费在11ms
 ## 2024.11.07 发布 2.1.2
 
 - 对AudioVolumeInfoInner 以及 AudioVolumeInfo 结构中的user_id更新为str 类型

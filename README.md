@@ -36,6 +36,13 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 
 # Change log
 
+## 2024.11.11 发布 2.1.3
+- Added a new sample: example_jpeg_send.py which can push JPEG files or JPEG streams to a channel.
+-
+- Performance overhead, as noted in the example comments, can be summarized as follows:
+- For a 1920x1080 JPEG file, the process from reading the file to converting it to an RGBA bytearray - takes approximately 11 milliseconds.
+
+
 ## 2024.11.07 release 2.1.2
 - Updates `user_id` in the `AudioVolumeInfoInner and AudioVolumeInfo` structure to `str` type.
 - Fixes the bug in `_on_audio_volume_indication` callback, where it could only handle one callback to speaker_number 
