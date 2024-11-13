@@ -772,10 +772,23 @@ class ExternalVideoFrameInner(ctypes.Structure):
     def create(frame: ExternalVideoFrame) -> 'ExternalVideoFrameInner':
         c_buffer = (ctypes.c_uint8 * len(frame.buffer)).from_buffer(frame.buffer)
         c_buffer_ptr = ctypes.cast(c_buffer, ctypes.c_void_p)
-        c_metadata = bytearray(frame.metadata.encode('utf-8'))
-        c_metadata_ptr = (ctypes.c_uint8 * len(c_metadata)).from_buffer(c_metadata)
-        c_alpha_buffer = (ctypes.c_uint8 * len(frame.alpha_buffer)).from_buffer(frame.alpha_buffer)
-        c_alpha_buffer_ptr = ctypes.cast(c_alpha_buffer, ctypes.c_void_p)
+       
+
+        #aplha_buffer and is_fill alpha_buffer 
+        if (frame.fill_alpha_buffer >0) and (frame.alpha_buffer is not None):
+            c_alpha_buffer = (ctypes.c_uint8 * len(frame.alpha_buffer)).from_buffer(frame.alpha_buffer)
+            c_alpha_buffer_ptr = ctypes.cast(c_alpha_buffer, ctypes.c_void_p)
+        else:
+            c_alpha_buffer_ptr = ctypes.c_void_p(0)
+
+        if frame.metadata is not None:
+            c_metadata = bytearray(frame.metadata.encode('utf-8'))
+            c_metadata_ptr = (ctypes.c_uint8 * len(c_metadata)).from_buffer(c_metadata)
+        else:
+            c_metadata_ptr = ctypes.c_void_p(0)
+        
+
+        
         return ExternalVideoFrameInner(
             frame.type,
             frame.format,
