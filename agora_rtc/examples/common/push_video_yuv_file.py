@@ -169,7 +169,9 @@ async def push_jpeg_from_file(path, video_sender, fps, _exit:Event):
     
         width, height, byte_data = jpeg_to_bytearray(file_name)
         bytes_data.append(byte_data)
+    
 
+    print("finnish: bytes_data:", len(bytes_data))
 
 
     while  not  _exit.is_set():
