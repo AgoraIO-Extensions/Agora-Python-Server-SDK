@@ -169,6 +169,7 @@ async def push_jpeg_from_file(path, video_sender, fps, _exit:Event):
     
         width, height, byte_data = jpeg_to_bytearray(file_name)
         bytes_data.append(byte_data)
+        print(f"width: {width}, height: {height},len: {len(byte_data)}")
     
 
     print("finnish: bytes_data:", len(bytes_data))
@@ -179,6 +180,7 @@ async def push_jpeg_from_file(path, video_sender, fps, _exit:Event):
             
             rgb_len = int(width*height*4)
             frame_buf = bytes
+            print(f"rgb_len: {rgb_len}, len: {len(frame_buf)}")
             
             
                 
