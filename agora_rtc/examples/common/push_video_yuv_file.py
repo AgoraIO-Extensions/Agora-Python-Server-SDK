@@ -38,7 +38,7 @@ async def push_yuv_data_from_file(width, height, fps, video_sender: VideoFrameSe
             frame.stride = width
             frame.height = height
             frame.timestamp = 0
-            frame.metadata = "hello metadata"
+            frame.metadata = bytearray(b'hello metadata')
             #frame.alpha_buffer = first_frame
             ret = video_sender.send_video_frame(frame)
             yuv_count += 1
@@ -77,7 +77,7 @@ async def push_yuv_data_from_file2(width, height, fps, video_sender: VideoFrameS
             frame.stride = width
             frame.height = height
             frame.timestamp = 0
-            frame.metadata = "hello metadata"
+            frame.metadata = bytearray(b'hello metadata')
             ret = video_sender.send_video_frame(frame)
             yuv_count += 1
             logger.info("send yuv: count,ret=%d, %s", yuv_count, ret)
@@ -191,7 +191,7 @@ async def push_jpeg_from_file(path, video_sender, fps, _exit:Event):
             frame.stride = width
             frame.height = height
             frame.timestamp = 0
-            frame.metadata = "hello metadata"
+            frame.metadata = bytearray(b'hello metadata')
             #frame.alpha_buffer = first_frame
             ret = video_sender.send_video_frame(frame)
             rgb_count += 1
