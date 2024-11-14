@@ -36,6 +36,10 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # 更新日志
+## 2024.11.15 发布 2.1.4
+- 修改videoFrame中的metadata的类型从str修改bytes类型，和c++保持一致；从而可以支持字节流；
+- 修改了内部对ExteranlVideoFrame的封装，从而支持字节流；对alpha编码的支持，做了逻辑判断，如果fill_alpha_buffer 为0 ，则不处理
+
 ## 2024.11.11 发布 2.1.3
 - 增加了一个sample：example_jpeg_send.py 可以将jpeg文件或者jpeg 流 推送到频道中
 - 性能耗费参考example中的注释，可以简单总结为对1920*1080对jpeg文件，从读取文件到转换为RGBA bytearry，耗费在11ms

@@ -36,7 +36,10 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 
 # Change log
 
-## 2024.11.11 发布 2.1.3
+## 2024.11.12 release 2.1.4
+- Modify the type of metadata in videoFrame from str to bytes type to be consistent with C++; thus, it can support byte streams.
+- The internal encapsulation of ExteranlVideoFrame has been modified to support byte streams. Regarding the support for alpha encoding, a logical judgment has been made. If fill_alpha_buffer is 0, it will not be processed.
+## 2024.11.11 release 2.1.3
 - Added a new sample: example_jpeg_send.py which can push JPEG files or JPEG streams to a channel.
 -
 - Performance overhead, as noted in the example comments, can be summarized as follows:
