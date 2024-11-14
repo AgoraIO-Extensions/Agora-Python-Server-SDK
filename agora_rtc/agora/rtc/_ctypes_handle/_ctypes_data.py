@@ -151,7 +151,7 @@ class VideoFrameInner(ctypes.Structure):
             rotation=self.rotation,
             render_time_ms=self.render_time_ms,
             avsync_type=self.avsync_type,
-            metadata=ctypes.string_at(self.metadata_buffer, self.metadata_size).decode() if self.metadata_buffer else None,
+            metadata=ctypes.string_at(self.metadata_buffer, self.metadata_size) if self.metadata_buffer else None,
             shared_context=self.shared_context.decode() if self.shared_context else None,
             texture_id=self.texture_id,
             matrix=self.matrix,
@@ -770,8 +770,11 @@ class ExternalVideoFrameInner(ctypes.Structure):
 
     @staticmethod
     def create(frame: ExternalVideoFrame) -> 'ExternalVideoFrameInner':
-        c_buffer = (ctypes.c_uint8 * len(frame.buffer)).from_buffer(frame.buffer)
-        c_buffer_ptr = ctypes.cast(c_buffer, ctypes.c_void_p)
+        if frame.buffer is not None:
+            c_buffer = (ctypes.c_uint8 * len(frame.buffer)).from_buffer(frame.buffer)
+            c_buffer_ptr = ctypes.cast(c_buffer, ctypes.c_void_p)
+        else:
+            c_buffer_ptr = ctypes.c_void_p(0)
        
 
         #aplha_buffer and is_fill alpha_buffer 
@@ -781,11 +784,14 @@ class ExternalVideoFrameInner(ctypes.Structure):
         else:
             c_alpha_buffer_ptr = ctypes.c_void_p(0)
 
-        if frame.metadata is not None:
-            c_metadata = bytearray(frame.metadata.encode('utf-8'))
-            c_metadata_ptr = (ctypes.c_uint8 * len(c_metadata)).from_buffer(c_metadata)
+        c_metadata_size = len (frame.metadata)
+        if frame.metadata is not None and c_metadata_size > 0:
+            c_metadata_ptr = (ctypes.c_uint8 * len(frame.metadata)).from_buffer(frame.metadata)
+            c_metadata_size = len(frame.metadata)
         else:
             c_metadata_ptr = ctypes.c_void_p(0)
+            c_metadata_size = 0
+       
         
 
         
@@ -806,7 +812,7 @@ class ExternalVideoFrameInner(ctypes.Structure):
             frame.texture_id,
             (ctypes.c_float * 16)(*frame.matrix),
             c_metadata_ptr,
-            len(c_metadata),
+            c_metadata_size,
             c_alpha_buffer_ptr,
             frame.fill_alpha_buffer,
             frame.alpha_mode
