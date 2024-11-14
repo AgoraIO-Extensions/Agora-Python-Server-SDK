@@ -286,7 +286,7 @@ class VideoFrame():
     rotation: int = 0
     render_time_ms: int = 0
     avsync_type: int = 0
-    metadata: str = None
+    metadata: bytearray = None
     shared_context: str = None
     texture_id: int = 0
     matrix: list = None
@@ -441,7 +441,7 @@ class ExternalVideoFrame:
     egl_type: int = 0
     texture_id: int = 0
     matrix: list = field(default_factory=list)
-    metadata: str = ""
+    metadata: bytearray = None  #change type from str to bytearray to match the C++ version,i.e to support bytes as metadata
     alpha_buffer: bytearray = None
     fill_alpha_buffer: int = 0
     alpha_mode: int = 0
