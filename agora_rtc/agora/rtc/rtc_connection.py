@@ -53,16 +53,19 @@ agora_rtc_conn_renew_token.argtypes = [AGORA_HANDLE, ctypes.c_char_p]
 
 
 class RTCConnection:
-    def __init__(self, conn_handle) -> None:
+    def __init__(self, conn_handle, is_low_delay: bool = False) -> None:
         self.conn_handle = conn_handle
         self.con_observer = None
         self.local_user = None
         self.local_user_handle = agora_rtc_conn_get_local_user(conn_handle)
         if self.local_user_handle:
             self.local_user = LocalUser(self.local_user_handle, self)
+        #added to set low delay mode
+        if is_low_delay == True: 
+            self.local_user.set_audio_scenario(AudioScenarioType.AUDIO_SCENARIO_CHORUS)
         # add to map
-        AgoraHandleInstanceMap().set_local_user_map(self.conn_handle, self)
-        AgoraHandleInstanceMap().set_con_map(self.conn_handle, self)
+        #AgoraHandleInstanceMap().set_local_user_map(self.conn_handle, self)
+        #AgoraHandleInstanceMap().set_con_map(self.conn_handle, self)
 
     #
     def connect(self, token: str, chan_id: str, user_id: str) -> int:
@@ -130,7 +133,7 @@ class RTCConnection:
     def release(self):
         # release local user map
         if self.conn_handle:
-            AgoraHandleInstanceMap().del_local_user_map(self.conn_handle)
+            #AgoraHandleInstanceMap().del_local_user_map(self.conn_handle)
             agora_rtc_conn_release(self.conn_handle)
         self.conn_handle = None
         self.local_user = None

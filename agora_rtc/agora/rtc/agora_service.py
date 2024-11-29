@@ -75,6 +75,8 @@ class AgoraService:
         if result == 0:
             self.inited = True
         logger.debug(f'Initialization result: {result}')
+        self._is_low_delay = True if  config.audio_scenario == AudioScenarioType.AUDIO_SCENARIO_CHORUS  else False
+        
 
         # to enable plugin
         provider = "agora.builtin"
@@ -128,7 +130,7 @@ class AgoraService:
         rtc_conn_handle = agora_rtc_conn_create(self.service_handle, ctypes.byref(RTCConnConfigInner.create(con_config)))
         if rtc_conn_handle is None:
             return None
-        return RTCConnection(rtc_conn_handle)
+        return RTCConnection(rtc_conn_handle, self._is_low_delay)
 
     # createCustomAudioTrackPcm: creatae a custom audio track from pcm data sender
     def create_custom_audio_track_pcm(self, audio_pcm_data_sender: AudioPcmDataSender) -> LocalAudioTrack:
@@ -138,7 +140,11 @@ class AgoraService:
         custom_audio_track = agora_service_create_custom_audio_track_pcm(self.service_handle, audio_pcm_data_sender.sender_handle)
         if custom_audio_track is None:
             return None
-        return LocalAudioTrack(custom_audio_track)
+        local_track =  LocalAudioTrack(custom_audio_track)
+        #default for ai senario to set min delay to 10ms
+        if local_track is not None:
+            local_track.set_send_delay_ms(10)
+        return local_track
     # mix_mode: MIX_ENABLED = 0, MIX_DISABLED = 1
 
     def create_custom_audio_track_encoded(self, audio_encoded_frame_sender: AudioEncodedFrameSender, mix_mode: int):
