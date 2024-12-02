@@ -506,7 +506,7 @@ class LocalUser:
         if ret < 0:
             logger.error("Failed to unsubscribe all video")
         else:
-            self.del_remote_video_map_all(None)
+            self.del_remote_video_map(None)
         return ret
 
     def set_audio_volume_indication_parameters(self, interval_in_ms, smooth, report_vad):
