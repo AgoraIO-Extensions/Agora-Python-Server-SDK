@@ -7,7 +7,7 @@ import time
 import datetime
 import ctypes
 from common.path_utils import get_log_path_with_filename
-from common.audio_consumer import *
+from agora.rtc.utils.audio_consumer import AudioConsumer
 from observer.connection_observer import ExampleConnectionObserver
 from observer.local_user_observer import ExampleLocalUserObserver
 from agora.rtc.agora_service import AgoraServiceConfig, AgoraService, RTCConnConfig
@@ -257,6 +257,8 @@ async def main(exit_event):
     await asyncio.gather(produce_task, consumer_task)
 
     # release resource
+    # release AudioConsumer firstly
+    audio_consumer.release()
     
     localuser.unpublish_audio(audio_track)
     audio_track.set_enabled(0)
