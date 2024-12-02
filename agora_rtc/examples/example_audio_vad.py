@@ -189,205 +189,7 @@ class MyAudioFrameObserver(IAudioFrameObserver):
     #     return 0
 
 
-class AsyncAudioStreamConsumer:
-    def __init__(self, pcm_sender) -> None:
-        self._lock = threading.Lock()
-        self._data = bytearray()
-        self._interval = 0.05  # 50ms
 
-        self._start_time = 0
-        self._consumed_packages = 0
-        self._run = True
-        self._event = threading.Event()
-        self._pcm_sender = pcm_sender
-
-        self._task = asyncio.create_task(self._start_task())
-
-        pass
-
-    def push_pcm_data(self, data):
-        # add to buffer, lock
-        with self._lock:
-            self._data += data
-        pass
-
-    async def _start_task(self):
-        while self._run:
-            await asyncio.sleep(self._interval)
-            await self._consume()
-
-    async def _consume(self):
-        with self._lock:
-            # cal current duration
-            cur_time = time.time()*1000
-            elapsed_time = cur_time - self._start_time
-            wanted_packages = int(elapsed_time/10) - self._consumed_packages
-
-            if wanted_packages > 18:  # 180ms, a new session
-                wanted_packages = 18
-                self._start_time = cur_time
-                self._consumed_packages = -18
-            # check datasize to get min(packages*320, len(data))
-            data_len = len(self._data)
-            wanted_packages = min(wanted_packages, data_len//320)
-            print("wanted_packages:", wanted_packages, "data_len:", data_len, "consumed_packages:", self._consumed_packages, "elapsed_time:", elapsed_time)
-            if self._data and wanted_packages > 0:
-                # pop data
-                frame_size = 320*wanted_packages
-                frame_buf = bytearray(frame_size)
-                frame_buf[:] = self._data[:frame_size]
-                self._data = self._data[frame_size:]
-                # print("pop data:", len(frame_buf))
-                # send data
-                frame = PcmAudioFrame()
-                frame.data = frame_buf
-                frame.timestamp = 0
-                frame.samples_per_channel = 160*wanted_packages
-                frame.bytes_per_sample = 2
-                frame.number_of_channels = 1
-                frame.sample_rate = 16000
-                ret = self._pcm_sender.send_audio_pcm_data(frame)
-                # print("second,ret=",wanted_packages, ret)
-                self._consumed_packages += wanted_packages
-        pass
-
-    def relase(self):
-        self._run = False
-
-        self._task.cancel()
-
-        self._data = None
-
-        pass
-
-    def clear(self):
-        with self._lock:
-            self._data = bytearray()
-
-
-class AsycncAudioStreamProducer:
-    def __init__(self, file_path, consumer) -> None:
-        self._file = open(file_path, "rb")
-        self._consumer = consumer
-        self._task = asyncio.create_task(self._produce())
-        pass
-
-    def simulate_process_data(self):
-        pass
-
-    async def _produce(self):
-        while True:
-            frame_buf = bytearray(320*200)
-            success = self._file.readinto(frame_buf)
-            if success <= 0:
-                print("read file error,ret=", success)
-                self._file.seek(0, 0)
-                self._file.readinto(frame_buf)
-            self._consumer.push_pcm_data(frame_buf)
-            await asyncio.sleep(0.05)
-
-
-class AudioStreamConsumer:
-    def __init__(self, pcm_sender) -> None:
-        self._lock = threading.Lock()
-        self._data = bytearray()
-        self._interval = 0.05  # 50ms
-        self._timer = threading.Timer(self._interval, self._consume).start()
-        self._start_time = 0
-        self._consumed_packages = 0
-        self._run = True
-        self._event = threading.Event()
-        self._pcm_sender = pcm_sender
-
-        pass
-
-    def push_pcm_data(self, data):
-        # add to buffer, lock
-        with self._lock:
-            self._data += data
-        pass
-
-    def _consume(self):
-        with self._lock:
-            # cal current duration
-            cur_time = time.time()*1000
-            elapsed_time = cur_time - self._start_time
-            wanted_packages = int(elapsed_time/10) - self._consumed_packages
-            data_len = len(self._data)
-
-            # for the first time(wanted_packages>18), at least 6 packages shoud be sent to make sure the sdk has enough data buffer to
-            # o as to eliminate the jitter of the producer and the timer.
-            if wanted_packages > 18 and data_len // 320 < 6:
-                print("data_len:", data_len, "wanted_packages:", wanted_packages)
-                return
-
-            if wanted_packages > 18:  # 180ms, a new session
-                wanted_packages = 18
-                self._start_time = cur_time
-                self._consumed_packages = -18
-            # check datasize to get min(packages*320, len(data))
-            data_len = len(self._data)
-            wanted_packages = min(wanted_packages, data_len//320)
-            print("wanted_packages:", wanted_packages, "data_len:", data_len, "consumed_packages:", self._consumed_packages, "elapsed_time:", elapsed_time)
-            if self._data and wanted_packages > 0:
-                # pop data
-                frame_size = 320*wanted_packages
-                frame_buf = bytearray(frame_size)
-                frame_buf[:] = self._data[:frame_size]
-                self._data = self._data[frame_size:]
-                # print("pop data:", len(frame_buf))
-                # send data
-                frame = PcmAudioFrame()
-                frame.data = frame_buf
-                frame.timestamp = 0
-                frame.samples_per_channel = 160*wanted_packages
-                frame.bytes_per_sample = 2
-                frame.number_of_channels = 1
-                frame.sample_rate = 16000
-                ret = self._pcm_sender.send_audio_pcm_data(frame)
-                # print("second,ret=",wanted_packages, ret)
-                self._consumed_packages += wanted_packages
-
-            # restart timer
-            if self._run:
-                self._timer = threading.Timer(self._interval, self._consume).start()
-            else:
-                self._event.set()
-        pass
-
-    def relase(self):
-        self._run = False
-
-        self._event.wait()
-        self._timer = None
-        self._data = None
-        self._event = None
-        pass
-
-    def clear(self):
-        with self._lock:
-            self._data = bytearray()
-
-
-def pushPcmDatafromFile(file, packnum, pcmsender):
-    frame_buf = bytearray(320*packnum)
-    success = file.readinto(frame_buf)
-    if not success:
-        # print("read pcm file failed")
-        return -1
-    frame = PcmAudioFrame()
-    frame.data = frame_buf
-    frame.timestamp = 0
-    frame.samples_per_channel = 160*packnum
-    frame.bytes_per_sample = 2
-    frame.number_of_channels = 1
-    frame.sample_rate = 16000
-
-    # do voulume adjust
-
-    ret = pcmsender.send_audio_pcm_data(frame)
-    # print("first,ret=",packnum, ret)
-    return ret
 
 # sig handleer
 
@@ -396,72 +198,6 @@ def signal_handler(signal, frame):
     global g_runing
     g_runing = False
     print("prsss ctrl+c: ", g_runing)
-
-
-def CalEnergy(frame):
-    energy = 0
-    buffer = (ctypes.c_ubyte * len(frame)).from_buffer(frame)
-    ptr = ctypes.cast(buffer, ctypes.POINTER(ctypes.c_int16))
-    for i in range(len(frame)//2):  # 16bit
-        energy += ptr[i] * ptr[i]
-    energy = energy / (len(frame)//2)
-    # round to int16
-    energy = energy/(2**15)
-
-    return energy
-
-
-def vadcallback(frameout, size):
-    print("vadcallback:", len(frameout), "size:", size)
-
-
-def DoVadTest(filepath):
-    print("DoVadTest")
-    # vad testing
-    vadcg = VadConfig()
-    vad = AudioVad()
-    vad.Create(vadcg)
-    inVadData = VadAudioData()
-    outVadData = VadAudioData()
-    vadflag = VAD_STATE()
-    # read pcm file& output status
-
-    with open(pcm_file_path, "rb") as file:
-
-        # seek wav file header :44 byte
-        file.seek(44)
-        frame_buf = bytearray(320)
-
-        outfile = open("/Users/weihognqin/Documents/work/python_rtc_sdk/vadcopy.pcm", "wb")
-        index = 0
-        total = 0
-        energy = 0
-        while True:
-            ret = file.readinto(frame_buf)
-            if ret < 320:
-                break
-            energy = 0
-
-            ret, frame_out, flag = vad.Proc(frame_buf)
-            if ret == 0 and len(frame_out) > 0:
-                energy = CalEnergy(frame_out)
-                outfile.write(frame_out)
-
-                out = frame_out
-                vadcallback(out, len(out))
-            index += 1
-            total += len(frame_out)
-            # print("index:", index, "ret:", ret, "vadflag:", flag, "size:", len(output), "total:", total, "energy:", energy)
-
-            # print("index:", index, "ret:", ret, "vadflag:", flag, "size:", len(frame_out), "total:", total, "energy:", energy)
-
-            # print("index:", index, "ret:", ret, "vadflag:", vadflag.value, "size:", outVadData.size, "data",outVadData.audioData)
-    # release
-    vad.Destroy()
-    file.close()
-    outfile.close()
-
-    return 0
 
 
 g_runing = True
@@ -559,11 +295,7 @@ def main():
     localuser.publish_audio(audio_track)
     localuser.subscribe_all_audio()
 
-    # test
-# todo:  ??? ERROR!!
 
-    # detailed_stat = localuser.get_local_audio_statistics()
-    # print("detailed_stat:", detailed_stat.local_ssrc, detailed_stat.codec_name)
 
     # stream msg
     stream_id = connection.create_data_stream(0, 0)
@@ -585,95 +317,37 @@ def main():
     while g_runing:
         time.sleep(0.05)
 
-    # audio_stream.relase()
+     # release resource
+    
     localuser.unpublish_audio(audio_track)
     audio_track.set_enabled(0)
-    localuser.release()
-    connection.unregister_observer()
+
+    localuser.unregister_audio_frame_observer()
+    localuser.unregister_local_user_observer()
+
     connection.disconnect()
+    connection.unregister_observer()
+
+    localuser.release()
     connection.release()
-    print("release")
-    time.sleep(0.01)
+
+    
+    audio_track.release()
+    pcm_data_sender.release()
+    
+
+    media_node_factory.release()
     agora_service.release()
-    print("end")
+    
+    #set to None
+    audio_track = None
+    audio_observer = None
+    local_observer = None
+    localuser = None
+    connection = None
+    agora_service = None
 
 
 if __name__ == "__main__":
     main()
 
-"""
-#asyn mode, cpu wast 35
-  audio_strem = AsyncAudioStreamConsumer(pcm_data_sender)
-    audio_producer = AsycncAudioStreamProducer(pcm_file_path, audio_strem)
-    try:
-        await asyncio.Future()
-    except Exception as e:
-        print("exception:", e)
-if __name__ == "__main__":
-    asyncio.run(main())
-
-# sync mode, cpu wast ~~5.5
- 
-    # sync mode
-    if role_type == 1:
-        audio_stream = AudioStreamConsumer(pcm_data_sender)
-        with open(pcm_file_path, "rb") as file:
-            while  g_runing :
-                frame_buf = bytearray(320*200)
-                success = file.readinto(frame_buf)
-                if success <= 0:
-                    print("read file error,ret=",success)
-                    file.seek(0,0)
-                    file.readinto(frame_buf)
-                audio_stream.push_pcm_data(frame_buf)
-                #print("push pcm data")
-                time.sleep(0.2)
-    else:
-        #just runing
-        while g_runing:
-            time.sleep(0.05)
-    
-    with open(pcm_file_path, "rb") as file:
-        #第一次读区 180ms的数据
-        packnum = 18
-        ret = pushPcmDatafromFile(file, packnum, pcm_data_sender)
-        #print("first,ret=",packnum, ret)
-
-        #fortesting
-
-        packnum = int((sendinterval*1000)/10)
-        sessionstarttick = int(time.time()*1000) #round to ms
-        cursendtotalpack = 0
-        frame_buf = bytearray(packnum*320)
-
-        
-
-        while  g_runing :
-            # check
-            curtime = int(time.time()*1000)
-
-            #every 1500ms do check
-            checkinterval = curtime - sessionstarttick
-            
-            needcompensationpack = int( checkinterval/10) - cursendtotalpack
-            #print("needcompensationpack:", needcompensationpack)
-            if needcompensationpack > 0:
-                ret = pushPcmDatafromFile(file, needcompensationpack, pcm_data_sender)
-                if ret < 0:
-                    print("read file error,ret=",ret)
-                    #re-seek to file header
-                    file.seek(0, 0)
-                else:
-                    cursendtotalpack += needcompensationpack
-
-            #send steam msg
-            if send_stream == 1:
-                time_str = f"send stream msg,total packs: {cursendtotalpack}, curtime:{curtime}"
-                ret = connection.send_stream_message(stream_id, time_str)
-                print(f"send stream msg ret={ret}, msg={time_str}")
-        
-
-            time.sleep(sendinterval)
-            #print("goruning = ", g_runing)
-                
-    """
