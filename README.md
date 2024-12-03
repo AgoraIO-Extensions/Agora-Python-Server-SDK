@@ -36,6 +36,21 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 
 # Change log
 
+## 2024.12.03 release Version 2.1.5
+- Modifications:
+  - LocalUser/audioTrack:
+    -- When the scenario is chorus, developers don't need to call setSendDelayInMs.
+    -- When the scenario is chorus, developers don't need to set the audio scenario of the track to chorus.
+    -- NOTE: This can reduce the difficulty for developers. In AI scenarios, developers only need to set the service to chorus.
+- Additions:
+  -- Added the VadDump class, which can assist in troubleshooting vad issues in the testing environment. However, it should not be enabled in the online env  ironment.
+  -- Added the on_volume_indication callback.
+  -- Added the on_remote_video_track_state_changed callback.
+- Removals:
+  -- Removed Vad V1 version, only retaining the V2 version. Refer to voice_detection.py and sample_audio_vad.py.
+- Updates:
+  -- Updated relevant samples: audioconsume, vad sample.
+
 ## 2024.11.12 release 2.1.4
 - Modify the type of metadata in videoFrame from str to bytes type to be consistent with C++; thus, it can support byte streams.
 - The internal encapsulation of ExteranlVideoFrame has been modified to support byte streams. Regarding the support for alpha encoding, a logical judgment has been made. If fill_alpha_buffer is 0, it will not be processed.

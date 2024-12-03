@@ -15,7 +15,6 @@ from agora.rtc.media_node_factory import *
 from agora.rtc.audio_pcm_data_sender import *
 from agora.rtc.audio_frame_observer import *
 import signal
-from agora.rtc.audio_vad import *
 from agora.rtc.local_user import *
 from agora.rtc.local_user_observer import *
 import threading
@@ -23,7 +22,7 @@ from collections import deque
 
 # import voicesentencedetection
 from agora.rtc.voice_detection import *
-from agora.rtc.audio_vad import *
+
 from agora.rtc.utils.vad_dump import VadDump
 
 import gc

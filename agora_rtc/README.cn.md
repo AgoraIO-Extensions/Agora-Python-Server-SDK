@@ -37,6 +37,17 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # 更新日志
+## 2024.12.03 发布 2.1.5
+- 修改: LocalUser/audioTrack：
+  - 当场景为chorus的时候，开发者不需要调用setsenddelayinms；
+  - 当场景为chorus的时候，开发者不需要调用track的setaudioscnario 为chorus
+  - NOTE： 可以降低开发者难度。在ai场景下，开发者只需要设置service为chorus就可以。
+- 增加：VadDump 类，在测试环境下可以协助排查vad的问题。但在线上环境中，不要开启
+- 移除: Vad V1版本，只保留v2 版本。参考voice_detection.py,sample_audio_vad.py
+- 增加： on_volume_indication 回调
+- 增加： on_remote_video_track_state_changed 回调
+- 更新：更新有关的samples：audioconsume, vad sample
+
 ## 2024.11.15 发布 2.1.4
 - 修改videoFrame中的metadata的类型从str修改bytes类型，和c++保持一致；从而可以支持字节流；
 - 修改了内部对ExteranlVideoFrame的封装，从而支持字节流；对alpha编码的支持，做了逻辑判断，如果fill_alpha_buffer 为0 ，则不处理
