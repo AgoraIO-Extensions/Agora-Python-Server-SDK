@@ -89,6 +89,9 @@ class AgoraService:
         agora_parameter = self.get_agora_parameter()
         agora_parameter.set_int("rtc.set_app_type", 18)
 
+        # force audio vad v2 to be enabled
+        agora_parameter.set_parameters("{\"che.audio.label.enable\": true}")
+
         if config.log_path:
             log_size = 512 * 1024
             if config.log_size > 0:
