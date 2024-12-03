@@ -24,6 +24,7 @@ from collections import deque
 # import voicesentencedetection
 from agora.rtc.voice_detection import *
 from agora.rtc.audio_vad import *
+from agora.rtc.utils.vad_dump import VadDump
 
 import gc
 import asyncio
@@ -41,43 +42,19 @@ def local_get_log_path_with_filename():
 class MyAudioFrameObserver(IAudioFrameObserver):
     def __init__(self):
         super(MyAudioFrameObserver, self).__init__()
-        self._source_file = open("./vad_source.pcm", "wb")
-        self._case1_file = open("./vad_case1.pcm", "wb")
-        self._case2_file = open("./vad_case2.pcm", "wb")
-        self._case3_file = open("./vad_case3.pcm", "wb")
         self._silence_pack = bytearray(320)
-        self._vad_file = None  # open("./vad_file.pcm", "wb")
-        self._log_file = None  # open("./vad_log.txt", "w")
         """
         # Recommended  configurations:  
             # For not-so-noisy environments, use this configuration: (16, 30, 20, 0.7, 0.5, 70, 70, -50)  
             # For noisy environments, use this configuration: (16, 30, 20, 0.7, 0.5, 70, 70, -40)  
             # For high-noise environments, use this configuration: (16, 30, 20, 0.7, 0.5, 70, 70, -30)
-
          """
 
-        self._vad_instance = AudioVadV2(AudioVadConfigV2(16, 30, 20, 0.7, 0.5, 70, 70, -50))
-        self._vad_counts = 0
-        # vad v1 related
-        self.v1_configure = VadConfig()
-        # modify v1 vad configure
-        self.v1_configure.voiceProbThr = 0.5
-        self.v1_configure.rmsThr = -40
-        self.v1_configure.aggressive = 2.0
-        self.v1_configure.preStartRecognizeCount = 18
-        self.v1_configure.startRecognizeCount = 16
-        self.v1_configure.stopRecognizeCount = 20
-        self.v1_configure.activePercent = 0.6
-        self.v1_configure.inactivePercent = 0.2
-
-        self._vad_v1_instance = AudioVad()
-        self._vad_v1_instance.Create(self.v1_configure)
-        self._vad_v1_counts = 0
-        self._vad_v1_file = None  # open("./vad_file_v1.pcm", "wb")
-
-    # def on_get_playback_audio_frame_param(self, agora_local_user):
-    #     audio_params_instance = AudioParams()
-    #     return audio_params_instance
+        self._vad_instance = AudioVadV2(AudioVadConfigV2(16, 30, 30, 0.7, 0.5, 70, 70, -50))
+        self._dump_path = './vad'
+        self._vad_dump = VadDump(self._dump_path)
+        self._vad_dump.open()
+        pass
 
     def on_record_audio_frame(self, agora_local_user, channelId, frame):
         logger.info(f"on_record_audio_frame")
@@ -91,109 +68,33 @@ class MyAudioFrameObserver(IAudioFrameObserver):
         logger.info(f"on_ear_monitoring_audio_frame")
         return 0
 
-    def _dump_to_file(self, fd, audio_frame: AudioFrame):
-        fd.write(audio_frame.buffer)
 
     def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, audio_frame: AudioFrame):
         # logger.info(f"on_playback_audio_frame_before_mixing, channelId={channelId}, uid={uid}, type={audio_frame.type}, samples_per_sec={audio_frame.samples_per_sec}, samples_per_channel={audio_frame.samples_per_channel}, bytes_per_sample={audio_frame.bytes_per_sample}, channels={audio_frame.channels}, len={len(audio_frame.buffer)}")
         print(f"before_mixing: far = {audio_frame.far_field_flag },rms = {audio_frame.rms}, voice = {audio_frame.voice_prob}, music ={audio_frame.music_prob},pith = {audio_frame.pitch}")
-        # strategies
-        # anyway, dump source file
-        # if audio_frame.buffer:
-        self._source_file.write(audio_frame.buffer)
-        v1_datas = audio_frame.buffer
-
-        # vad v2
+        #vad v2 processing: can do in sdk callback
         state, bytes = self._vad_instance.process(audio_frame)
         print("state = ", state, len(bytes) if bytes != None else 0)
-        # save and append to file
+        # dump to vad for debuging
+        self._vad_dump.write(audio_frame, bytes, state)
         if bytes != None:
             if state == 1:
-                # open and write to file
-                print("vad v2 start speaking:", self._vad_counts)
-                cur_time = int(time.time()*1000)
-                name = f"./vad_{self._vad_counts}.pcm"
-                self._vad_file = open(name, "wb")
-                self._vad_file.write(bytes)
+                # start speaking: then start send bytes(not audio_frame) to ARS
+                print("vad v2 start speaking")
             elif state == 2:
-                self._vad_file.write(bytes)
+                # continue send bytes to ARS
+                pass
             elif state == 3:
-                self._vad_file.write(bytes)
-                self._vad_file.close()
-                self._vad_counts += 1
-                print("vad v2 stop speaking:", self._vad_counts-1)
+                # stop speaking: send bytes to ARS and then then stop  ARS
+                print("vad v2 stop speaking:")
             else:
                 logger.info("unknown state")
-        # vad v1
-        ret, frameout, flag = self._vad_v1_instance.Proc(v1_datas)
-        print(f"vad v1 ret = {ret}, flag = {flag}")
-        if ret == 0 and flag == 1:
-            # start speaking
-            print("vad v1 start speaking:", self._vad_v1_counts)
-            cur_time = int(time.time()*1000)
-            name = f"./vad1_{self._vad_v1_counts}.pcm"
-            self._vad_v1_file = open(name, "wb")
-            self._vad_v1_file.write(frameout)
-        elif ret == 0 and flag == 2:
-            # speaking:
-            self._vad_v1_file.write(frameout)
-        elif ret == 0 and flag == 3:
-            # stop speaking
-            self._vad_v1_file.write(frameout)
-            self._vad_v1_file.close()
-            self._vad_v1_counts += 1
-            print("vad v1 stop speaking:", self._vad_v1_counts-1)
-
-        """
-        
-        """
-
-        # case 1
-        if audio_frame.far_field_flag == 1:
-            self._case1_file.write(audio_frame.buffer)
-        else:
-            self._case1_file.write(self._silence_pack)
-
-        # case2
-        if audio_frame.far_field_flag == 1 and audio_frame.voice_prob > 75:
-            self._case2_file.write(audio_frame.buffer)
-        else:
-            self._case2_file.write(self._silence_pack)
-
-        # case3
-        if audio_frame.far_field_flag == 1 and audio_frame.voice_prob > 75 and audio_frame.rms > -35:
-            self._case3_file.write(audio_frame.buffer)
-        else:
-            self._case3_file.write(self._silence_pack)
-
         return 1
 
     def on_get_audio_frame_position(self, agora_local_user):
         logger.info(f"on_get_audio_frame_position")
         return 0
-    # def on_get_audio_frame_position(self, agora_local_user):
-    #     logger.info("CCC on_get_audio_frame_position")
-    #     return 0
-
-    # def on_get_playback_audio_frame_param(self, agora_local_user):
-    #     logger.info("CCC on_get_playback_audio_frame_param")
-    #     return 0
-    # def on_get_record_audio_frame_param(self, agora_local_user):
-    #     logger.info("CCC on_get_record_audio_frame_param")
-    #     return 0
-    # def on_get_mixed_audio_frame_param(self, agora_local_user):
-    #     logger.info("CCC on_get_mixed_audio_frame_param")
-    #     return 0
-    # def on_get_ear_monitoring_audio_frame_param(self, agora_local_user):
-    #     logger.info("CCC on_get_ear_monitoring_audio_frame_param")
-    #     return 0
-
-
-
-
 # sig handleer
-
-
 def signal_handler(signal, frame):
     global g_runing
     g_runing = False
@@ -210,33 +111,18 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
 
     # run this example
-    # 例如： python examples/example.py {appid} {token} {channel_id} ./test_data/demo.pcm {userid}
+    # 例如： python examples/example.py {appid}  {channel_id}
+    #check argv len
+    if len (sys.argv) < 3:
+        print("usage: python example_audio_vad.py appid channelname")
+        return
     appid = sys.argv[1]
-    token = sys.argv[2]
-    channel_id = sys.argv[3]
-    pcm_file_path = sys.argv[4]
-    # check argv len
-    if len(sys.argv) > 5:
-        uid = sys.argv[5]
-    else:
-        uid = "0"
+    channel_id = sys.argv[2]
+   
+    uid = "0"
 
-    # send stream or not
-    if len(sys.argv) > 7:
-        send_stream = int(sys.argv[7])
-    else:
-        send_stream = 0
-    if len(sys.argv) > 8:
-        role_type = int(sys.argv[8])
-    else:
-        role_type = 2
 
-    """
-    #check vad sample file
-    if len(sys.argv) > 6:
-        DoVadTest(sys.argv[6])
-    """
-    print("appid:", appid, "token:", token, "channel_id:", channel_id, "pcm_file_path:", pcm_file_path, "uid:", uid, "send_stream:", send_stream)
+    print("appid:", appid, "channel_id:", channel_id)
 
     config = AgoraServiceConfig()
     config.appid = appid
@@ -245,6 +131,7 @@ def main():
 
     agora_service = AgoraService()
     agora_service.initialize(config)
+
 
     sub_opt = AudioSubscriptionOptions(
         packet_only=0,
@@ -257,7 +144,7 @@ def main():
     con_config = RTCConnConfig(
         auto_subscribe_audio=1,
         auto_subscribe_video=0,
-        client_role_type=ClientRoleType.CLIENT_ROLE_BROADCASTER if role_type == 1 else ClientRoleType.CLIENT_ROLE_AUDIENCE,
+        client_role_type=ClientRoleType.CLIENT_ROLE_BROADCASTER,
         channel_profile=ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
         audio_recv_media_packet=0,
         audio_subs_options=sub_opt,
@@ -268,7 +155,7 @@ def main():
     conn_observer = ExampleConnectionObserver()
     connection.register_observer(conn_observer)
 
-    connection.connect(token, channel_id, uid)
+    connection.connect(appid, channel_id, uid)
 
     # step2:
     media_node_factory = agora_service.create_media_node_factory()
@@ -308,10 +195,6 @@ def main():
     # agora_parameter = connection.get_agora_parameter()
     # agora_parameter.set_parameters("{\"che.audio.frame_dump\":{\"location\":\"all\",\"action\":\"start\",\"max_size_bytes\":\"120000000\",\"uuid\":\"123456789\",\"duration\":\"1200000\"}}")
 
-    sendinterval = 0.05  # 50ms
-
-    packnum = int((sendinterval*1000)/10)
-
     global g_runing
     # recv mode
     while g_runing:
@@ -330,6 +213,7 @@ def main():
 
     localuser.release()
     connection.release()
+    
 
     
     audio_track.release()

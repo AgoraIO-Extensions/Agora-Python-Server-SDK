@@ -144,29 +144,18 @@ async def main(exit_event):
     
 
     # run this example
-    # 例如： python examples/example.py {appid} {token} {channel_id} ./test_data/demo.pcm {userid}
+    # 例如： python examples/example.py {appid}  {channel_id} ./test_data/demo.pcm 
+    #check argv len
+    if len(sys.argv) < 4:
+        print("usage: python example_audio_consumer.py appid  channelname pcm_file_path")
+        return
     appid = sys.argv[1]
-    token = sys.argv[2]
-    channel_id = sys.argv[3]
-    pcm_file_path = sys.argv[4]
-    # check argv len
-    if len(sys.argv) > 5:
-        uid = sys.argv[5]
-    else:
-        uid = "0"
+    channel_id = sys.argv[2]
+    pcm_file_path = sys.argv[3]
+   
+    uid = "0"
 
-    # send stream or not
-    if len(sys.argv) > 7:
-        send_stream = int(sys.argv[7])
-    else:
-        send_stream = 0
-    if len(sys.argv) > 8:
-        role_type = int(sys.argv[8])
-    else:
-        role_type = 2
-
-
-    print("appid:", appid, "token:", token, "channel_id:", channel_id, "pcm_file_path:", pcm_file_path, "uid:", uid, "send_stream:", send_stream)
+    print("appid:", appid,  "channel_id:", channel_id, "pcm_file_path:", pcm_file_path)
 
     config = AgoraServiceConfig()
     config.appid = appid
@@ -187,7 +176,7 @@ async def main(exit_event):
     con_config = RTCConnConfig(
         auto_subscribe_audio=1,
         auto_subscribe_video=0,
-        client_role_type=ClientRoleType.CLIENT_ROLE_BROADCASTER if role_type == 1 else ClientRoleType.CLIENT_ROLE_AUDIENCE,
+        client_role_type=ClientRoleType.CLIENT_ROLE_BROADCASTER ,
         channel_profile=ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
         audio_recv_media_packet=0,
         audio_subs_options=sub_opt,
@@ -198,7 +187,7 @@ async def main(exit_event):
     conn_observer = ExampleConnectionObserver()
     connection.register_observer(conn_observer)
 
-    connection.connect(token, channel_id, uid)
+    connection.connect(appid, channel_id, uid)
 
     # step2:
     media_node_factory = agora_service.create_media_node_factory()
