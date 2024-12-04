@@ -14,7 +14,7 @@
   - CentOS 7.0 and above
   
 - Supported Mac versions:
-  - MacOS 13 and above
+  - MacOS 13 and above(only for coding and testing)
 
 - Python version:
   - Python 3.10 and above

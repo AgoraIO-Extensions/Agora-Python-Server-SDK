@@ -14,7 +14,7 @@
   - Ubuntu 18.04 LTS 及以上
   - CentOS 7.0 及以上
   
-- 支持的 Mac 版本：
+- 支持的 Mac 版本:（仅支持开发测试）
   - MacOS 13 及以上
 
 - Python 版本：
