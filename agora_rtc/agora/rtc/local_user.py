@@ -413,10 +413,10 @@ class LocalUser:
         ret = agora_local_user_set_playback_audio_frame_before_mixing_parameters(self.user_handle, channels, sample_rate_hz)
         return ret
 
-    def register_audio_frame_observer(self, observer: IAudioFrameObserver):
+    def register_audio_frame_observer(self, observer: IAudioFrameObserver,  enable_vad: int, vad_configure):
         if self.audio_frame_observer:
             self.unregister_audio_frame_observer()
-        self.audio_frame_observer = AudioFrameObserverInner(observer, self)
+        self.audio_frame_observer = AudioFrameObserverInner(observer, self, enable_vad, vad_configure)
         ret = agora_local_user_register_audio_frame_observer(self.user_handle, self.audio_frame_observer)
         return ret
 
@@ -424,6 +424,8 @@ class LocalUser:
         ret = 0
         if self.audio_frame_observer:
             ret = agora_local_user_unregister_audio_frame_observer(self.user_handle)
+            # clear observerInner related resoure
+            self.audio_frame_observer.clear()
         self.audio_frame_observer = None
         return ret
 
