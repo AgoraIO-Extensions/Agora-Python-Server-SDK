@@ -25,7 +25,7 @@ class RTCProcessIMPL(RTCBaseProcess):
 
         local_user.set_playback_audio_frame_before_mixing_parameters(1, 16000)
         audio_frame_observer = ExampleAudioFrameObserver(save_to_disk=sample_options.save_to_disk)
-        ret = local_user.register_audio_frame_observer(audio_frame_observer)
+        ret = local_user.register_audio_frame_observer(audio_frame_observer, 0, None)
         logger.info(f"register_audio_frame_observer ret:{ret}")
 
         video_frame_observer = ExampleVideoFrameObserver(save_to_disk=sample_options.save_to_disk)

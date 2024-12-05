@@ -47,7 +47,7 @@ class ExampleAudioFrameObserver(IAudioFrameObserver):
         logger.info(f"on_ear_monitoring_audio_frame")
         return 0
 
-    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, audio_frame: AudioFrame):
+    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, audio_frame: AudioFrame, vad_result_state: int, vad_result_bytearray: bytearray):
         # logger.info(f"on_playback_audio_frame_before_mixing: {audio_frame}")
         frame = PcmAudioFrame(
             data=audio_frame.buffer,
@@ -127,7 +127,8 @@ async def run_example():
     # await push_init_pcm(pcm_data_sender)
     # logger.info(f"rpush_init_pcm: after time:{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]}")
     audio_frame_observer = ExampleAudioFrameObserver(pcm_data_sender, loop, True if sample_options.mode == 1 else False)
-    local_user.register_audio_frame_observer(audio_frame_observer)
+    #in this example, we only test loopback,so disable vad
+    local_user.register_audio_frame_observer(audio_frame_observer, 0 ,None)
 
     await _exit
     local_user.unpublish_audio(audio_track)
