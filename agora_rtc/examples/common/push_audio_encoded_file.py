@@ -4,7 +4,7 @@ import itertools
 import av
 from agora.rtc.agora_base import AudioCodecType, EncodedAudioFrameInfo
 from agora.rtc.audio_encoded_frame_sender import AudioEncodedFrameSender
-from common.pacer import Pacer
+
 from asyncio import Event
 import logging
 logger = logging.getLogger(__name__)
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 async def push_encoded_audio_from_file(audio_sender: AudioEncodedFrameSender, audio_file_path, _exit: Event):
     sendinterval = 0.1
-    pacer = Pacer(sendinterval)
+    
     container = av.open(audio_file_path)
     sample_rate = 48000
     channels = 1
@@ -39,4 +39,5 @@ async def push_encoded_audio_from_file(audio_sender: AudioEncodedFrameSender, au
                 time_base = packet.stream.time_base
                 duration_in_seconds = packet.duration * time_base
                 logger.info(f"Read audio packet with size {packet.size} bytes, PTS {packet.pts}, DTS {packet.dts}, duration_in_seconds={duration_in_seconds}")
-                await pacer.apace_interval(duration_in_seconds)
+                
+                await asyncio.sleep(duration_in_seconds)
