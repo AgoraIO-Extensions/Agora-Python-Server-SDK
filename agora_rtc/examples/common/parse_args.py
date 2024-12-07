@@ -23,7 +23,7 @@ class ExampleOptions:
         self.hours = 0
         self.mode = 1
         self.value = 0
-        self.dir_path = None #directory path
+        self.dir_path = None  # directory path
         self.msg = "hello agora python sdk"
 
 
@@ -34,15 +34,24 @@ def parse_args():
     parser.add_argument("--channelId", required=True, help="Channel Id / must")
     parser.add_argument("--connectionNumber", default=1, help="Enter the channel number")
     parser.add_argument("--userId", default="0", help="User Id / default is 0")
-    parser.add_argument("--audioFile", required=False, help="The audio file in raw PCM format to be sent")
+    parser.add_argument(
+        "--audioFile",
+        required=False,
+        help="The audio file in raw PCM format to be sent")
     parser.add_argument("--lowdelay", action="store_true", help="Enable the low delay")
     parser.add_argument("--videoFile", help="The video file in YUV420 format to be sent")
     parser.add_argument("--sampleRate", type=int, help="Example rate for the PCM file to be sent")
-    parser.add_argument("--numOfChannels", type=int, help="Number of channels for the PCM file to be sent")
+    parser.add_argument(
+        "--numOfChannels",
+        type=int,
+        help="Number of channels for the PCM file to be sent")
     parser.add_argument("--fps", type=int, help="Target frame rate for sending the video stream")
     parser.add_argument("--width", type=int, help="Image width for the YUV file to be sent")
     parser.add_argument("--height", type=int, help="Image height for the YUV file to be sent")
-    parser.add_argument("--bitrate", type=int, help="Target bitrate (bps) for encoding the YUV stream")
+    parser.add_argument(
+        "--bitrate",
+        type=int,
+        help="Target bitrate (bps) for encoding the YUV stream")
     parser.add_argument("--message", help="The message to be sent")
     parser.add_argument("--hours", default="0", help="The time to run")
     parser.add_argument("--saveToDisk", default=0, help="The time to run")
@@ -82,5 +91,6 @@ def parse_args_example() -> ExampleOptions:
     sample_options.mode = args.mode
     sample_options.value = args.value
     sample_options.dir_path = args.dir
+    print(sample_options)
 
     return sample_options
