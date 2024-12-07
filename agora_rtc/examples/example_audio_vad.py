@@ -68,12 +68,12 @@ class MyAudioFrameObserver(IAudioFrameObserver):
         return 0
 
 
-    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, audio_frame: AudioFrame):
+    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, audio_frame: AudioFrame, vad_result_state:int, vad_result_bytearray:bytearray):
         # logger.info(f"on_playback_audio_frame_before_mixing, channelId={channelId}, uid={uid}, type={audio_frame.type}, samples_per_sec={audio_frame.samples_per_sec}, samples_per_channel={audio_frame.samples_per_channel}, bytes_per_sample={audio_frame.bytes_per_sample}, channels={audio_frame.channels}, len={len(audio_frame.buffer)}")
         print(f"before_mixing: far = {audio_frame.far_field_flag },rms = {audio_frame.rms}, voice = {audio_frame.voice_prob}, music ={audio_frame.music_prob},pith = {audio_frame.pitch}")
         #vad v2 processing: can do in sdk callback
         state, bytes = self._vad_instance.process(audio_frame)
-        print("state = ", state, len(bytes) if bytes != None else 0)
+        print("state = ", state, len(bytes) if bytes != None else 0, vad_result_state, len(vad_result_bytearray) if vad_result_bytearray != None else 0)
         # dump to vad for debuging
         self._vad_dump.write(audio_frame, bytes, state)
         if bytes != None:
@@ -171,7 +171,8 @@ def main():
     # note: set_playback_audio_frame_before_mixing_parameters must be call before register_audio_frame_observer
     localuser.set_playback_audio_frame_before_mixing_parameters(1, 16000)
     audio_observer = MyAudioFrameObserver()
-    localuser.register_audio_frame_observer(audio_observer)
+    vad_configure  = AudioVadConfigV2(16, 30, 30, 0.7, 0.5, 70, 70, -50)
+    localuser.register_audio_frame_observer(audio_observer, 1, vad_configure)
 
     # ret = localuser.get_user_role()
     # localuser.set_user_role(con_config.client_role_type)

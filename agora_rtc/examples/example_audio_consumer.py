@@ -61,10 +61,9 @@ class MyAudioFrameObserver(IAudioFrameObserver):
     def _dump_to_file(self, fd, audio_frame: AudioFrame):
         fd.write(audio_frame.buffer)
 
-    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, audio_frame: AudioFrame):
-        # logger.info(f"on_playback_audio_frame_before_mixing, channelId={channelId}, uid={uid}, type={audio_frame.type}, samples_per_sec={audio_frame.samples_per_sec}, samples_per_channel={audio_frame.samples_per_channel}, bytes_per_sample={audio_frame.bytes_per_sample}, channels={audio_frame.channels}, len={len(audio_frame.buffer)}")
-       
-        return 1
+    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, frame, vad_result_state: int, vad_result_bytearray: bytearray):
+        return 0
+  
 
     def on_get_audio_frame_position(self, agora_local_user):
         logger.info(f"on_get_audio_frame_position")
@@ -203,7 +202,8 @@ async def main(exit_event):
     # note: set_playback_audio_frame_before_mixing_parameters must be call before register_audio_frame_observer
     localuser.set_playback_audio_frame_before_mixing_parameters(1, 16000)
     audio_observer = MyAudioFrameObserver()
-    localuser.register_audio_frame_observer(audio_observer)
+    #note: in Consume sample, no need to show vad,so disable it!
+    localuser.register_audio_frame_observer(audio_observer,0, None)
 
     # ret = localuser.get_user_role()
     # localuser.set_user_role(con_config.client_role_type)

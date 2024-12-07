@@ -1,7 +1,7 @@
 #!env python
 
 from agora.rtc.video_frame_sender import ExternalVideoFrame, VideoFrameSender
-from common.pacer import Pacer
+
 from asyncio import Event
 import asyncio
 import datetime
@@ -20,7 +20,6 @@ async def push_yuv_data_from_file(width, height, fps, video_sender: VideoFrameSe
     first_frame = None
     with open(video_file_path, "rb") as video_file:
         yuv_sendinterval = 1.0/fps
-        pacer_yuv = Pacer(yuv_sendinterval)
         yuv_count = 0
         yuv_len = int(width*height*3/2)
         frame_buf = bytearray(yuv_len)
@@ -43,7 +42,7 @@ async def push_yuv_data_from_file(width, height, fps, video_sender: VideoFrameSe
             ret = video_sender.send_video_frame(frame)
             yuv_count += 1
             logger.info("send yuv: count,ret=%d, %s", yuv_count, ret)
-            await pacer_yuv.apace_interval(yuv_sendinterval)
+            await asyncio.sleep(yuv_sendinterval)
         frame_buf = None
 
 
@@ -61,7 +60,7 @@ async def push_yuv_data_from_file2(width, height, fps, video_sender: VideoFrameS
 
     with open(video_file_path, "rb") as video_file:
         yuv_sendinterval = 1.0/fps
-        pacer_yuv = Pacer(yuv_sendinterval)
+        
         yuv_count = 0
         yuv_len = int(width*height*3/2)
         frame_buf = bytearray(yuv_len)
@@ -81,7 +80,8 @@ async def push_yuv_data_from_file2(width, height, fps, video_sender: VideoFrameS
             ret = video_sender.send_video_frame(frame)
             yuv_count += 1
             logger.info("send yuv: count,ret=%d, %s", yuv_count, ret)
-            await pacer_yuv.apace_interval(yuv_sendinterval)
+            
+            await asyncio.sleep(yuv_sendinterval)
         frame_buf = None
 
 """"
@@ -154,7 +154,7 @@ async def push_jpeg_from_file(path, video_sender, fps, _exit:Event):
     rgb_count = 0
     interval = 1.0/fps
 
-    pacer = Pacer(interval)
+ 
 
     #simulate only 3 jpges
     bytes_data = []
@@ -196,9 +196,9 @@ async def push_jpeg_from_file(path, video_sender, fps, _exit:Event):
             ret = video_sender.send_video_frame(frame)
             rgb_count += 1
             logger.info("send jpg: count,ret=%d, %d, %d, %d, %d", rgb_count, ret, width, height,time.time()*1000)
-            await pacer.apace_interval(interval)
-            #asyncio.sleep(1)
-                #pacer_yuv.apace_interval(yuv_sendinterval)
+
+            await asyncio.sleep(interval)
+           
             frame_buf = None
             #image.close()
 

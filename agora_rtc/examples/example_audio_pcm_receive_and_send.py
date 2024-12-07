@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # run this example
-# python agora_rtc/examples/example_audio_pcm_receive.py --appId=xxx --channelId=xxx
+# python3 agora_rtc/examples/example_audio_pcm_receive_and_send.py --appId={} --channelId= {} --audioFile=./test_data/demo.pcm --sampleRate=16000 --numOfChannels=1
 
 
 class RTCProcessIMPL(RTCBaseProcess):
@@ -25,7 +25,8 @@ class RTCProcessIMPL(RTCBaseProcess):
         media_node_factory = agora_service.create_media_node_factory()
         local_user.set_playback_audio_frame_before_mixing_parameters(1, 16000)
         audio_frame_observer = ExampleAudioFrameObserver(save_to_disk=sample_options.save_to_disk)
-        ret = local_user.register_audio_frame_observer(audio_frame_observer)
+        #note: disable vad in this sample, but you can set to 1 with an vadconfigureV2 to enable it
+        ret = local_user.register_audio_frame_observer(audio_frame_observer, 0, None)
         if ret < 0:
             logger.error(f"register_audio_frame_observer failed")
             return

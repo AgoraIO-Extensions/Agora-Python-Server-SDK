@@ -33,7 +33,7 @@ class ExampleAudioFrameObserver(IAudioFrameObserver):
         logger.info(f"on_ear_monitoring_audio_frame")
         return 0
 
-    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, audio_frame: AudioFrame):
+    def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, audio_frame: AudioFrame, vad_result_state:int, vad_result_bytearray:bytearray):
         # logger.info(f"on_playback_audio_frame_before_mixing")
         # logger.info(f"on_playback_audio_frame_before_mixing, channelId={channelId}, uid={uid}, type={audio_frame.type}, samples_per_sec={audio_frame.samples_per_sec}, samples_per_channel={audio_frame.samples_per_channel}, bytes_per_sample={audio_frame.bytes_per_sample}, channels={audio_frame.channels}, len={len(audio_frame.buffer)}")
         # logger.info(f"on_playback_audio_frame_before_mixing, file_path={file_path}, len={len(audio_frame.buffer)}")

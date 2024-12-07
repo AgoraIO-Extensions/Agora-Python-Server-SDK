@@ -4,7 +4,7 @@ import itertools
 import av
 from agora.rtc.agora_base import AudioCodecType
 from agora.rtc.video_encoded_image_sender import EncodedVideoFrameInfo, VideoEncodedImageSender
-from common.pacer import Pacer
+
 from asyncio import Event
 import logging
 logger = logging.getLogger(__name__)
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 async def push_encoded_video_from_file(video_sender: VideoEncodedImageSender, video_file_path, _exit: Event):
     frame_rate = 30
-    pacer = Pacer(1.0/frame_rate)
+    
     count = 0
     width = 352
     height = 288
@@ -55,4 +55,4 @@ async def push_encoded_video_from_file(video_sender: VideoEncodedImageSender, vi
                 ret = video_sender.send_encoded_video_image(packet.buffer_ptr, packet.buffer_size, encoded_video_frame_info)
                 count += 1
                 logger.info(f"count,ret={count}, {ret}")
-                await pacer.apace_interval(1.0/frame_rate)
+                await asyncio.sleep(1.0/frame_rate)

@@ -69,7 +69,7 @@ class AudioConsumer:
     def consume(self):
         print("consume begin")
         if self._init == False:
-            return
+            return -1
         now = time.time()*1000
         elapsed_time = int(now - self._start_time)
         expected_total_packages = int(elapsed_time//10)
@@ -78,7 +78,7 @@ class AudioConsumer:
 
         if besent_packages > 18 and data_len //self._bytes_per_frame < 18: #for fist time, if data_len is not enough, just return and wait for next time
             #print("-----underflow data")
-            return
+            return -2
         if besent_packages > 18: #rest to start state, push 18 packs in Start_STATE
             self._reset()
             besent_packages = min(18, data_len//self._bytes_per_frame)
@@ -89,7 +89,7 @@ class AudioConsumer:
         act_besent_packages = (int)(min(besent_packages, data_len//self._bytes_per_frame))
         #print("consume 1:", act_besent_packages, data_len)
         if act_besent_packages < 1:
-            return
+            return 0
        
         #construct an audio frame to push
         #frame = PcmAudioFrame()
@@ -104,6 +104,7 @@ class AudioConsumer:
             self._consumed_packages += act_besent_packages
 
         self._pcm_sender.send_audio_pcm_data(self._frame)
+        return act_besent_packages
         #print(f"act_besent_packages: {now},{now - self._start_time}, {besent_packages}, {act_besent_packages},{self._consumed_packages},{data_len}")
         pass
 

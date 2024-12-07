@@ -115,7 +115,7 @@ class AudioVadV2():
         
         ratios = self._calculate_sliding_window_ratio(queue, self._trend_window)
         # 计算趋势
-        print(ratios)
+        #print(ratios)
         return 1 if ratios[1] > ratios[0] else 0
 
     #get silence count from deque: totalcount, silenct_count
@@ -156,7 +156,7 @@ class AudioVadV2():
                
                 #and clear pre &start
                 self._clear_queue(self._stop_queue)
-                print("start speaking:", len(self._stop_queue))
+                #print("start speaking:", len(self._stop_queue))
             
         return state, bytes
         
@@ -165,7 +165,7 @@ class AudioVadV2():
         #如果数据满，怎判断是否触发stop
         state = self._cur_state
         size, full = self._push_to_stop(data)
-        print(f"stop: {size}, {full}")
+        #print(f"stop: {size}, {full}")
 
         
         if full == True:
