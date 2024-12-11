@@ -104,7 +104,7 @@ class AudioConsumer:
             self._consumed_packages += act_besent_packages
 
         self._pcm_sender.send_audio_pcm_data(self._frame)
-        return act_besent_packages
+        return self._consumed_packages
         #print(f"act_besent_packages: {now},{now - self._start_time}, {besent_packages}, {act_besent_packages},{self._consumed_packages},{data_len}")
         pass
 
