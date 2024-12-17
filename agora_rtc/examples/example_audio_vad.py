@@ -20,13 +20,18 @@ from agora.rtc.local_user_observer import *
 import threading
 from collections import deque
 
+
 # import voicesentencedetection
 from agora.rtc.voice_detection import *
 
 from agora.rtc.utils.vad_dump import VadDump
+from common.push_audio_pcm_file import file_to_consumer
+from agora.rtc.utils.audio_consumer import AudioConsumer
 
 import gc
 import asyncio
+# memey leak test
+from memory_profiler import profile
 
 
 # connection observer
@@ -38,18 +43,19 @@ def local_get_log_path_with_filename():
 
 
 # observer
+@profile
 class MyAudioFrameObserver(IAudioFrameObserver):
     def __init__(self):
-        super(MyAudioFrameObserver, self).__init__()
+        #super(MyAudioFrameObserver, self).__init__()
         self._silence_pack = bytearray(320)
         """
         # Recommended  configurations:  
-            # For not-so-noisy environments, use this configuration: (16, 30, 20, 0.7, 0.5, 70, 70, -50)  
-            # For noisy environments, use this configuration: (16, 30, 20, 0.7, 0.5, 70, 70, -40)  
-            # For high-noise environments, use this configuration: (16, 30, 20, 0.7, 0.5, 70, 70, -30)
+            # For not-so-noisy environments, use this configuration: (16, 30, 50, 0.7, 0.5, 70, 70, -50)  
+            # For noisy environments, use this configuration: (16, 30, 50, 0.7, 0.5, 70, 70, -40)  
+            # For high-noise environments, use this configuration: (16, 30, 50, 0.7, 0.5, 70, 70, -30)
          """
 
-        self._vad_instance = AudioVadV2(AudioVadConfigV2(16, 30, 30, 0.7, 0.5, 70, 70, -50))
+        self._vad_instance = AudioVadV2(AudioVadConfigV2(16, 30, 50, 0.7, 0.5, 70, 70, -50))
         self._dump_path = './vad'
         self._vad_dump = VadDump(self._dump_path)
         self._vad_dump.open()
@@ -103,6 +109,7 @@ def signal_handler(signal, frame):
 g_runing = True
 
 
+@profile
 def main():
 
     # signal handler
@@ -128,8 +135,14 @@ def main():
     # config.audio_scenario = AudioScenarioType.AUDIO_SCENARIO_CHORUS
     config.log_path = local_get_log_path_with_filename()  # get_log_path_with_filename(os.path.splitext(__file__)[0])
 
+    now = time.time()*1000
     agora_service = AgoraService()
     agora_service.initialize(config)
+    print("diff = ", time.time()*1000-now) # 85ms
+
+    
+
+    
 
 
     sub_opt = AudioSubscriptionOptions(
@@ -161,6 +174,8 @@ def main():
     pcm_data_sender = media_node_factory.create_audio_pcm_data_sender()
     audio_track = agora_service.create_custom_audio_track_pcm(pcm_data_sender)
 
+    audio_consumer  = AudioConsumer(pcm_sender= pcm_data_sender, sample_rate=16000, channels=1)
+
     # step3: localuser:must regiseter before connect
     localuser = connection.get_local_user()
     local_observer = ExampleLocalUserObserver()
@@ -171,8 +186,15 @@ def main():
     # note: set_playback_audio_frame_before_mixing_parameters must be call before register_audio_frame_observer
     localuser.set_playback_audio_frame_before_mixing_parameters(1, 16000)
     audio_observer = MyAudioFrameObserver()
-    vad_configure  = AudioVadConfigV2(16, 30, 30, 0.7, 0.5, 70, 70, -50)
+    vad_configure  = AudioVadConfigV2(16, 30, 50, 0.7, 0.5, 70, 70, -50)
     localuser.register_audio_frame_observer(audio_observer, 1, vad_configure)
+
+    #sub 
+    remote_uid = "123"
+    localuser.subscribe_audio(remote_uid)
+    localuser.unsubscribe_audio(remote_uid)
+    localuser.subscribe_video(remote_uid, None)
+    localuser.unsubscribe_video(remote_uid)
 
     # ret = localuser.get_user_role()
     # localuser.set_user_role(con_config.client_role_type)
@@ -196,12 +218,34 @@ def main():
     # agora_parameter.set_parameters("{\"che.audio.frame_dump\":{\"location\":\"all\",\"action\":\"start\",\"max_size_bytes\":\"120000000\",\"uuid\":\"123456789\",\"duration\":\"1200000\"}}")
 
     global g_runing
+
+    #open for consumer
+    frame_buffer = bytearray(320)
+    audio_file = open ("../test_data/demo.pcm", "rb")
+    file_to_consumer(audio_file, frame_buffer, audio_consumer)
+
+    audio_frame = PcmAudioFrame()
+    #init sample rate and channels
+    audio_frame.sample_rate = 16000
+    audio_frame.number_of_channels = 1
+
+    #audio parame
+    audio_frame.bytes_per_sample = 2
+    
+    #init pcmaudioframe
+    audio_frame.timestamp = 0
     # recv mode
     while g_runing:
+        remain_len = audio_consumer.len()
+        if remain_len < 320*50*150: #interval*1000/10 *1.5. where 1.5 is the redundancy coeficient
+            file_to_consumer(audio_file, frame_buffer, audio_consumer)
+        ret = audio_consumer.consume()
+        #audio_frame.data = frame_buffer
+        #pcm_data_sender.send_audio_pcm_data(audio_frame)
         time.sleep(0.05)
 
      # release resource
-    
+    audio_consumer.release()
     localuser.unpublish_audio(audio_track)
     audio_track.set_enabled(0)
 
@@ -230,6 +274,9 @@ def main():
     localuser = None
     connection = None
     agora_service = None
+
+    # for memory leak check
+    print("end")
 
 
 if __name__ == "__main__":

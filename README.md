@@ -35,6 +35,12 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # Change log
+2024.12.17 Release 2.1.7
+--Changes:
+
+  Fixed the typeError issue in LocalUser::sub/unsub audio/video.
+  Adjusted the default stopRecogCount for VAD from 30 to 50.
+  Modified sample_vad.
 ## 2024.12.09 Release 2.1.6
 - New Features:
   -- Added AudioVadManager to manage VAD (Voice Activity Detection) instances.
@@ -262,3 +268,41 @@ Store the LLM results in a cache as they are received.
 Perform a reverse scan of the cached data to find the most recent punctuation mark.
 Truncate the data from the start to the most recent punctuation mark and pass it to TTS for synthesis.
 Remove the truncated data from the cache. The remaining data should be moved to the beginning of the cache and continue waiting for additional data from the LLM.
+
+##VAD Configuration Parameters
+AgoraAudioVadConfigV2 Properties
+
+Property Name	Type	Description	Default Value	Value Range
+preStartRecognizeCount	int	Number of audio frames saved before detecting speech	16	[0, ]
+startRecognizeCount	int	Total number of audio frames to detect speech start	30	[1, max]
+stopRecognizeCount	int	Number of audio frames to detect speech stop	50	[1, max]
+activePercent	float	Percentage of active frames in startRecognizeCount frames	0.7	[0.0, 1.0]
+inactivePercent	float	Percentage of inactive frames in stopRecognizeCount frames	0.5	[0.0, 1.0]
+startVoiceProb	int	Probability that an audio frame contains human voice	70	[0, 100]
+stopVoiceProb	int	Probability that an audio frame contains human voice	70	[0, 100]
+startRmsThreshold	int	Energy dB threshold for detecting speech start	-50	[-100, 0]
+stopRmsThreshold	int	Energy dB threshold for detecting speech stop	-50	[-100, 0]
+Notes:
+startRmsThreshold and stopRmsThreshold:
+
+The higher the value, the louder the speaker's voice needs to be compared to the surrounding background noise.
+In quiet environments, it is recommended to use the default value of -50.
+In noisy environments, you can increase the threshold to between -40 and -30 to reduce false positives.
+Adjusting these thresholds based on the actual use case and audio characteristics can achieve optimal performance.
+stopRecognizeCount:
+
+This value reflects how long to wait after detecting non-human voice before concluding that the user has stopped speaking. It controls the gap between consecutive speech utterances. Within this gap, VAD will treat adjacent sentences as part of the same speech.
+A shorter gap will increase the likelihood of adjacent sentences being recognized as separate speech segments. Typically, it is recommended to set this value between 50 and 80.
+For example: "Good afternoon, [interval_between_sentences] what are some fun places to visit in Beijing?"
+
+If the interval_between_sentences between the speaker's phrases is greater than the stopRecognizeCount, the VAD will recognize the above as two separate VADs:
+
+VAD1: Good afternoon
+VAD2: What are some fun places to visit in Beijing?
+If the interval_between_sentences is less than stopRecognizeCount, the VAD will recognize the above as a single VAD:
+
+VAD: Good afternoon, what are some fun places to visit in Beijing?
+
+
+
+If latency is a concern, you can lower this value, or consult with the development team to determine how to manage latency while ensuring semantic continuity in speech recognition. This will help avoid the AI being interrupted too sensitively.

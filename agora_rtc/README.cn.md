@@ -37,6 +37,11 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # 更新日志
+## 2024.12.17 发布 2.1.7  
+--修改：
+  修改了LocalUser::sub/unsub audio/video中typeError的问题
+  将vad默认的stopRecogCount从30调整到50
+  修改sample_vad
 ## 2024.12.09 发布 2.1.6
 -- 增加：
   -增加了AduioVadManger，用来管理vad instance
@@ -219,3 +224,34 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
     b 对缓存中的数据做逆序扫描，找到最近的一个标点符号
     c 将缓存中的数据，从头开始到最尾的一个标点符号截断，然后交给TTS做合成。
     d 将截断后的数据，从缓存中删除。剩余的数据，移动到缓存头位置，继续等待LLM返回数据。
+
+## VAD配置参数的含义
+AgoraAudioVadConfigV2 属性
+属性名	                 类型	    描述	                         默认值	     取值范围
+preStartRecognizeCount	int	    开始说话状态前保存的音频帧数	      16	       [0, ]  
+startRecognizeCount	    int   	判断是否开始说话状态的音频帧总数     30	    [1, max]
+stopRecognizeCount	    int	    判断停止说话状态的音频帧数	        50	    [1, max]
+activePercent	          float	  在 startRecognizeCount 
+                                  帧中活跃帧的百分比	            0.7	    0.0, 1.0]
+inactivePercent       	float	  在 stopRecognizeCount
+                                 帧中非活跃帧的百分比	             0.5     [0.0, 1.0]
+startVoiceProb	        int	    音频帧是人声的概率	              70	    [0, 100]
+stopVoiceProb	          int	     音频帧是人声的概率	               70	    [0, 100]
+startRmsThreshold	      int	     音频帧的能量分贝阈值	            -50	     [-100, 0]
+stopRmsThreshold	      int	    音频帧的能量分贝阈值            	-50	    [-100, 0]
+注意事项
+
+startRmsThreshold 和 stopRmsThreshold:
+值越高，就需要说话人的声音相比周围环境的环境音的音量越大
+在安静环境中推荐使用默认值 -50。
+在嘈杂环境中可以调高到 -40 到 -30 之间，以减少误检。
+根据实际使用场景和音频特征进行微调可获得最佳效果。
+
+stopReecognizeCount: 反映在识别到非人声的情况下，需要等待多长时间才认为用户已经停止说话。可以用来控制说话人相邻语句的间隔，在该间隔内，VAD会将相邻的语句当作一段话。如果时间短，相邻语句就越容易被识别为2段话。通常推荐50～80
+比如：下午好，[interval_between_sentences]北京有哪些好玩的地方？
+如果说话人语气之间的间隔interval_between_sentences 大于stopReecognizeCount，那么VAD就会将上述识别为2个vad：
+vad1: 下午好
+vad2: 北京有哪些好玩的地方？
+如果interval_between_sentences 小于 stopReecognizeCount，那么VAD就会将上述识别为1个vad：
+vad： 下午好，北京有哪些好玩的地方？
+如果对延迟敏感，可以调低该值，或者咨询研发，在降低该值的情况下，应该如何在应用层做处理，在保障延迟的情况下，还能确保语意的连续性，不会产生AI被敏感的打断的感觉。

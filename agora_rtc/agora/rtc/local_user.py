@@ -62,7 +62,7 @@ agora_local_user_subscribe_all_audio.argtypes = [AGORA_HANDLE]
 
 agora_local_user_unsubscribe_audio = agora_lib.agora_local_user_unsubscribe_audio
 agora_local_user_unsubscribe_audio.restype = AGORA_API_C_INT
-agora_local_user_unsubscribe_audio.argtypes = [AGORA_HANDLE, ctypes.c_uint]
+agora_local_user_unsubscribe_audio.argtypes = [AGORA_HANDLE, user_id_t]
 
 agora_local_user_unsubscribe_all_audio = agora_lib.agora_local_user_unsubscribe_all_audio
 agora_local_user_unsubscribe_all_audio.restype = AGORA_API_C_INT
@@ -184,7 +184,7 @@ agora_local_user_subscribe_all_video.argtypes = [AGORA_HANDLE, ctypes.POINTER(Vi
 
 agora_local_user_unsubscribe_video = agora_lib.agora_local_user_unsubscribe_video
 agora_local_user_unsubscribe_video.restype = AGORA_API_C_INT
-agora_local_user_unsubscribe_video.argtypes = [AGORA_HANDLE, ctypes.c_uint]
+agora_local_user_unsubscribe_video.argtypes = [AGORA_HANDLE, user_id_t]
 
 agora_local_user_unsubscribe_all_video = agora_lib.agora_local_user_unsubscribe_all_video
 agora_local_user_unsubscribe_all_video.restype = AGORA_API_C_INT
@@ -361,7 +361,13 @@ class LocalUser:
         return ret
 
     def subscribe_audio(self, user_id):
-        ret = agora_local_user_subscribe_audio(self.user_handle, ctypes.c_char_p(user_id.encode()))
+        if user_id is None:
+            return -1
+        uid_str = user_id.encode('utf-8')
+        #ret = agora_local_user_subscribe_audio(self.user_handle, ctypes.create_string_buffer(uid_str))
+        # note：both ctypes.create_string_buffer and ctypes.c_char_p are all can change python's str to c_char_p
+        # but ctypes.c_char_p is more suitable for this case for the c api never change the content of c_char_p
+        ret = agora_local_user_subscribe_audio(self.user_handle, ctypes.c_char_p(uid_str))
         return ret
 
     def subscribe_all_audio(self):
@@ -369,7 +375,11 @@ class LocalUser:
         return ret
 
     def unsubscribe_audio(self, user_id):
-        ret = agora_local_user_unsubscribe_audio(self.user_handle, ctypes.c_char_p(user_id.encode()))
+        #validity check
+        if user_id is None:
+            return -1
+        uid_str = user_id.encode('utf-8')
+        ret = agora_local_user_unsubscribe_audio(self.user_handle, ctypes.c_char_p(uid_str))
         if ret < 0:
             logger.error("Failed to unsubscribe audio")
         else:
@@ -485,18 +495,33 @@ class LocalUser:
     #     return ret
 
     def subscribe_video(self, user_id, options: VideoSubscriptionOptions):
-        user_id_t = user_id.encode('utf-8')
+        if user_id is None:
+            return -1
+        uid_str = user_id.encode('utf-8')
 
-        ret = agora_local_user_subscribe_video(self.user_handle, user_id_t, ctypes.byref(options))
+        
+        if options is  None:
+            inner = VideoSubscriptionOptionsInner()
+        else:
+            inner = VideoSubscriptionOptionsInner.create(options)
+
+        c_ptr = ctypes.byref(inner)
+        ret = agora_local_user_subscribe_video(self.user_handle, ctypes.c_char_p(uid_str), c_ptr)
         return ret
 
     def subscribe_all_video(self, options: VideoSubscriptionOptions):
-        ret = agora_local_user_subscribe_all_video(self.user_handle, ctypes.byref(VideoSubscriptionOptionsInner.create(options)))
+        if options is  None:
+            inner = VideoSubscriptionOptionsInner()
+        else:
+            inner = VideoSubscriptionOptionsInner.create(options)
+        ret = agora_local_user_subscribe_all_video(self.user_handle, ctypes.byref(inner))
         return ret
 
     def unsubscribe_video(self, user_id):
-        user_id_t = user_id.encode('utf-8')
-        ret = agora_local_user_unsubscribe_video(self.user_handle, user_id_t)
+        if user_id is None:
+            return -1
+        uid_str = user_id.encode('utf-8')
+        ret = agora_local_user_unsubscribe_video(self.user_handle, ctypes.c_char_p(uid_str))
         if ret < 0:
             logger.error("Failed to unsubscribe video")
         else:
