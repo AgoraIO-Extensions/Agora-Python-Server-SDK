@@ -50,12 +50,12 @@ class MyAudioFrameObserver(IAudioFrameObserver):
         self._silence_pack = bytearray(320)
         """
         # Recommended  configurations:  
-            # For not-so-noisy environments, use this configuration: (16, 30, 20, 0.7, 0.5, 70, 70, -50)  
-            # For noisy environments, use this configuration: (16, 30, 20, 0.7, 0.5, 70, 70, -40)  
-            # For high-noise environments, use this configuration: (16, 30, 20, 0.7, 0.5, 70, 70, -30)
+            # For not-so-noisy environments, use this configuration: (16, 30, 50, 0.7, 0.5, 70, 70, -50)  
+            # For noisy environments, use this configuration: (16, 30, 50, 0.7, 0.5, 70, 70, -40)  
+            # For high-noise environments, use this configuration: (16, 30, 50, 0.7, 0.5, 70, 70, -30)
          """
 
-        self._vad_instance = AudioVadV2(AudioVadConfigV2(16, 30, 30, 0.7, 0.5, 70, 70, -50))
+        self._vad_instance = AudioVadV2(AudioVadConfigV2(16, 30, 50, 0.7, 0.5, 70, 70, -50))
         self._dump_path = './vad'
         self._vad_dump = VadDump(self._dump_path)
         self._vad_dump.open()
@@ -186,8 +186,15 @@ def main():
     # note: set_playback_audio_frame_before_mixing_parameters must be call before register_audio_frame_observer
     localuser.set_playback_audio_frame_before_mixing_parameters(1, 16000)
     audio_observer = MyAudioFrameObserver()
-    vad_configure  = AudioVadConfigV2(16, 30, 30, 0.7, 0.5, 70, 70, -50)
+    vad_configure  = AudioVadConfigV2(16, 30, 50, 0.7, 0.5, 70, 70, -50)
     localuser.register_audio_frame_observer(audio_observer, 1, vad_configure)
+
+    #sub 
+    remote_uid = "123"
+    localuser.subscribe_audio(remote_uid)
+    localuser.unsubscribe_audio(remote_uid)
+    localuser.subscribe_video(remote_uid, None)
+    localuser.unsubscribe_video(remote_uid)
 
     # ret = localuser.get_user_role()
     # localuser.set_user_role(con_config.client_role_type)
