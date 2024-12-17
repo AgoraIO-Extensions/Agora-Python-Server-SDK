@@ -67,7 +67,7 @@ class AudioConsumer:
         pass
  
     def consume(self):
-        print("consume begin")
+        #print("consume begin")
         if self._init == False:
             return -1
         now = time.time()*1000
