@@ -117,3 +117,6 @@ class IRTCLocalUserObserver():
 
     def on_user_state_changed(self, agora_local_user, user_id, state):
         pass
+    # data is bytearray object, is diff to on_stream_msg which is str object
+    def on_audio_meta_data_received(self, agora_local_user, user_id, data):
+        pass

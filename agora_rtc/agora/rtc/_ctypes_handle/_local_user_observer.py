@@ -44,6 +44,7 @@ ON_INTRA_REQUEST_RECEIVED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE)
 ON_REMOTE_SUBSCRIBE_FALLBACK_TO_AUDIO_ONLY_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, user_id_t, ctypes.c_int)
 ON_STREAM_MESSAGE_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, user_id_t, ctypes.c_int, ctypes.c_char_p, ctypes.c_size_t)
 ON_USER_STATE_CHANGED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, user_id_t, ctypes.c_uint32)
+ON_AUDIO_META_DATA_RECEIVED_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, user_id_t, ctypes.c_char_p, ctypes.c_size_t)
 
 
 class RTCLocalUserObserverInner(ctypes.Structure):
@@ -85,7 +86,8 @@ class RTCLocalUserObserverInner(ctypes.Structure):
         ("on_intra_request_received", ON_INTRA_REQUEST_RECEIVED_CALLBACK),
         ("on_remote_subscribe_fallback_to_audio_only", ON_REMOTE_SUBSCRIBE_FALLBACK_TO_AUDIO_ONLY_CALLBACK),
         ("on_stream_message", ON_STREAM_MESSAGE_CALLBACK),
-        ("on_user_state_changed", ON_USER_STATE_CHANGED_CALLBACK)
+        ("on_user_state_changed", ON_USER_STATE_CHANGED_CALLBACK),
+        ("on_audio_meta_data_received", ON_AUDIO_META_DATA_RECEIVED_CALLBACK)
     ]
 
     def __init__(self, local_user_observer: IRTCLocalUserObserver, local_user: 'LocalUser') -> None:
@@ -128,6 +130,7 @@ class RTCLocalUserObserverInner(ctypes.Structure):
         self.on_remote_subscribe_fallback_to_audio_only = ON_REMOTE_SUBSCRIBE_FALLBACK_TO_AUDIO_ONLY_CALLBACK(self._on_remote_subscribe_fallback_to_audio_only)
         self.on_stream_message = ON_STREAM_MESSAGE_CALLBACK(self._on_stream_message)
         self.on_user_state_changed = ON_USER_STATE_CHANGED_CALLBACK(self._on_user_state_changed)
+        self.on_audio_meta_data_received = ON_AUDIO_META_DATA_RECEIVED_CALLBACK(self._on_audio_meta_data_received)
 
     """
     it seems that this interface does not provide much value to the user's business, 
@@ -348,3 +351,8 @@ class RTCLocalUserObserverInner(ctypes.Structure):
         logger.debug(f"LocalUserCB _on_user_state_changed: {local_user_handle}, {user_id}, {state}")
         user_id_str = user_id.decode('utf-8') if user_id else ""
         self.local_user_observer.on_user_state_changed(self.local_user, user_id_str, state)
+    def _on_audio_meta_data_received(self, local_user_handle, user_id, audio_meta_data, size):
+        user_id_str = user_id.decode('utf-8') if user_id else ""
+        bytes_from_c = bytearray(ctypes.string_at(audio_meta_data, size))
+        
+        self.local_user_observer.on_audio_meta_data_received(self.local_user, user_id_str, bytes_from_c)

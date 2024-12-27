@@ -223,6 +223,15 @@ agora_local_user_set_audio_scenario = agora_lib.agora_local_user_set_audio_scena
 agora_local_user_set_audio_scenario.restype = AGORA_API_C_INT
 agora_local_user_set_audio_scenario.argtypes = [AGORA_HANDLE, ctypes.c_int]
 
+#verison 2.2.0
+
+#AGORA_API_C_INT agora_local_user_send_audio_meta_data(AGORA_HANDLE agora_local_user, const char* meta_data, size_t length);
+agora_local_user_send_aduio_meta_data = agora_lib.agora_local_user_send_audio_meta_data
+agora_local_user_send_aduio_meta_data.restype = AGORA_API_C_INT
+agora_local_user_send_aduio_meta_data.argtypes = [AGORA_HANDLE, ctypes.c_char_p, ctypes.c_size_t]
+
+
+
 
 class LocalUser:
     def __init__(self, local_user_handle, connection):
@@ -593,4 +602,13 @@ class LocalUser:
 
     def set_audio_scenario(self, scenario_type: AudioScenarioType):
         ret = agora_local_user_set_audio_scenario(self.user_handle, scenario_type.value)
+        return ret
+    # data can be str or bytes/bytearray object,is diff to send_sream_message which is a str object
+    def send_audio_meta_data(self, data):
+        # chang to ctypes.c_char_p
+        if isinstance(data, str):
+            data = data.encode('utf-8')
+        c_data = ctypes.create_string_buffer(bytes(data))
+        size = len(data)
+        ret = agora_local_user_send_aduio_meta_data(self.user_handle, c_data, ctypes.c_size_t(size))
         return ret
