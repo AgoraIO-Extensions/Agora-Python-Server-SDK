@@ -1105,6 +1105,7 @@ class AgoraServiceConfigInner(ctypes.Structure):
         ('audio_scenario', ctypes.c_int),
 
         ('use_string_uid', ctypes.c_int),
+        ('domain_limit', ctypes.c_int),
     ]
 
     def get(self):
@@ -1117,7 +1118,8 @@ class AgoraServiceConfigInner(ctypes.Structure):
             area_code=self.area_code,
             channel_profile=self.channel_profile,
             audio_scenario=self.audio_scenario,
-            use_string_uid=self.use_string_uid
+            use_string_uid=self.use_string_uid,
+            domain_limit=self.domain_limit
         )
 
     @staticmethod
@@ -1131,7 +1133,8 @@ class AgoraServiceConfigInner(ctypes.Structure):
             config.area_code,
             config.channel_profile,
             config.audio_scenario,
-            config.use_string_uid
+            config.use_string_uid,
+            config.domain_limit
         )
 
 

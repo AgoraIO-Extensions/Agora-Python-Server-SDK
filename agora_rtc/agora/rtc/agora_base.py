@@ -307,6 +307,15 @@ class AgoraServiceConfig:
     channel_profile: ChannelProfileType = ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING
     audio_scenario: AudioScenarioType = AudioScenarioType.AUDIO_SCENARIO_CHORUS
     use_string_uid: int = 0
+    #version 2.2.0
+    # default to 0
+    domain_limit: int = 0
+    '''
+    // if >0, when remote user muted itself, the onplaybackbeforemixing will be still called badk with active pacakage
+	// if <=0, when remote user muted itself, the onplaybackbeforemixing will be no longer called back
+	// default to 0, i.e when muted, no callback will be triggered
+    '''
+    should_callbck_when_muted: int = 0
 
 
 @dataclass(kw_only=True)

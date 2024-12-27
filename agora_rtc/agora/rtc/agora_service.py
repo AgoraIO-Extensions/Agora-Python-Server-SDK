@@ -92,6 +92,10 @@ class AgoraService:
         # force audio vad v2 to be enabled
         agora_parameter.set_parameters("{\"che.audio.label.enable\": true}")
 
+        #versio 2.2.0 for callback when muted
+        if config.should_callbck_when_muted > 0:
+            agora_parameter.set_parameters("{\"rtc.audio.enable_user_silence_packet\": true}")
+
         if config.log_path:
             log_size = 512 * 1024
             if config.log_size > 0:
