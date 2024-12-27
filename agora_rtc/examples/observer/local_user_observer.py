@@ -40,4 +40,7 @@ class ExampleLocalUserObserver(IRTCLocalUserObserver):
     def on_user_audio_track_state_changed(self, agora_local_user, user_id, agora_remote_audio_track, state, reason, elapsed):
         print(f"on_user_audio_track_state_changed: user_id={user_id},state={state}, reason={reason}, elapsed={elapsed}")
         pass
+    def on_audio_meta_data_received(self, agora_local_user, user_id, data):
+        print(f"on_audio_meta_data_received: user_id={user_id}, data={data}")
+        pass
     
