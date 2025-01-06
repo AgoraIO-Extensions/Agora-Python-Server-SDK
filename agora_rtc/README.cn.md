@@ -37,6 +37,17 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # 更新日志
+## 2025.01.07 发布 2.2.0
+-- 更新：
+  -- 更新sdk 版本，从4.4.30更新到4.4.31 ok
+-- 增加：serviceconfigure
+  -- 增加domain_limit ok
+  -- 增加should_callback_when_muted: ok
+  -- ExternalVideoFrame::增加colorspacetype，支持虚拟人场景下的纯色背景的编码：ok
+-- 增加：
+  -- AudioMetaData接口:localuser::send_audio_meta_data ok
+  -- OnAudioMetaDataReceived 回调接localuserObserver::on_audio_meta_data_received, ok
+-- sample 修改
 ## 2024.12.17 发布 2.1.7  
 --修改：
   修改了LocalUser::sub/unsub audio/video中typeError的问题

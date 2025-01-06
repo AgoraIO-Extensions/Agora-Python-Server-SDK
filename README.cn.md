@@ -37,7 +37,7 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # 更新日志
-## 2024.12.28 发布 2.2.0
+## 2025.01.07 发布 2.2.0
 -- 更新：
   -- 更新sdk 版本，从4.4.30更新到4.4.31 ok
 -- 增加：serviceconfigure

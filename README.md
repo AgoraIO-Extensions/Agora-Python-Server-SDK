@@ -35,6 +35,18 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # Change log
+2025.01.08 Release 2.2.0
+-- Updates:
+  - Update the SDK version from 4.4.30 to 4.4.31. Done.
+-- FEAT:
+  - Add serviceconfigure.
+    - Add domain_limit. Done.
+    - Add should_callback_when_muted. Done.
+    - Add colorspacetype to ExternalVideoFrame to support the encoding of solid-color backgrounds in virtual human scenarios. Done.
+-- FEAT:
+  - Add the AudioMetaData interface: localuser::send_audio_meta_data. Done.
+  - Add the OnAudioMetaDataReceived callback to localuserObserver::on_audio_meta_data_received. Done.
+-- Sample modifications.
 2024.12.17 Release 2.1.7
 --Changes:
 
