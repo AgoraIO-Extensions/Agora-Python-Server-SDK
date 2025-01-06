@@ -432,6 +432,13 @@ class VideoEncoderConfiguration:
     mirror_mode: int = 0
     encode_alpha: int = 0
 
+@dataclass(kw_only=True)
+class ColorSpaceType:
+    primaries_id: int = 0
+    transfer_id: int = 0
+    matrix_id: int = 0
+    range_id: int = 0
+
 
 @dataclass(kw_only=True)
 class ExternalVideoFrame:
@@ -454,6 +461,7 @@ class ExternalVideoFrame:
     alpha_buffer: bytearray = None
     fill_alpha_buffer: int = 0
     alpha_mode: int = 0
+    color_space: ColorSpaceType = field(default_factory=ColorSpaceType)
 
 
 @dataclass(kw_only=True)

@@ -718,6 +718,29 @@ class RemoteVideoTrackStatsInner(ctypes.Structure):
             stats.total_active_time,
             stats.publish_duration
         )
+    
+class ColorSpaceTypeInner(ctypes.Structure):
+    _fields_ = [
+        ("primaries_id", ctypes.c_int),
+        ("transfer_id", ctypes.c_int),
+        ("matrix_id", ctypes.c_int),
+        ("range_id", ctypes.c_int)
+    ]
+    def get(self):
+        return ColorSpaceType(
+            primaries_id=self.primaries_id,
+            transfer_id=self.transfer_id,
+            matrix_id=self.matrix_id,
+            range_id=self.range_id
+        )
+    @staticmethod
+    def create(colorspace:ColorSpaceType) -> 'ColorSpaceTypeInner':
+        return ColorSpaceTypeInner(
+            primaries_id=colorspace.primaries_id,
+            transfer_id=colorspace.transfer_id,
+            matrix_id=colorspace.matrix_id,
+            range_id=colorspace.range_id
+        )
 
 
 class ExternalVideoFrameInner(ctypes.Structure):
@@ -741,7 +764,8 @@ class ExternalVideoFrameInner(ctypes.Structure):
         ("metadata_size", ctypes.c_int),
         ("alpha_buffer", ctypes.c_void_p),
         ("fill_alpha_buffer", ctypes.c_uint8),
-        ("alpha_mode", ctypes.c_int)
+        ("alpha_mode", ctypes.c_int),
+        ("color_space", ColorSpaceTypeInner)
     ]
 
     def get(self):
@@ -765,7 +789,8 @@ class ExternalVideoFrameInner(ctypes.Structure):
             metadata_size=self.metadata_size,
             alpha_buffer=self.alpha_buffer,
             fill_alpha_buffer=self.fill_alpha_buffer,
-            alpha_mode=self.alpha_mode
+            alpha_mode=self.alpha_mode,
+            color_space=self.color_space.get()
         )
 
     @staticmethod
@@ -815,7 +840,8 @@ class ExternalVideoFrameInner(ctypes.Structure):
             c_metadata_size,
             c_alpha_buffer_ptr,
             frame.fill_alpha_buffer,
-            frame.alpha_mode
+            frame.alpha_mode,
+            ColorSpaceTypeInner.create(frame.color_space)
         )
 
 
