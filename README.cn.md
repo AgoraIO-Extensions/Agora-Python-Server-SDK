@@ -43,7 +43,7 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 -- 增加：serviceconfigure
   -- 增加domain_limit ok
   -- 增加should_callback_when_muted: ok
-  -- ExternalVideoFrame::增加colorspacetype，支持虚拟人场景下的纯色背景的编码
+  -- ExternalVideoFrame::增加colorspacetype，支持虚拟人场景下的纯色背景的编码：ok
 -- 增加：
   -- AudioMetaData接口:localuser::send_audio_meta_data ok
   -- OnAudioMetaDataReceived 回调接localuserObserver::on_audio_meta_data_received, ok
