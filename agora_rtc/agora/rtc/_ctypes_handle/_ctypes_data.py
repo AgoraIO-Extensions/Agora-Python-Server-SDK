@@ -809,12 +809,13 @@ class ExternalVideoFrameInner(ctypes.Structure):
         else:
             c_alpha_buffer_ptr = ctypes.c_void_p(0)
 
-        c_metadata_size = len (frame.metadata)
+        c_metadata_size = len (frame.metadata) if frame.metadata is not None else 0
         if frame.metadata is not None and c_metadata_size > 0:
             c_metadata_ptr = (ctypes.c_uint8 * len(frame.metadata)).from_buffer(frame.metadata)
             c_metadata_size = len(frame.metadata)
         else:
-            c_metadata_ptr = ctypes.c_void_p(0)
+            #c_metadata_ptr = ctypes.c_void_p(0)
+            c_metadata_ptr  = ctypes.POINTER(ctypes.c_uint8)()
             c_metadata_size = 0
        
         
