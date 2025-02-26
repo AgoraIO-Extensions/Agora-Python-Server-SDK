@@ -31,6 +31,8 @@ AudioConsumer调用方式：
     E 退出的时候，调用release()方法，释放资源
 """
 class AudioConsumer:
+    MIN_BUFFER_SIZE = 10
+    RTC_E2E_DELAY = 200 # e2e delay 90ms for iphone, 120ms for android;150ms for web. so we use 200ms here
     def __init__(self, pcm_sender: AudioPcmDataSender, sample_rate: int, channels: int) -> None:
         self._lock = threading.Lock()
         self._start_time = 0
@@ -45,11 +47,12 @@ class AudioConsumer:
         #audio parame
         self._frame.bytes_per_sample = 2
         self._bytes_per_frame = sample_rate // 100 * channels * 2
-        self._samples_per_channel = sample_rate // 100* channels
+        self._samples_per_channel = sample_rate // 100
         #init pcmaudioframe
         self._frame.timestamp = 0
 
         self._init = True
+        self._last_consume_time = 0
         
         pass
     def push_pcm_data(self, data) ->None:
@@ -64,6 +67,7 @@ class AudioConsumer:
             return
         self._start_time = time.time()*1000
         self._consumed_packages = 0
+        self._last_consume_time = self._start_time
         pass
  
     def consume(self):
@@ -75,13 +79,16 @@ class AudioConsumer:
         expected_total_packages = int(elapsed_time//10)
         besent_packages = expected_total_packages - self._consumed_packages
         data_len = len(self._data)
+        #if data is not empty, to update last consume time
+        if data_len > 0:
+            self._last_consume_time = now
 
-        if besent_packages > 18 and data_len //self._bytes_per_frame < 18: #for fist time, if data_len is not enough, just return and wait for next time
+        if besent_packages > AudioConsumer.MIN_BUFFER_SIZE and data_len //self._bytes_per_frame < AudioConsumer.MIN_BUFFER_SIZE: #for fist time, if data_len is not enough, just return and wait for next time
             #print("-----underflow data")
             return -2
-        if besent_packages > 18: #rest to start state, push 18 packs in Start_STATE
+        if besent_packages > AudioConsumer.MIN_BUFFER_SIZE: #rest to start state, push 18 packs in Start_STATE
             self._reset()
-            besent_packages = min(18, data_len//self._bytes_per_frame)
+            besent_packages = min(AudioConsumer.MIN_BUFFER_SIZE, data_len//self._bytes_per_frame)
             self._consumed_packages = -besent_packages
             
 
@@ -113,6 +120,25 @@ class AudioConsumer:
             return 0
         with self._lock:
             return len(self._data)
+
+    #判断AudioConsumer中的数据是否已经完全推送给了RTC 频道
+    #因为audioconsumer内部有一定的缓存机制，所以当get_remaining_data_size 返回是0的时候，还有数据没有推送给
+    #rtc 频道。如果要判断数据是否完全推送给了rtc 频道，需要调用这个api来做判断。
+    #return value：1--push to rtc completed, 0--push to rtc not completed   -1--error
+    def is_push_to_rtc_completed(self)->int:
+        if self._init == False:
+            return -1
+        with self._lock:
+            remain_size = len(self._data)
+            if remain_size == 0:
+                now = time.time()*1000
+                diff = now - self._last_consume_time
+
+                if diff > AudioConsumer.MIN_BUFFER_SIZE*10 + AudioConsumer.RTC_E2E_DELAY:
+                    return 1
+            
+            return 0
+        pass
     def clear(self):
         if self._init == False:
             return

@@ -35,6 +35,13 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # Change log
+2025.02.26 Release 2.2.1
+--Update：
+  ​- Reduced buffer size from ​180ms​ to ​100ms​ to minimize latency.
+-- Added：
+  - AudioConsumer::is_push_to_rtc_completed： Add audio consumer support for playback state notifications.
+-- ​Bug fix:
+  - Fixed incorrect _samples_per_channel calculation in stereo mode.
 
 2025.01.08 Release 2.2.0
 -- Updates:

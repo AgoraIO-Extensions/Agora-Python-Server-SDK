@@ -37,6 +37,15 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # 更新日志
+## 2025.02.26 发布 2.2.1
+-- sdk 更新：
+  -- sdk更新到20250102版本，优化main线程参考群：？？？
+-- AudioConsumer修改：==>支持业务上能感知对TTS数据的播放状态，包括：开始播放、结束播放；从而可以推送播放状态信息给app端，完成业务诉求 
+  -- AudioConsumer的buffer大小修改为100ms，原来是180ms；ok
+  -- AudioConsumer::_samples_per_channel 在立体声下计算错误的bu g
+  -- AudioConsumer 新增加一个函数：is_push_to_rtc_completed 表示是否已经推送完成？》
+  -- 验证方式：app层启动一个timer，定时的去consume，当数据为空的时候，就通过datastream发送结束的消息给app端，app端收到消息后，渲染出来；通过对app 录制视频来判断文字和语音的同步性；？？？需要测试android·端和iOS端和web 端
+-- 增加：支持私有化的接口 ？？
 ## 2025.01.07 发布 2.2.0
 -- 更新：
   -- 更新sdk 版本，从4.4.30更新到4.4.31 ok
