@@ -7,6 +7,7 @@ import zipfile
 # import urllib
 from urllib import request
 import ssl
+import platform
 ssl._create_default_https_context = ssl._create_unverified_context
 
 
@@ -20,6 +21,9 @@ class CustomInstallCommand(install):
         agora_service_path = os.path.join(site.getsitepackages()[0], 'agora', 'rtc')
         sdk_dir = os.path.join(agora_service_path, "agora_sdk")
         zip_path = os.path.join(agora_service_path, "agora_rtc_sdk.zip")
+        arch = platform.machine()
+        os_type = platform.system()
+
         '''# version before 2.2.0
         #url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.30-20241024_101940-398537.zip"
         #url = "https://download.agora.io/sdk/release/agora_rtc_sdk_mac_rel.v4.4.30_22472_FULL_20241024_1224_398653.zip"
@@ -28,6 +32,10 @@ class CustomInstallCommand(install):
         url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.31-20241223_111509-491956.zip"
         if sys.platform == 'darwin':
             url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.31_23136_FULL_20241223_1245_492039.zip"
+        if arch == "aarch64" and sys.platform == 'linux':
+            url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.31-20250307_175457-603878.zip"
+      
+
 
 
         if os.path.exists(sdk_dir):

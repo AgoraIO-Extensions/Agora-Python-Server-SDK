@@ -8,6 +8,7 @@ from urllib import request
 import ctypes
 import os
 import sys
+import platform
 import logging
 logger = logging.getLogger(__name__)
 ssl._create_default_https_context = ssl._create_unverified_context
@@ -26,6 +27,12 @@ def _check_download_and_extract_sdk():
     sdk_dir = os.path.join(agora_service_path, "agora_sdk")
     zip_path = os.path.join(agora_service_path, "agora_rtc_sdk.zip")
 
+    # for diff os and arch
+    arch = platform.machine()
+    os_type = platform.system()
+
+    
+
     #url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.30-20241024_101940-398537.zip"
     # version 2.2.0 for linux
     url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.31-20241223_111509-491956.zip"
@@ -42,6 +49,9 @@ def _check_download_and_extract_sdk():
         libagora_rtc_sdk_path = os.path.join(sdk_dir, "libAgoraRtcKit.dylib")
         #rtc_md5 = "ca3ca14f9e2b7d97eb2594d1f32dab9f"
         rtc_md5 = "6821cae218c8f31f8d720ac0c77edab0"
+    if arch == "aarch64" and sys.platform == 'linux':
+        url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.31-20250307_175457-603878.zip"
+        rtc_md5 = "436dd59b9aa03f4d9ce919e04afcbe01"
 
 
     if os.path.exists(libagora_rtc_sdk_path) and get_file_md5(libagora_rtc_sdk_path) == rtc_md5:
