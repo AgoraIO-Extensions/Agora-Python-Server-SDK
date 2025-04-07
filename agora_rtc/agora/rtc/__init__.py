@@ -51,7 +51,7 @@ def _check_download_and_extract_sdk():
         rtc_md5 = "6821cae218c8f31f8d720ac0c77edab0"
     if arch == "aarch64" and sys.platform == 'linux':
         url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.31-20250307_175457-603878.zip"
-        rtc_md5 = "436dd59b9aa03f4d9ce919e04afcbe01"
+        rtc_md5 = "41d200483e2e2e913a617c59b9d922b0"
 
 
     if os.path.exists(libagora_rtc_sdk_path) and get_file_md5(libagora_rtc_sdk_path) == rtc_md5:
