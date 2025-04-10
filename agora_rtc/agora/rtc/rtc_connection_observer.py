@@ -88,3 +88,5 @@ class IRTCConnectionObserver():
 
     def on_upload_log_result(self, agora_rtc_conn, request_id_str, success, reason):
         pass
+    def on_encryption_error(self, agora_rtc_conn, error_type: int):
+        pass

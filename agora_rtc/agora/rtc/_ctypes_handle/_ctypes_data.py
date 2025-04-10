@@ -267,7 +267,7 @@ class LocalAudioStatsInner(ctypes.Structure):
     ]
 
     def get(self):
-        return LocalAudioStats(
+        return LocalAudioTrackStats(
             num_channels=self.num_channels,
             sent_sample_rate=self.sent_sample_rate,
             sent_bitrate=self.sent_bitrate,
@@ -276,7 +276,7 @@ class LocalAudioStatsInner(ctypes.Structure):
         )
 
     @staticmethod
-    def create(stats: LocalAudioStats) -> 'LocalAudioStatsInner':
+    def create(stats: LocalAudioTrackStats) -> 'LocalAudioStatsInner':
         return LocalAudioStatsInner(
             stats.num_channels,
             stats.sent_sample_rate,
@@ -1209,4 +1209,40 @@ class EncodedVideoFrameInfoInner(ctypes.Structure):
             info.decode_time_ms,
             info.uid,
             info.stream_type
+        )
+    
+
+
+class EncryptionConfigInner(ctypes.Structure):
+    _fields_ = [
+        ("encryption_mode", ctypes.c_int),
+        ("encryption_key", ctypes.c_char_p),
+        ("encryption_kdf_salt", ctypes.c_uint8 * 32)
+    ]
+
+    def get(self):
+        return EncryptionConfig(
+            encryption_mode=self.encryption_mode,
+            encryption_key=self.encryption_key.decode() if self.encryption_key else "",
+            encryption_kdf_salt=bytearray(bytes(self.encryption_kdf_salt))
+        )   
+
+    @staticmethod
+    def create(config: EncryptionConfig) -> 'EncryptionConfigInner':
+        length = len(config.encryption_kdf_salt) if config.encryption_kdf_salt else 0
+        #   如果length大于32，则设置为32
+        if length > 32:
+            length = 32
+        #change bytearray to uint8 * length
+        if length > 0:
+            encryption_kdf_salt = (ctypes.c_uint8 * length)(*config.encryption_kdf_salt)
+        else:
+            encryption_kdf_salt = (ctypes.c_uint8 * 32)() # 32 bytes,empty array
+        # change encryption_key to c_char_p
+        encryption_key = config.encryption_key.encode('utf-8') if config.encryption_key else None
+        #change None to c_char_p
+        return EncryptionConfigInner(
+            config.encryption_mode,
+            encryption_key,
+            encryption_kdf_salt
         )

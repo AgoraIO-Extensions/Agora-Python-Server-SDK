@@ -44,6 +44,7 @@ ON_STREAM_MESSAGE_ERROR_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, user_id_
 ON_ENCRYPTION_ERROR_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_int)
 ON_UPLOAD_LOG_RESULT_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_char_p, ctypes.c_int, ctypes.c_int)
 
+ON_ENCRYPTION_ERROR_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_int)   
 
 class RTCConnectionObserverInner(ctypes.Structure):
     _fields_ = [
@@ -81,7 +82,8 @@ class RTCConnectionObserverInner(ctypes.Structure):
         ("on_user_account_updated", ON_USER_ACCOUNT_UPDATED_CALLBACK),
         ("on_stream_message_error", ON_STREAM_MESSAGE_ERROR_CALLBACK),
         ("on_encryption_error", ON_ENCRYPTION_ERROR_CALLBACK),
-        ("on_upload_log_result", ON_UPLOAD_LOG_RESULT_CALLBACK)
+        ("on_upload_log_result", ON_UPLOAD_LOG_RESULT_CALLBACK),
+        ("on_encryption_error", ON_ENCRYPTION_ERROR_CALLBACK)
     ]
 
     def __init__(self, conn_observer: IRTCConnectionObserver, connection: 'RTCConnection') -> None:
@@ -118,6 +120,7 @@ class RTCConnectionObserverInner(ctypes.Structure):
         self.on_stream_message_error = ON_STREAM_MESSAGE_ERROR_CALLBACK(self._on_stream_message_error)
         self.on_encryption_error = ON_ENCRYPTION_ERROR_CALLBACK(self._on_encryption_error)
         self.on_upload_log_result = ON_UPLOAD_LOG_RESULT_CALLBACK(self._on_upload_log_result)
+        self.on_encryption_error = ON_ENCRYPTION_ERROR_CALLBACK(self._on_encryption_error)
 
     def _on_connected(self, agora_rtc_conn, conn_info_inner, reason):
         logger.debug(f"ConnCB _on_connected: {agora_rtc_conn}, {conn_info_inner}, {reason}")
@@ -263,3 +266,7 @@ class RTCConnectionObserverInner(ctypes.Structure):
         logger.debug(f"ConnCB _on_upload_log_result: {agora_rtc_conn}, {request_id}, {success}, {reason}")
         _request_id_str = request_id.decode("utf-8") if request_id else ""
         self.conn_observer.on_upload_log_result(self.conn, _request_id_str, success, reason)
+
+    def _on_encryption_error(self, agora_rtc_conn, error_type):
+        logger.debug(f"ConnCB _on_encryption_error: {agora_rtc_conn}, {error_type}")
+        self.conn_observer.on_encryption_error(self.conn, error_type)
