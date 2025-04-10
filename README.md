@@ -35,6 +35,20 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # Change log
+2025.04.10 Release 2.2.2
+-- Additions:
+  - Added push_video_encoded_file.py to support pushing mp4 files and h264 encoded h.264 files. Includes conversion from mp4 file avformat to raw 264 stream in annex B format.
+-- Additions:
+  - Added set_log_file_filter function to set the log filter level.
+-- Additions:
+  - Added support for arm64 version, but currently this version does not support audio label algorithm. Therefore, it is not supported on arm64!
+-- Changes:
+  - Modified localuserstats, local video stats, local audio stats, remote video stats, remote audio stats.
+-- Additions:
+  - Added connection::agora_rtc_conn_enable_encryption.
+-- Additions:
+  - Added connectionObserver::on_encryption_error (but not working for now, need to fix in the next monthly version 4.4.32).
+
 2025.02.26 Release 2.2.1
 --Update：
   ​- Reduced buffer size from ​180ms​ to ​100ms​ to minimize latency.

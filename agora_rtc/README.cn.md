@@ -37,6 +37,14 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # 更新日志
+## 2025.04.10 发布 2.2.2
+-- Add:
+  - push_video_encoded_file.py: 支持推送mp4文件；支持推送h264编码的h.264文件；其中里面有从mp4文件的avformat转换为raw 264流的annex B格式的转换。
+-- Add：增加set_log_file_filter函数，可以设置日志的过滤级别
+-- 增加arm64版本的支持，但目前该版本不支持audio label 算法！所以在arm64 下不支持！
+-- 修改loalauidostats, local video stats, local audio stats, remote video stats, remote audio stats, 
+-- 增加：connnection::agora_rtc_conn_enable_encryption 
+-- 增加：connectionObserver::on_encryption_error (but not working for now, need to fix in the next monthly version 4.4.32)
 ## 2025.02.26 发布 2.2.1
 -- sdk 更新：
   -- sdk更新到20250102版本，优化main线程参考群：？？？
