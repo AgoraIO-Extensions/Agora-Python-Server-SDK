@@ -59,6 +59,11 @@ agora_service_create_custom_video_track_encoded = agora_lib.agora_service_create
 agora_service_create_custom_video_track_encoded.restype = AGORA_HANDLE
 agora_service_create_custom_video_track_encoded.argtypes = [AGORA_HANDLE, AGORA_HANDLE, ctypes.POINTER(SenderOptionsInner)]
 
+#for version 2.2.2
+agora_service_set_log_filter = agora_lib.agora_service_set_log_filter
+agora_service_set_log_filter.restype = AGORA_API_C_INT
+agora_service_set_log_filter.argtypes = [AGORA_HANDLE, ctypes.c_uint]
+
 
 class AgoraService:
     def __init__(self) -> None:
@@ -70,6 +75,7 @@ class AgoraService:
     def initialize(self, config: AgoraServiceConfig):
         if self.inited == True:
             return 0
+        
         config.app_id = config.appid.encode('utf-8')
         result = agora_service_initialize(self.service_handle, ctypes.byref(AgoraServiceConfigInner.create(config=config)))
         if result == 0:
@@ -96,12 +102,12 @@ class AgoraService:
         if config.should_callbck_when_muted > 0:
             agora_parameter.set_parameters("{\"rtc.audio.enable_user_silence_packet\": true}")
 
+        
         if config.log_path:
             log_size = 512 * 1024
             if config.log_size > 0:
                 log_size = config.log_size
             agora_service_set_log_file(self.service_handle, ctypes.create_string_buffer(config.log_path.encode('utf-8')), log_size)
-
         return result
 
     def release(self):

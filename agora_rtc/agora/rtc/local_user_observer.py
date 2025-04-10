@@ -6,6 +6,7 @@
 # state: int
 # agora_remote_audio_track: RemoteAudioTrack
 """
+from agora.rtc.agora_base import *
 
 
 class IRTCLocalUserObserver():
@@ -25,10 +26,10 @@ class IRTCLocalUserObserver():
     def on_local_audio_track_state_changed(self, agora_local_user, agora_local_audio_track, state, error):
         pass
 
-    def on_local_audio_track_statistics(self, agora_local_user, stats):
+    def on_local_audio_track_statistics(self, agora_local_user, stats:LocalAudioTrackStats):
         pass
 
-    def on_remote_audio_track_statistics(self, agora_local_user, agora_remote_audio_track, stats):
+    def on_remote_audio_track_statistics(self, agora_local_user, agora_remote_audio_track, stats:RemoteAudioTrackStats):
         pass
 
     def on_user_audio_track_subscribed(self, agora_local_user, user_id, agora_remote_audio_track):
@@ -64,7 +65,7 @@ class IRTCLocalUserObserver():
     def on_local_video_track_state_changed(self, agora_local_user, agora_local_video_track, state, error):
         pass
 
-    def on_local_video_track_statistics(self, agora_local_user, agora_local_video_track, stats):
+    def on_local_video_track_statistics(self, agora_local_user, agora_local_video_track, stats:LocalVideoTrackStats):
         pass
 
     def on_user_video_track_subscribed(self, agora_local_user, user_id, info, agora_remote_video_track):
@@ -73,7 +74,7 @@ class IRTCLocalUserObserver():
     def on_user_video_track_state_changed(self, agora_local_user, user_id, agora_remote_video_track, state, reason, elapsed):
         pass
 
-    def on_remote_video_track_statistics(self, agora_local_user, agora_remote_video_track, stats):
+    def on_remote_video_track_statistics(self, agora_local_user, agora_remote_video_track, stats:RemoteVideoTrackStats):
         pass
 
     def on_audio_volume_indication(self, agora_local_user, speakers_list, speaker_number, total_volume):

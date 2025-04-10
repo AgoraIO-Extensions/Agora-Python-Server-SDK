@@ -180,7 +180,7 @@ class RTCLocalUserObserverInner(ctypes.Structure):
         self.local_user_observer.on_local_audio_track_state_changed(self.local_user, audio_track, state, error)
 
     def _on_local_audio_track_statistics(self, local_user_handle, stats):
-        local_audio_stats = stats.contents
+        local_audio_stats = stats.contents.get() if stats else None
         self.local_user_observer.on_local_audio_track_statistics(self.local_user, local_audio_stats)
 
     def _on_user_audio_track_subscribed(self, local_user_handle, user_id, remote_audio_track_handle):
@@ -194,7 +194,7 @@ class RTCLocalUserObserverInner(ctypes.Structure):
 
     def _on_remote_audio_track_statistics(self, local_user_handle, remote_audio_track_handle, stats):
         logger.debug(f"LocalUserCB _on_remote_audio_track_statistics: {local_user_handle}, {remote_audio_track_handle}, {stats}")
-        audio_stats = stats.contents  # RemoteAudioTrackStats
+        audio_stats = stats.contents.get() if stats else None
         remote_audio_track = self.local_user.get_remote_audio_map(remote_audio_track_handle)
         self.local_user_observer.on_remote_audio_track_statistics(self.local_user, remote_audio_track, audio_stats)
 
@@ -246,7 +246,7 @@ class RTCLocalUserObserverInner(ctypes.Structure):
         logger.debug(f"LocalUserCB _on_local_video_track_statistics: {local_user_handle}, {local_video_track_handle}, {stats}")
         # stats: ctypes.pointer to LocalVideoTrackStats
         local_video_track = self.local_user.get_video_map(local_video_track_handle)
-        video_stats = stats.contents
+        video_stats = stats.contents.get() if stats else None
         self.local_user_observer.on_local_video_track_statistics(self.local_user, local_video_track, video_stats)
 
     def _on_user_video_track_subscribed(self, local_user_handle, user_id, video_track_info, remote_video_track_handle):
@@ -269,7 +269,7 @@ class RTCLocalUserObserverInner(ctypes.Structure):
 
     def _on_remote_video_track_statistics(self, local_user_handle, remote_video_track_handle, stats_ptr):
         logger.debug(f"LocalUserCB _on_remote_video_track_statistics: {local_user_handle}, {remote_video_track_handle}, {stats_ptr}")
-        remote_stats = stats_ptr.contents  # RemoteVideoTrackStats
+        remote_stats = stats_ptr.contents.get() if stats_ptr else None
         video_track = self.local_user.get_remote_video_map(remote_video_track_handle)
         self.local_user_observer.on_remote_video_track_statistics(self.local_user, video_track, remote_stats)
 

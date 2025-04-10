@@ -145,7 +145,7 @@ class RTCStats:
 
 
 @dataclass(frozen=True, kw_only=True)
-class LocalAudioStats:
+class LocalAudioTrackStats:
     num_channels: int
     sent_sample_rate: int
     sent_bitrate: int
@@ -512,3 +512,10 @@ class LocalAudioDetailedStats:
     typing_noise_detected: int
     ana_statistics: AnaStats
     apm_statistics: AudioProcessingStats
+
+
+@dataclass(kw_only=True)
+class EncryptionConfig:
+    encryption_mode: int
+    encryption_key: str
+    encryption_kdf_salt: bytearray = None

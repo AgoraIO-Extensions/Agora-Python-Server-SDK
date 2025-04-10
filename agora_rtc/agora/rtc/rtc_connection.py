@@ -51,6 +51,12 @@ agora_rtc_conn_renew_token = agora_lib.agora_rtc_conn_renew_token
 agora_rtc_conn_renew_token.restype = AGORA_API_C_INT
 agora_rtc_conn_renew_token.argtypes = [AGORA_HANDLE, ctypes.c_char_p]
 
+#AGORA_API_C_INT agora_rtc_conn_enable_encryption(AGORA_HANDLE agora_rtc_conn, int enabled, const encryption_config* config);
+
+agora_rtc_conn_enable_encryption = agora_lib.agora_rtc_conn_enable_encryption
+agora_rtc_conn_enable_encryption.restype = AGORA_API_C_INT
+agora_rtc_conn_enable_encryption.argtypes = [AGORA_HANDLE, ctypes.c_int, ctypes.POINTER(EncryptionConfigInner)]
+
 
 class RTCConnection:
     def __init__(self, conn_handle, is_low_delay: bool = False) -> None:
@@ -129,6 +135,22 @@ class RTCConnection:
 
     def get_local_user(self):
         return self.local_user
+   
+    def enable_encryption(self, enabled: int, config: EncryptionConfig) -> int:
+        """
+        Enables or disables encryption for the connection.
+
+        Args:
+            enabled (int): 1 to enable encryption, 0 to disable.
+            config (EncryptionConfig): The encryption configuration.
+
+        Returns:
+            int: The result of the operation. 0 if successful, otherwise an error code.
+        Note:
+            This method must be called before self.connect()
+        """
+        inner_config = EncryptionConfigInner.create(config)
+        return agora_rtc_conn_enable_encryption(self.conn_handle, enabled, ctypes.byref(inner_config))
 
     def release(self):
         # release local user map

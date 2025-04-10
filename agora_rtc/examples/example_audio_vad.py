@@ -81,7 +81,7 @@ class MyAudioFrameObserver(IAudioFrameObserver):
         state, bytes = self._vad_instance.process(audio_frame)
         print("state = ", state, len(bytes) if bytes != None else 0, vad_result_state, len(vad_result_bytearray) if vad_result_bytearray != None else 0)
         # dump to vad for debuging
-        self._vad_dump.write(audio_frame, bytes, state)
+        self._vad_dump.write(audio_frame, vad_result_bytearray, vad_result_state)
         if bytes != None:
             if state == 1:
                 # start speaking: then start send bytes(not audio_frame) to ARS
