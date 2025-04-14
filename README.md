@@ -35,6 +35,11 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # Change log
+
+## 2025.04.14 Release 2.2.3
+-- Fix: 
+  -- Fixed a bug in the salt processing in enable_encryption
+  -- Updated the logic in enable_encryption, no processing when enable is 0
 2025.04.10 Release 2.2.2
 -- Additions:
   - Added push_video_encoded_file.py to support pushing mp4 files and h264 encoded h.264 files. Includes conversion from mp4 file avformat to raw 264 stream in annex B format.
