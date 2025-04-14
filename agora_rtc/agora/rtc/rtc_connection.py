@@ -149,6 +149,9 @@ class RTCConnection:
         Note:
             This method must be called before self.connect()
         """
+        if enabled == 0:
+            return 0
+        
         inner_config = EncryptionConfigInner.create(config)
         return agora_rtc_conn_enable_encryption(self.conn_handle, enabled, ctypes.byref(inner_config))
 
