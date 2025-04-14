@@ -37,6 +37,10 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # 更新日志
+## 2025.04.14 发布 2.2.3
+-- Fix: 
+  -- 修复了enable_encryption 在salt 处理中的一个bug
+  -- 更新在enable_encryption 中的逻辑，当enable为0的时候，不做处理
 ## 2025.04.10 发布 2.2.2
 -- Add:
   - push_video_encoded_file.py: 支持推送mp4文件；支持推送h264编码的h.264文件；其中里面有从mp4文件的avformat转换为raw 264流的annex B格式的转换。
