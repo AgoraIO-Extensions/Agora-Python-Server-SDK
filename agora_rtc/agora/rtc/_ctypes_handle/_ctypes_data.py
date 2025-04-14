@@ -1234,10 +1234,13 @@ class EncryptionConfigInner(ctypes.Structure):
         if length > 32:
             length = 32
         #change bytearray to uint8 * length
-        if length > 0:
-            encryption_kdf_salt = (ctypes.c_uint8 * length)(*config.encryption_kdf_salt)
-        else:
-            encryption_kdf_salt = (ctypes.c_uint8 * 32)() # 32 bytes,empty array
+        encryption_kdf_salt = (ctypes.c_uint8 * 32)() # 32 bytes,empty array
+        # get min length of config.encryption_kdf_salt and 32
+        min_length = min(length, 32)
+        #copy config.encryption_kdf_salt to encryption_kdf_salt
+        for i in range(min_length):
+            encryption_kdf_salt[i] = config.encryption_kdf_salt[i]
+      
         # change encryption_key to c_char_p
         encryption_key = config.encryption_key.encode('utf-8') if config.encryption_key else None
         #change None to c_char_p
