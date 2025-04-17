@@ -180,7 +180,7 @@ def main():
     localuser = connection.get_local_user()
     local_observer = ExampleLocalUserObserver()
     # enable volume indication
-    localuser.set_audio_volume_indication_parameters(100, 3, 1)
+ 
     localuser.register_local_user_observer(local_observer)
 
     # note: set_playback_audio_frame_before_mixing_parameters must be call before register_audio_frame_observer
