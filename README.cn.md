@@ -38,6 +38,8 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 
 # 更新日志
 ## todo：
+## 2025.04.28 发布 2.2.4
+-- 更新：更新rtc sdk 到版本4.4.32
 ## 2025.04.14 发布 2.2.3
 -- Fix: 
   -- 修复了enable_encryption 在salt 处理中的一个bug

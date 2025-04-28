@@ -36,6 +36,8 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 
 # Change log
 
+## 2025.04.28 Release 2.2.4
+-- Update: update rtc sdk from 4.4.31 to 4.4.32
 ## 2025.04.14 Release 2.2.3
 -- Fix: 
   -- Fixed a bug in the salt processing in enable_encryption

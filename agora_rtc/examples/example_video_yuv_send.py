@@ -26,6 +26,7 @@ class RTCProcessIMPL(RTCBaseProcess):
         video_track = agora_service.create_custom_video_track_frame(yuv_data_sender)
         video_config = VideoEncoderConfiguration(
             frame_rate=sample_options.fps,
+            codec_type=VideoCodecType.VIDEO_CODEC_H264,
             dimensions=VideoDimensions(
                 width=sample_options.width,
                 height=sample_options.height

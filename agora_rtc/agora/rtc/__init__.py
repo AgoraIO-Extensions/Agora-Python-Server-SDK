@@ -35,23 +35,26 @@ def _check_download_and_extract_sdk():
 
     #url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.30-20241024_101940-398537.zip"
     # version 2.2.0 for linux
-    url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.31-20241223_111509-491956.zip"
+    #url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.31-20241223_111509-491956.zip"
+    url  = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.32-20250425_144419-675648.zip"
         
            
     libagora_rtc_sdk_path = os.path.join(sdk_dir, "libagora_rtc_sdk.so")
     #rtc_md5 = "7031dd10d1681cd88fd89d68c5b54282"
-    rtc_md5 = "f2a9e3ed15f872cb7e3b62d1528ac5cb"
+    rtc_md5 = "0d6c96bbebdd9b0a84b9cdf01ba6aa7f"
     if sys.platform == 'darwin':
         #url = "https://download.agora.io/sdk/release/agora_rtc_sdk_mac_rel.v4.4.30_22472_FULL_20241024_1224_398653.zip"
         # version   2.2.0 for mac
-        url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.31_23136_FULL_20241223_1245_492039.zip"
+        #url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.31_23136_FULL_20241223_1245_492039.zip"
+        url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.32_24257_FULL_20250425_1609_675722.zip"
 
         libagora_rtc_sdk_path = os.path.join(sdk_dir, "libAgoraRtcKit.dylib")
         #rtc_md5 = "ca3ca14f9e2b7d97eb2594d1f32dab9f"
-        rtc_md5 = "6821cae218c8f31f8d720ac0c77edab0"
+        rtc_md5 = "358be32c5dfc72192402cf49838ea942"
     if arch == "aarch64" and sys.platform == 'linux':
-        url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.31-20250307_175457-603878.zip"
-        rtc_md5 = "41d200483e2e2e913a617c59b9d922b0"
+        #url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.31-20250307_175457-603878.zip"
+        url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.32-20250425_150503-675674.zip"
+        rtc_md5 = "a217a8ed32c964843b120006511121cf"
 
 
     if os.path.exists(libagora_rtc_sdk_path) and get_file_md5(libagora_rtc_sdk_path) == rtc_md5:
