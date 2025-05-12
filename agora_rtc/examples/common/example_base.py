@@ -23,6 +23,11 @@ class RTCBaseProcess():
         # ---------------2. Create Connection
         self.set_conn_config()
         logger.info(f"connect_and_release: {self._conn_config.auto_subscribe_video}, auto_subscribe_audio: {self._conn_config.auto_subscribe_audio}")
+        #change role
+        if sample_options.role == 0:
+            self._conn_config.client_role_type = ClientRoleType.CLIENT_ROLE_AUDIENCE
+        else:
+            self._conn_config.client_role_type = ClientRoleType.CLIENT_ROLE_BROADCASTER 
         connection = agora_service.create_rtc_connection(self._conn_config)
         conn_observer = ExampleConnectionObserver()
         connection.register_observer(conn_observer)
