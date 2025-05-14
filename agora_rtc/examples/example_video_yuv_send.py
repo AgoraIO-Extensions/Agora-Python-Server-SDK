@@ -31,6 +31,8 @@ class RTCProcessIMPL(RTCBaseProcess):
                 width=sample_options.width,
                 height=sample_options.height
             ),
+            bitrate=sample_options.bitrate,
+            min_bitrate=sample_options.bitrate/3,
             #disable or enable alpha encoding 
             #case1: enable alpha encoding:
                 # 1. encode_alpha = 1 

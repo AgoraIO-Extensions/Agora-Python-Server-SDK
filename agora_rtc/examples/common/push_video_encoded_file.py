@@ -113,12 +113,14 @@ def get_sps_pps(codec_context):
     print(f"SPS: {sps.hex(), pps.hex()}")
     return sps+b"\x00\x00\x00\x01" + pps + b"\x00\x00\x00\x01"
 
-async def push_encoded_video_from_file(video_sender: VideoEncodedImageSender, video_file_path, _exit: Event):
+async def push_encoded_video_from_file(video_sender: VideoEncodedImageSender, sample_options, _exit: Event):
     frame_rate = 30
+    video_file_path = sample_options.video_file
+    frame_rate = sample_options.fps
     
     count = 0
-    width = 352
-    height = 288
+    width = sample_options.width
+    height = sample_options.height
     container = av.open(video_file_path)
     for stream in container.streams:
         if stream.type == 'video':

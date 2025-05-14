@@ -85,6 +85,10 @@ class RTCBaseProcess():
                 channel_id = sample_options.channel_id
             else:
                 channel_id = sample_options.channel_id + str(i)
+            #for audience, use same channel_id, and force uid to 0 for this case
+            if sample_options.role == 0:
+                channel_id = sample_options.channel_id
+                sample_options.user_id = 0 
             logger.info(f"------channel_id: {channel_id}, uid: {sample_options.user_id}")
             tasks.append(asyncio.create_task(self.connect_and_release(agora_service, channel_id, sample_options)))
         await asyncio.gather(*tasks)

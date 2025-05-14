@@ -51,7 +51,7 @@ class RTCProcessIMPL(RTCBaseProcess):
         media_node_factory = None
 
     async def send(self, sample_options: ExampleOptions, video_sender):
-        video_task = asyncio.create_task(push_encoded_video_from_file(video_sender, sample_options.video_file, self._exit))
+        video_task = asyncio.create_task(push_encoded_video_from_file(video_sender, sample_options, self._exit))
         await video_task
         logger.info("send finish")
 
