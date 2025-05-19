@@ -108,6 +108,8 @@ class AgoraService:
             if config.log_size > 0:
                 log_size = config.log_size
             agora_service_set_log_file(self.service_handle, ctypes.create_string_buffer(config.log_path.encode('utf-8')), log_size)
+            #change log level to error for testing
+            agora_service_set_log_filter(self.service_handle, 12)
         return result
 
     def release(self):
