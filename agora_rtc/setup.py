@@ -40,7 +40,8 @@ class CustomInstallCommand(install):
         if sys.platform == 'darwin':
             url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.32_24257_FULL_20250425_1609_675722.zip"
         if arch == "aarch64" and sys.platform == 'linux':
-            url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.32-20250425_150503-675674.zip"
+            #url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.32-20250425_150503-675674.zip"
+            url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.31-20250515_101136-700354.zip"
 
 
 
