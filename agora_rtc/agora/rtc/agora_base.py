@@ -60,7 +60,8 @@ class AudioScenarioType(IntEnum):
     AUDIO_SCENARIO_CHATROOM = 5
     AUDIO_SCENARIO_CHORUS = 7
     AUDIO_SCENARIO_MEETING = 8
-    AUDIO_SCENARIO_NUM = 9
+    AUDIO_SCENARIO_AI_SERVER = 9
+    AUDIO_SCENARIO_AI_CLIENT = 10
 
 
 class RawAudioFrameOpModeType(IntEnum):
@@ -305,7 +306,7 @@ class AgoraServiceConfig:
     appid: str = ""
     area_code: int = AreaCode.AREA_CODE_GLOB.value
     channel_profile: ChannelProfileType = ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING
-    audio_scenario: AudioScenarioType = AudioScenarioType.AUDIO_SCENARIO_CHORUS
+    audio_scenario: AudioScenarioType = AudioScenarioType.AUDIO_SCENARIO_AI_SERVER
     use_string_uid: int = 0
     #version 2.2.0
     # default to 0
@@ -316,6 +317,10 @@ class AgoraServiceConfig:
 	// default to 0, i.e when muted, no callback will be triggered
     '''
     should_callbck_when_muted: int = 0
+    log_level: int = 0
+    log_file_size_kb: int = 0
+    data_dir: str = ""
+    config_dir: str = "" #format like: "./agora_rtc_log"
 
 
 @dataclass(kw_only=True)

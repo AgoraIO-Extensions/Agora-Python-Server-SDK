@@ -1133,6 +1133,11 @@ class AgoraServiceConfigInner(ctypes.Structure):
 
         ('use_string_uid', ctypes.c_int),
         ('domain_limit', ctypes.c_int),
+        ('log_level', ctypes.c_int),
+        ('log_file_path', ctypes.c_char_p),
+        ('log_file_size_kb', ctypes.c_uint32),
+        ('data_dir', ctypes.c_char_p),
+        ('config_dir', ctypes.c_char_p),
     ]
 
     def get(self):
@@ -1146,7 +1151,12 @@ class AgoraServiceConfigInner(ctypes.Structure):
             channel_profile=self.channel_profile,
             audio_scenario=self.audio_scenario,
             use_string_uid=self.use_string_uid,
-            domain_limit=self.domain_limit
+            domain_limit=self.domain_limit,
+            log_level=self.log_level,
+            log_path=self.log_file_path.decode() if self.log_file_path else "",
+            log_file_size_kb=self.log_file_size_kb,
+            data_dir=self.data_dir.decode() if self.data_dir else "",
+            config_dir=self.config_dir.decode() if self.config_dir else ""
         )
 
     @staticmethod
@@ -1156,12 +1166,17 @@ class AgoraServiceConfigInner(ctypes.Structure):
             config.enable_audio_device,
             config.enable_video,
             config.context,
-            config.appid.encode(),
+            config.appid.encode() if config.appid else None,
             config.area_code,
             config.channel_profile,
             config.audio_scenario,
             config.use_string_uid,
-            config.domain_limit
+            config.domain_limit,
+            config.log_level,
+            config.log_path.encode() if config.log_path else None,
+            config.log_file_size_kb,
+            config.data_dir.encode() if config.data_dir else None,
+            config.config_dir.encode() if config.config_dir else None
         )
 
 
