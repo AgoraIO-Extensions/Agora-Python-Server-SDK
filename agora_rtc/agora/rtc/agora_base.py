@@ -347,6 +347,31 @@ class RTCConnConfig:
     audio_recv_encoded_frame: int = 0
     video_recv_media_packet: int = 0
 
+class AudioPublishType(IntEnum):
+    AUDIO_PUBLISH_TYPE_NONE = 0
+    AUDIO_PUBLISH_TYPE_PCM = 1
+    AUDIO_PUBLISH_TYPE_ENCODED_PCM = 2
+class VideoPublishType(IntEnum):
+    VIDEO_PUBLISH_TYPE_NONE = 0
+    VIDEO_PUBLISH_TYPE_YUV = 1
+    VIDEO_PUBLISH_TYPE_ENCODED_IMAGE = 2
+
+@dataclass(kw_only=True)
+class SenderOptions:
+    target_bitrate: int=0
+    cc_mode: TCcMode = TCcMode.CC_ENABLED
+    codec_type: VideoCodecType = VideoCodecType.VIDEO_CODEC_H264
+
+
+@dataclass(kw_only=True)
+class RtcConnectionPublishConfig:
+	audio_profile: AudioProfileType = AudioProfileType.AUDIO_PROFILE_DEFAULT
+	audio_scenario: AudioScenarioType = AudioScenarioType.AUDIO_SCENARIO_AI_SERVER
+	is_publish_audio: bool = True  #default to true
+	is_publish_video: bool = False  # default to false
+	audio_publish_type: AudioPublishType = AudioPublishType.AUDIO_PUBLISH_TYPE_PCM
+	video_publish_type: VideoPublishType = VideoPublishType.VIDEO_PUBLISH_TYPE_NONE
+	video_encoded_image_sender_options: 'SenderOptions' = field(default_factory=SenderOptions)
 
 @dataclass(kw_only=True)
 class VideoSubscriptionOptions:
@@ -403,11 +428,7 @@ class VideoDimensions:
     height: int
 
 
-@dataclass(kw_only=True)
-class SenderOptions:
-    target_bitrate: int
-    cc_mode: TCcMode = TCcMode.CC_ENABLED
-    codec_type: VideoCodecType = VideoCodecType.VIDEO_CODEC_NONE
+
 
 
 @dataclass(kw_only=True)
