@@ -168,12 +168,12 @@ class RTCConnection:
         return ret
     
     # send data stream message to connection
-    def send_stream_message(self, stream_id, data) -> int:
+    def send_stream_message(self, data) -> int:
         encoded_data = data.encode('utf-8')
         length = len(encoded_data)
         ret = agora_rtc_conn_send_stream_message(
             self.conn_handle,
-            stream_id,
+            self._data_stream_id,
             encoded_data,
             length
         )
@@ -333,4 +333,9 @@ class RTCConnection:
             self.publish_audio()
         elif self._audio_track:
             self._audio_track.clear_sender_buffer()
+        return ret
+    def send_audio_meta_data(self, data)->int:
+        ret = -1000
+        if self.local_user:
+            ret = self.local_user._send_audio_meta_data(data)
         return ret

@@ -616,7 +616,7 @@ class LocalUser:
         ret = agora_local_user_set_audio_scenario(self.user_handle, scenario_type.value)
         return ret
     # data can be str or bytes/bytearray object,is diff to send_sream_message which is a str object
-    def send_audio_meta_data(self, data):
+    def _send_audio_meta_data(self, data):
         # chang to ctypes.c_char_p
         if isinstance(data, str):
             data = data.encode('utf-8')
