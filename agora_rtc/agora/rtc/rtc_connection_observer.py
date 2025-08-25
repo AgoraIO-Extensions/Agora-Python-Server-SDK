@@ -90,3 +90,23 @@ class IRTCConnectionObserver():
         pass
     def on_encryption_error(self, agora_rtc_conn, error_type: int):
         pass
+    def on_aiqos_capability_missing(self, agora_rtc_conn, recommend_audio_scenario)->int:
+        """
+            //date: 2025-06-27
+        // Triggered when the following two conditions are both met:
+        // 1. The developer sets the connection's scenario to AudioScenarioAiServer.
+        // 2. The version of the SDK on the client side does not support aiqos.
+        // If triggered, it means the client-side version does not support aiqos, and the developer needs to decide to reset the server-side scenario.
+        // How should the developer handle it when the callback is triggered?
+        // 1. If set return value to -1, it means the SDK internally does not handle the scenario incompatibility.
+        // 2. If set return value to a valid scenario, it means the SDK internally automatically falls back to the scenario returned, ensuring compatibility.
+        // how to use it: can ref to examples/ai_send_recv_pcm/ai_send_recv_pcm.go
+
+       @parameters:
+       agora_rtc_conn: the connection object
+       recommend_audio_scenario: the recommended audio scenario
+       @return:
+       -1: the SDK internally does not handle the scenario incompatibility.
+       a valid scenario: the SDK internally automatically falls back to the scenario returned, ensuring compatibility.
+        """
+        pass
