@@ -160,7 +160,7 @@ class AgoraService:
         #default for ai senario to set min delay to 10ms
         if scenario != AudioScenarioType.AUDIO_SCENARIO_AI_SERVER:
             local_track.set_send_delay_ms(10)
-            local_track.set_max_buffer_size(100000)
+            local_track.set_max_buffer_audio_frame_number(100000)
         #and set enable to true
         local_track.set_enabled(True)
         return local_track
