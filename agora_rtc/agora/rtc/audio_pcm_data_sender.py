@@ -8,7 +8,7 @@ agora_audio_pcm_data_sender_send.restype = AGORA_API_C_INT
 agora_audio_pcm_data_sender_send.argtypes = [AGORA_HANDLE, ctypes.c_void_p, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint32]
 
 agora_audio_pcm_data_sender_destroy = agora_lib.agora_audio_pcm_data_sender_destroy
-agora_audio_pcm_data_sender_send.restype = AGORA_API_C_VOID
+agora_audio_pcm_data_sender_destroy.restype = AGORA_API_C_VOID
 agora_audio_pcm_data_sender_destroy.argtypes = [ctypes.c_void_p]
 
 
