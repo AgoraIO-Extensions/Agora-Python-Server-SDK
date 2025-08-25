@@ -25,6 +25,14 @@ class VideoEncodedImageSender:
         if ret != 1:
             logger.error(f"Failed to send video frame, error code: {ret}")
         return ret
+    def send_encoded_video_image_withbytes(self, data, frame_info: EncodedVideoFrameInfo):
+        buffer_size = len(data)
+        if isinstance(data, bytearray):
+            c_data = ctypes.cast(data, ctypes.POINTER(ctypes.c_uint8))
+        else:
+            c_data = ctypes.cast(data, ctypes.POINTER(ctypes.c_uint8))
+        ret = agora_video_encoded_image_sender_send(self.sender_handle, c_data, buffer_size, EncodedVideoFrameInfoInner.create(frame_info)) 
+        return ret
 
     def release(self):
         if self.sender_handle:
