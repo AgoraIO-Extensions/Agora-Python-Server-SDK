@@ -156,5 +156,46 @@ class AudioConsumer:
             self._pcm_sender = None
         self._lock = None
         pass
+class PcmConsumeStats:
+    def __init__(self):
+        self.startTime = 0
+        self.totalLength = 0
+        self.duration = 0
+    def __str__(self):
+        return f"PcmConsumeStats: startTime={self.startTime}, totalLength={self.totalLength}, duration={self.duration}"
+    def __repr__(self):
+        return self.__str__()
+    def is_new_round(self) -> bool:
+        if self.startTime == 0:
+            return True
+        now = int(time.time()*1000)
+        if now - self.startTime > self.duration:
+            return True
+        return False
+    def add_pcm_data(self, data_len: int,sample_rate: int,channels: int):
+        if self.is_new_round():
+            self.reset()
+            self.startTime = int(time.time()*1000)
+            self.totalLength = 0
+            self.duration = 0
 
+        self.totalLength += data_len
+        #change duration to ms
+        bytes_per_frame_in_ms = (sample_rate / 1000) * 2 * channels
+        self.duration = self.totalLength / bytes_per_frame_in_ms
+
+    def is_push_to_rtc_completed(self) -> bool:
+        now = int(time.time()*1000)
+        diff = now - self.startTime
+        print(f"is_push_to_rtc_completed: {diff}, {self.duration}")
+        if diff > self.duration + int(180):
+            return True
+        return False
+        
+    def reset(self):
+        self.startTime = 0
+        self.totalLength = 0
+        self.duration = 0
+    
+    
 
