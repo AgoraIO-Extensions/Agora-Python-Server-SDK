@@ -358,7 +358,7 @@ class VideoPublishType(IntEnum):
 
 @dataclass(kw_only=True)
 class SenderOptions:
-    target_bitrate: int=0
+    target_bitrate: int=3000
     cc_mode: TCcMode = TCcMode.CC_ENABLED
     codec_type: VideoCodecType = VideoCodecType.VIDEO_CODEC_H264
 
