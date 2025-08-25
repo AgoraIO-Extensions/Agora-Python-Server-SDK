@@ -119,6 +119,8 @@ class RTCConnection:
         self._data_stream_id = -1
         self._data_stream_id = self._create_data_stream(False, False)
         #7. register capabilities observer
+        self._capabilities_observer_handle = None
+        self._capabilities_observer_obj = None
         if self.publish_config.audio_scenario == AudioScenarioType.AUDIO_SCENARIO_AI_SERVER:
             self._register_capabilities_observer()
 
