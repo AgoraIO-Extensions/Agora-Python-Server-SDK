@@ -545,3 +545,16 @@ class EncryptionConfig:
     encryption_mode: int
     encryption_key: str
     encryption_kdf_salt: bytearray = None
+@dataclass(kw_only=True)
+class CapabilityItem:
+    id: int
+    name: str
+
+@dataclass(kw_only=True)
+class CapabilityItemMap:
+    item: list = field(default_factory=list)
+    size: int = 0
+@dataclass(kw_only=True)
+class Capabilities:
+    item_map: CapabilityItemMap = None
+    capability_type: int = 0
