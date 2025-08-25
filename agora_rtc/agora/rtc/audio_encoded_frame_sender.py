@@ -27,6 +27,18 @@ class AudioEncodedFrameSender:
         buffer_ptr = ctypes.cast(buffer_ptr, ctypes.POINTER(ctypes.c_void_p))
         ret = agora_audio_encoded_frame_sender_send(self.sender_handle, buffer_ptr, ctypes.c_uint32(buffer_size), ctypes.byref(EncodedAudioFrameInfoInner.create(frame_info)))
         return ret
+    def send_encoded_audio_frame_withbytes(self, data, frame_info: EncodedAudioFrameInfo):
+        buffer_size = len(data)
+       
+            # 将 bytearray 转换为 c_char_p 而不拷贝内存
+        if isinstance(data, bytearray):
+            c_data = ctypes.cast(data, ctypes.POINTER(ctypes.c_void_p))
+        else:
+            # 如果已经是 bytes，直接转换
+            c_data = ctypes.cast(data, ctypes.POINTER(ctypes.c_void_p))
+        
+        ret = agora_audio_encoded_frame_sender_send(self.sender_handle, c_data, ctypes.c_uint32(buffer_size), ctypes.byref(EncodedAudioFrameInfoInner.create(frame_info)))
+        return ret
 
     def release(self):
         if self.sender_handle:
