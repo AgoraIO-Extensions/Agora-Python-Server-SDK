@@ -3,14 +3,16 @@
 import itertools
 import av
 from agora.rtc.agora_base import AudioCodecType, EncodedAudioFrameInfo
-from agora.rtc.audio_encoded_frame_sender import AudioEncodedFrameSender
+from agora.rtc.rtc_connection import RTCConnection
+import asyncio
+import ctypes
 
 from asyncio import Event
 import logging
 logger = logging.getLogger(__name__)
 
 
-async def push_encoded_audio_from_file(audio_sender: AudioEncodedFrameSender, audio_file_path, _exit: Event):
+async def push_encoded_audio_from_file(connection: RTCConnection, audio_file_path, _exit: Event):
     sendinterval = 0.1
     
     container = av.open(audio_file_path)
@@ -35,7 +37,24 @@ async def push_encoded_audio_from_file(audio_sender: AudioEncodedFrameSender, au
                 frame.samples_per_channel = 1024
                 frame.number_of_channels = channels
                 frame.send_even_if_empty = 1
-                ret = audio_sender.send_encoded_audio_frame(packet.buffer_ptr, packet.size, frame)
+                '''
+                NOTE: need convert cytpe.ptr ie. c++ memory pointer to python bytes or bytearray without copy
+                mv = memoryview((ctypes.c_char * buffer_size).from_address(ctypes.addressof(buffer_ptr.contents)))
+
+                # 转换为 bytes 或 bytearray（仍无拷贝）
+                bytes_data = mv.tobytes()  # 如果需要不可变数据
+                byte_array = bytearray(mv)  # 如果需要可变数据
+                '''
+                #cast from int to void_P_ptr
+                #validity check
+                if packet.buffer_ptr == 0:
+                    logger.info("**** packet.buffer_ptr is 0 **********")
+                    continue
+                # cast from int to bytes without copy!!!!
+                buffer_ptr = ctypes.cast(packet.buffer_ptr, ctypes.POINTER(ctypes.c_void_p))
+                mv = memoryview((ctypes.c_char * packet.size).from_address(ctypes.addressof(buffer_ptr.contents)))
+                bytes_data = mv.tobytes()
+                ret = connection.push_audio_encoded_data(bytes_data, frame)
                 time_base = packet.stream.time_base
                 duration_in_seconds = packet.duration * time_base
                 logger.info(f"Read audio packet with size {packet.size} bytes, PTS {packet.pts}, DTS {packet.dts}, duration_in_seconds={duration_in_seconds}")
