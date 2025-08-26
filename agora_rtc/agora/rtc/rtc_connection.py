@@ -130,15 +130,15 @@ class RTCConnection:
                self._audio_sender = self.rtc_engine.media_node_factory.create_audio_pcm_data_sender()
                self._audio_track = self.rtc_engine._create_custom_audio_track_pcm(self._audio_sender, self.publish_config.audio_scenario)
            elif self.publish_config.audio_publish_type == AudioPublishType.AUDIO_PUBLISH_TYPE_ENCODED_PCM:
-               self._audio_encoded_sender = self.rtc_engine.media_node_factory.create_audio_encoded_data_sender()
-               self._audio_track = self.rtc_engine.create_custom_audio_track_encoded(self.audio_encoded_sender)
+               self._audio_encoded_sender = self.rtc_engine.media_node_factory.create_audio_encoded_frame_sender()
+               self._audio_track = self.rtc_engine.create_custom_audio_track_encoded(self._audio_encoded_sender, 1)#mix_mode: MIX_ENABLED = 0, MIX_DISABLED = 1
         if self.publish_config.is_publish_video:
             if self.publish_config.video_publish_type == VideoPublishType.VIDEO_PUBLISH_TYPE_YUV:
                 self._video_sender = self.rtc_engine.media_node_factory.create_video_frame_sender()
                 self._video_track = self.rtc_engine.create_custom_video_track_frame(self._video_sender)
             elif self.publish_config.video_publish_type == VideoPublishType.VIDEO_PUBLISH_TYPE_ENCODED_IMAGE:
-                self._video_encoded_sender = self.rtc_engine.media_node_factory.create_video_encoded_data_sender()
-                self._video_track = self.rtc_engine.create_custom_video_track_encoded(self._video_encoded_sender)
+                self._video_encoded_sender = self.rtc_engine.media_node_factory.create_video_encoded_image_sender()
+                self._video_track = self.rtc_engine.create_custom_video_track_encoded(self._video_encoded_sender, self.publish_config.video_encoded_image_sender_options)
         if self._audio_track:
             self._audio_track.set_enabled(True)
         if self._video_track:
@@ -444,7 +444,7 @@ class RTCConnection:
         if self._audio_sender:
             updated_track = self.rtc_engine._create_custom_audio_track_pcm(self._audio_sender, scenario)
         elif self._audio_encoded_sender:
-            updated_track = self.rtc_engine._create_custom_audio_track_encoded(self._audio_encoded_sender, scenario)
+            updated_track = self.rtc_engine.create_custom_audio_track_encoded(self._audio_encoded_sender, scenario)
             
         if updated_track:
             delayed_del_track = self._audio_track
