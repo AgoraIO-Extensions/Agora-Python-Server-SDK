@@ -358,7 +358,7 @@ class VideoPublishType(IntEnum):
 
 @dataclass(kw_only=True)
 class SenderOptions:
-    target_bitrate: int=3000
+    target_bitrate: int=4160 #4160 is the bitrate recommended for 1080p ref to agorabase.h
     cc_mode: TCcMode = TCcMode.CC_ENABLED
     codec_type: VideoCodecType = VideoCodecType.VIDEO_CODEC_H264
 
