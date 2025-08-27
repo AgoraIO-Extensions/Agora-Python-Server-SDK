@@ -50,7 +50,9 @@ async def push_encoded_audio_from_file(connection: RTCConnection, audio_file_pat
                 if packet.buffer_ptr == 0:
                     logger.info("**** packet.buffer_ptr is 0 **********")
                     continue
-                # cast from int to bytes without copy!!!!
+                # cast from int to bytes without copy!!!!but user Must care the life cycle of the pointer
+                # The pointer returned by packet.buffer_ptr has the same life cycle as the packet
+                # In your case, packet might be freed when you've processed all packets, so the pointer is invalid.
                 buffer_ptr = ctypes.cast(packet.buffer_ptr, ctypes.POINTER(ctypes.c_void_p))
                 mv = memoryview((ctypes.c_char * packet.size).from_address(ctypes.addressof(buffer_ptr.contents)))
                 bytes_data = mv.tobytes()
@@ -59,4 +61,5 @@ async def push_encoded_audio_from_file(connection: RTCConnection, audio_file_pat
                 duration_in_seconds = packet.duration * time_base
                 logger.info(f"Read audio packet with size {packet.size} bytes, PTS {packet.pts}, DTS {packet.dts}, duration_in_seconds={duration_in_seconds}")
                 
+                #note: 1. for send encoded audio, the frequency must be same  the package duration.  or in receive side, the audio will be played with a gap(caused by overflow and underflow)
                 await asyncio.sleep(duration_in_seconds)
