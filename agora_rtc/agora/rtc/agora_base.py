@@ -318,7 +318,7 @@ class AgoraServiceConfig:
     '''
     should_callbck_when_muted: int = 0
     log_level: int = 0
-    log_file_size_kb: int = 0
+    log_file_size_kb: int = 5*1024
     data_dir: str = ""
     config_dir: str = "" #format like: "./agora_rtc_log"
 
