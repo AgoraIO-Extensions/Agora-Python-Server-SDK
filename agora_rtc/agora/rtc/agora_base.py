@@ -452,7 +452,7 @@ class VideoEncoderConfiguration:
     codec_type: VideoCodecType = VideoCodecType.VIDEO_CODEC_H264
     frame_rate: int = 15
     bitrate: int = 0
-    min_bitrate: int = 0
+    min_bitrate: int = -1
     orientation_mode: int = 0
     degradation_preference: int = 0
     mirror_mode: int = 0
