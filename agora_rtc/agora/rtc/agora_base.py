@@ -449,7 +449,7 @@ class EncodedVideoFrameInfo:
 @dataclass(kw_only=True)
 class VideoEncoderConfiguration:
     dimensions: VideoDimensions
-    codec_type: VideoCodecType = VideoCodecType.VIDEO_CODEC_NONE
+    codec_type: VideoCodecType = VideoCodecType.VIDEO_CODEC_H264
     frame_rate: int = 15
     bitrate: int = 0
     min_bitrate: int = 0
