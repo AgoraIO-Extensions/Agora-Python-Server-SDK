@@ -203,12 +203,12 @@ class RTCConnection:
     
     # send data stream message to connection
     def send_stream_message(self, data) -> int:
-        encoded_data = data.encode('utf-8')
-        length = len(encoded_data)
+        length = len(data)
+        c_data = ctypes.c_char_p(data)
         ret = agora_rtc_conn_send_stream_message(
             self.conn_handle,
             self._data_stream_id,
-            encoded_data,
+            c_data,
             length
         )
         return ret
