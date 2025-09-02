@@ -19,6 +19,7 @@ from agora.rtc.local_user import *
 from agora.rtc.local_user_observer import *
 import threading
 from collections import deque
+from common.push_audio_pcm_file import push_pcm_data_from_file
 
 
 # import voicesentencedetection
@@ -107,6 +108,16 @@ def signal_handler(signal, frame):
 
 
 g_runing = True
+#read pcm data from file, return the data in bytes with memoryview to avoid copy
+def read_pcm_data_from_file(sample_rate, num_of_channels, buffer, audio_file):
+
+    bytes_in_ms = int(sample_rate * num_of_channels * 2 / 1000)
+    read_len = audio_file.readinto(buffer)
+    read_len = int(read_len//bytes_in_ms)*bytes_in_ms
+    mv = memoryview(buffer)
+    slice_data = mv[:read_len]
+    return slice_data
+
 
 
 @profile
@@ -162,53 +173,37 @@ def main():
         audio_subs_options=sub_opt,
         enable_audio_recording_or_playout=0,
     )
+    publish_config = RtcConnectionPublishConfig(
+        audio_profile=AudioProfileType.AUDIO_PROFILE_DEFAULT,
+        audio_scenario=AudioScenarioType.AUDIO_SCENARIO_AI_SERVER,
+        is_publish_audio=True,
+        is_publish_video=False,
+        audio_publish_type=AudioPublishType.AUDIO_PUBLISH_TYPE_PCM,
+        video_publish_type=VideoPublishType.VIDEO_PUBLISH_TYPE_NONE,
+        video_encoded_image_sender_options=SenderOptions(target_bitrate=4160, cc_mode=TCcMode.CC_ENABLED, codec_type=VideoCodecType.VIDEO_CODEC_H264)
+    )
 
-    connection = agora_service.create_rtc_connection(con_config)
-    conn_observer = ExampleConnectionObserver()
-    connection.register_observer(conn_observer)
+    connection = agora_service.create_rtc_connection(con_config, publish_config)
 
     connection.connect(appid, channel_id, uid)
 
     # step2:
-    media_node_factory = agora_service.create_media_node_factory()
-    pcm_data_sender = media_node_factory.create_audio_pcm_data_sender()
-    audio_track = agora_service.create_custom_audio_track_pcm(pcm_data_sender)
-
-    audio_consumer  = AudioConsumer(pcm_sender= pcm_data_sender, sample_rate=16000, channels=1)
+    
 
     # step3: localuser:must regiseter before connect
     localuser = connection.get_local_user()
     local_observer = ExampleLocalUserObserver()
     # enable volume indication
  
-    localuser.register_local_user_observer(local_observer)
+    connection.register_local_user_observer(local_observer)
 
     # note: set_playback_audio_frame_before_mixing_parameters must be call before register_audio_frame_observer
     localuser.set_playback_audio_frame_before_mixing_parameters(1, 16000)
     audio_observer = MyAudioFrameObserver()
     vad_configure  = AudioVadConfigV2(16, 30, 50, 0.7, 0.5, 70, 70, -50)
-    localuser.register_audio_frame_observer(audio_observer, 1, vad_configure)
+    connection.register_audio_frame_observer(audio_observer, 1, vad_configure)
 
-    #sub 
-    remote_uid = "123"
-    localuser.subscribe_audio(remote_uid)
-    localuser.unsubscribe_audio(remote_uid)
-    localuser.subscribe_video(remote_uid, None)
-    localuser.unsubscribe_video(remote_uid)
-
-    # ret = localuser.get_user_role()
-    # localuser.set_user_role(con_config.client_role_type)
-
-    # step4: pub
-    audio_track.set_enabled(1)
-    localuser.publish_audio(audio_track)
-    localuser.subscribe_all_audio()
-
-
-
-    # stream msg
-    stream_id = connection.create_data_stream(0, 0)
-    print(f"streamid: {stream_id}")
+    connection.publish_audio()
 
     # set paramter
 
@@ -219,59 +214,29 @@ def main():
 
     global g_runing
 
-    #open for consumer
-    frame_buffer = bytearray(320)
-    audio_file = open ("../test_data/demo.pcm", "rb")
-    file_to_consumer(audio_file, frame_buffer, audio_consumer)
+    #open file for push
+    audio_file_path = "./test_data/demo.pcm"
+    audio_file = open (audio_file_path, "rb")
+    bytes_in_ms = int(16000 * 1 * 2 / 1000)
+    buffer = bytearray(bytes_in_ms*1000*10)
+    with open(audio_file_path, "rb") as audio_file:
+        slice_data = read_pcm_data_from_file(16000, 1, buffer, audio_file)
+        while g_runing:
+            ret = connection.is_push_to_rtc_completed()
+            if ret == True:
+               connection.push_audio_pcm_data(slice_data, 16000, 1)
+            time.sleep(0.05)
 
-    audio_frame = PcmAudioFrame()
-    #init sample rate and channels
-    audio_frame.sample_rate = 16000
-    audio_frame.number_of_channels = 1
-
-    #audio parame
-    audio_frame.bytes_per_sample = 2
-    
-    #init pcmaudioframe
-    audio_frame.timestamp = 0
-    # recv mode
-    while g_runing:
-        remain_len = audio_consumer.len()
-        if remain_len < 320*50*150: #interval*1000/10 *1.5. where 1.5 is the redundancy coeficient
-            file_to_consumer(audio_file, frame_buffer, audio_consumer)
-        ret = audio_consumer.consume()
-        #audio_frame.data = frame_buffer
-        #pcm_data_sender.send_audio_pcm_data(audio_frame)
-        time.sleep(0.05)
 
      # release resource
-    audio_consumer.release()
-    localuser.unpublish_audio(audio_track)
-    audio_track.set_enabled(0)
-
-    localuser.unregister_audio_frame_observer()
-    localuser.unregister_local_user_observer()
-
     connection.disconnect()
-    connection.unregister_observer()
-
-    localuser.release()
+   
     connection.release()
-    
-
-    
-    audio_track.release()
-    pcm_data_sender.release()
-    
-
-    media_node_factory.release()
     agora_service.release()
     
     #set to None
-    audio_track = None
     audio_observer = None
     local_observer = None
-    localuser = None
     connection = None
     agora_service = None
 

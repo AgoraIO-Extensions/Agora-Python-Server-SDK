@@ -3,6 +3,7 @@
 from agora.rtc.audio_pcm_data_sender import PcmAudioFrame, AudioPcmDataSender
 from agora.rtc.utils.audio_consumer import AudioConsumer
 from asyncio import Event
+from agora.rtc.rtc_connection import RTCConnection
 import asyncio
 import datetime
 import logging
@@ -19,28 +20,36 @@ def file_to_consumer(file, buffer, consumer:AudioConsumer):
     pass
 
 
-async def push_pcm_data_from_file(sample_rate, num_of_channels, pcm_data_sender: AudioPcmDataSender, audio_file_path, _exit: Event):
+async def push_pcm_data_from_file(sample_rate, num_of_channels, connection: RTCConnection, audio_file_path, _exit: Event):
     with open(audio_file_path, "rb") as audio_file:
-        pcm_sendinterval = 0.1
+        pcm_sendinterval = 5  #5s send one frame
         pcm_count = 0
         send_size = int(sample_rate*num_of_channels*pcm_sendinterval*2)
         frame_buf = bytearray(send_size)
         interval = 0.06 # 60ms
-        audio_consumer = AudioConsumer(pcm_data_sender,sample_rate, num_of_channels)
-        # at begining:  read all data to consumer
-        file_to_consumer(audio_file, frame_buf, audio_consumer)
+        bytes_in_ms = int(sample_rate * num_of_channels * 2 / 1000)
+
+      
         while not _exit.is_set():
             # check rest len in consumer
-            remain_len = audio_consumer.len()
-            if remain_len < send_size*interval*150: #interval*1000/10 *1.5. where 1.5 is the redundancy coeficient
-                file_to_consumer(audio_file, frame_buf, audio_consumer)
-            ret = audio_consumer.consume()
-            logger.info(f"send pcm: count,ret={ret}")
+            ret = connection.is_push_to_rtc_completed()
+            if ret == True:
+                read_len = audio_file.readinto(frame_buf)
+
+                if read_len < bytes_in_ms*100: #at least 100 frames
+                    audio_file.seek(0)
+                    continue
+                #round to multiple of bytes_in_ms
+                #try memoryview and slice to avoid copy data
+                read_len = int(read_len//bytes_in_ms)*bytes_in_ms
+                mv = memoryview(frame_buf)
+                slice_data = mv[:read_len]
+                connection.push_audio_pcm_data(slice_data, sample_rate, num_of_channels)
             
             await asyncio.sleep(interval)
             
         frame_buf = None
-        audio_consumer.release()
+       
 
 
 async def my_conn_life_timer(cevent, delay):

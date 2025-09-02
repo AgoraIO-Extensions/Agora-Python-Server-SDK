@@ -343,9 +343,9 @@ class RTCLocalUserObserverInner(ctypes.Structure):
         logger.debug(f"LocalUserCB _on_stream_message: {local_user_handle}, {user_id}, {stream_id}, {data}, {size}")
         user_id_str = user_id.decode('utf-8') if user_id else ""
         bytes_from_c = ctypes.string_at(data, size)
-        data_byte_array = bytearray(bytes_from_c).decode()
+        #data_byte_array = bytearray(bytes_from_c).decode()
         # note: do not use date_byte_array.decode()  for the stream msg is binary data, not limited to only text
-        self.local_user_observer.on_stream_message(self.local_user, user_id_str, stream_id, data_byte_array, size)
+        self.local_user_observer.on_stream_message(self.local_user, user_id_str, stream_id, bytes_from_c, size)
 
     def _on_user_state_changed(self, local_user_handle, user_id, state):
         logger.debug(f"LocalUserCB _on_user_state_changed: {local_user_handle}, {user_id}, {state}")

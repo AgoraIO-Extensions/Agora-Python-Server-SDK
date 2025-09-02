@@ -25,7 +25,7 @@ class ExampleOptions:
         self.value = 0
         self.dir_path = None #directory path
         self.msg = "hello agora python sdk"
-
+        self.role = 1  # default is broadcaster
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Agora Python SDK Example")
@@ -42,7 +42,7 @@ def parse_args():
     parser.add_argument("--fps", type=int, help="Target frame rate for sending the video stream")
     parser.add_argument("--width", type=int, help="Image width for the YUV file to be sent")
     parser.add_argument("--height", type=int, help="Image height for the YUV file to be sent")
-    parser.add_argument("--bitrate", type=int, help="Target bitrate (bps) for encoding the YUV stream")
+    parser.add_argument("--bitrate", type=int, default=3600, help="Target bitrate (bps) for encoding the YUV stream")
     parser.add_argument("--message", help="The message to be sent")
     parser.add_argument("--hours", default="0", help="The time to run")
     parser.add_argument("--saveToDisk", default=0, help="The time to run")
@@ -51,6 +51,9 @@ def parse_args():
     parser.add_argument("--value", type=int, help="reversed value", default=0)
 
     parser.add_argument("--dir", help="The dir  to be sent")
+
+    # added by wei on 2025/05/12 for role
+    parser.add_argument("--role", type=int, help="role value: 1 for broadcaster; 0 for audience", default=1)
 
     return parser.parse_args()
 
@@ -82,5 +85,5 @@ def parse_args_example() -> ExampleOptions:
     sample_options.mode = args.mode
     sample_options.value = args.value
     sample_options.dir_path = args.dir
-
+    sample_options.role = args.role
     return sample_options

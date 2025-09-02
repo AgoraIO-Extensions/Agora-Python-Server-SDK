@@ -44,7 +44,13 @@ ON_STREAM_MESSAGE_ERROR_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, user_id_
 ON_ENCRYPTION_ERROR_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_int)
 ON_UPLOAD_LOG_RESULT_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_char_p, ctypes.c_int, ctypes.c_int)
 
-ON_ENCRYPTION_ERROR_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_int)   
+ON_ENCRYPTION_ERROR_CALLBACK = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_int)  
+ON_CAPABILITIES_CHANGED_CALLBACK = ctypes.CFUNCTYPE(
+    None,  # return type
+    AGORA_HANDLE,  # agora_capabilities_observer
+    ctypes.POINTER(CapabilitiesInner),  # caps
+    ctypes.c_int  # size
+) 
 
 class RTCConnectionObserverInner(ctypes.Structure):
     _fields_ = [
@@ -270,3 +276,40 @@ class RTCConnectionObserverInner(ctypes.Structure):
     def _on_encryption_error(self, agora_rtc_conn, error_type):
         logger.debug(f"ConnCB _on_encryption_error: {agora_rtc_conn}, {error_type}")
         self.conn_observer.on_encryption_error(self.conn, error_type)
+
+
+
+class CapabilitiesObserverInner(ctypes.Structure):
+    _fields_ = [
+        ("on_capabilities_changed", ON_CAPABILITIES_CHANGED_CALLBACK)
+    ]
+    def __init__(self, conn:'RtcConnection'):
+        self.conn = conn
+        self.on_capabilities_changed = ON_CAPABILITIES_CHANGED_CALLBACK(self._on_capabilities_changed)
+        
+    def _on_capabilities_changed(self, agora_capabilities_observer, ptr_caps_inner, size):
+        print(f"ConnCB _on_capabilities_changed: {agora_capabilities_observer}, {ptr_caps_inner}, {size}")
+        
+        # 正确解析C指针数组
+        # 方法1: 使用ctypes.cast将指针转换为数组
+        caps_list = []
+        for i in range(size):
+            cur_ptr = ptr_caps_inner[i]
+            cur_cap = cur_ptr.get()
+            caps_list.append(cur_cap)
+        self.conn._on_capabilities_changed(caps_list)
+        
+        
+        # 方法2: 直接使用指针算术（更安全的方式）
+        # caps_list = []
+        # for i in range(size.value):
+        #     cap_ptr = ctypes.pointer(ptr_caps_inner.contents)
+        #     cap_ptr = ctypes.cast(cap_ptr, ctypes.POINTER(ctypes.c_void_p))
+        #     cap_ptr.value = ctypes.addressof(ptr_caps_inner.contents) + i * ctypes.sizeof(CapabilitiesInner)
+        #     cap_ptr = ctypes.cast(cap_ptr, ctypes.POINTER(CapabilitiesInner))
+        #     cap_inner = cap_ptr.contents
+        #     cap = cap_inner.get()
+        #     caps_list.append(cap)
+        
+        # 调用回调函数
+

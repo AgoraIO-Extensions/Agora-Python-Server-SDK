@@ -60,7 +60,8 @@ class AudioScenarioType(IntEnum):
     AUDIO_SCENARIO_CHATROOM = 5
     AUDIO_SCENARIO_CHORUS = 7
     AUDIO_SCENARIO_MEETING = 8
-    AUDIO_SCENARIO_NUM = 9
+    AUDIO_SCENARIO_AI_SERVER = 9
+    AUDIO_SCENARIO_AI_CLIENT = 10
 
 
 class RawAudioFrameOpModeType(IntEnum):
@@ -305,7 +306,7 @@ class AgoraServiceConfig:
     appid: str = ""
     area_code: int = AreaCode.AREA_CODE_GLOB.value
     channel_profile: ChannelProfileType = ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING
-    audio_scenario: AudioScenarioType = AudioScenarioType.AUDIO_SCENARIO_CHORUS
+    audio_scenario: AudioScenarioType = AudioScenarioType.AUDIO_SCENARIO_AI_SERVER
     use_string_uid: int = 0
     #version 2.2.0
     # default to 0
@@ -316,6 +317,10 @@ class AgoraServiceConfig:
 	// default to 0, i.e when muted, no callback will be triggered
     '''
     should_callbck_when_muted: int = 0
+    log_level: int = 0
+    log_file_size_kb: int = 5*1024
+    data_dir: str = ""
+    config_dir: str = "" #format like: "./agora_rtc_log"
 
 
 @dataclass(kw_only=True)
@@ -342,6 +347,31 @@ class RTCConnConfig:
     audio_recv_encoded_frame: int = 0
     video_recv_media_packet: int = 0
 
+class AudioPublishType(IntEnum):
+    AUDIO_PUBLISH_TYPE_NONE = 0
+    AUDIO_PUBLISH_TYPE_PCM = 1
+    AUDIO_PUBLISH_TYPE_ENCODED_PCM = 2
+class VideoPublishType(IntEnum):
+    VIDEO_PUBLISH_TYPE_NONE = 0
+    VIDEO_PUBLISH_TYPE_YUV = 1
+    VIDEO_PUBLISH_TYPE_ENCODED_IMAGE = 2
+
+@dataclass(kw_only=True)
+class SenderOptions:
+    target_bitrate: int=4160 #4160 is the bitrate recommended for 1080p ref to agorabase.h
+    cc_mode: TCcMode = TCcMode.CC_ENABLED
+    codec_type: VideoCodecType = VideoCodecType.VIDEO_CODEC_H264
+
+
+@dataclass(kw_only=True)
+class RtcConnectionPublishConfig:
+	audio_profile: AudioProfileType = AudioProfileType.AUDIO_PROFILE_DEFAULT
+	audio_scenario: AudioScenarioType = AudioScenarioType.AUDIO_SCENARIO_AI_SERVER
+	is_publish_audio: bool = True  #default to true
+	is_publish_video: bool = False  # default to false
+	audio_publish_type: AudioPublishType = AudioPublishType.AUDIO_PUBLISH_TYPE_PCM
+	video_publish_type: VideoPublishType = VideoPublishType.VIDEO_PUBLISH_TYPE_NONE
+	video_encoded_image_sender_options: 'SenderOptions' = field(default_factory=SenderOptions)
 
 @dataclass(kw_only=True)
 class VideoSubscriptionOptions:
@@ -398,11 +428,7 @@ class VideoDimensions:
     height: int
 
 
-@dataclass(kw_only=True)
-class SenderOptions:
-    target_bitrate: int
-    cc_mode: TCcMode = TCcMode.CC_ENABLED
-    codec_type: VideoCodecType = VideoCodecType.VIDEO_CODEC_NONE
+
 
 
 @dataclass(kw_only=True)
@@ -423,10 +449,10 @@ class EncodedVideoFrameInfo:
 @dataclass(kw_only=True)
 class VideoEncoderConfiguration:
     dimensions: VideoDimensions
-    codec_type: VideoCodecType = VideoCodecType.VIDEO_CODEC_NONE
+    codec_type: VideoCodecType = VideoCodecType.VIDEO_CODEC_H264
     frame_rate: int = 15
     bitrate: int = 0
-    min_bitrate: int = 0
+    min_bitrate: int = -1
     orientation_mode: int = 0
     degradation_preference: int = 0
     mirror_mode: int = 0
@@ -519,3 +545,16 @@ class EncryptionConfig:
     encryption_mode: int
     encryption_key: str
     encryption_kdf_salt: bytearray = None
+@dataclass(kw_only=True)
+class CapabilityItem:
+    id: int
+    name: str
+
+@dataclass(kw_only=True)
+class CapabilityItemMap:
+    item: list = field(default_factory=list)
+    size: int = 0
+@dataclass(kw_only=True)
+class Capabilities:
+    item_map: CapabilityItemMap = None
+    capability_type: int = 0

@@ -6,7 +6,9 @@ from common.path_utils import get_log_path_with_filename
 from common.parse_args import parse_args_example, ExampleOptions
 from common.push_video_yuv_file import push_yuv_data_from_file
 from common.example_base import RTCBaseProcess
-from agora.rtc.agora_service import AgoraService, LocalUser, RTCConnection
+from agora.rtc.agora_service import AgoraService
+from agora.rtc.rtc_connection import RTCConnection
+from agora.rtc.local_user import LocalUser
 from agora.rtc.agora_base import *
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -17,13 +19,10 @@ logger = logging.getLogger(__name__)
 
 
 class RTCProcessIMPL(RTCBaseProcess):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, con_config: RTCConnConfig, publish_config: RtcConnectionPublishConfig):
+        super().__init__(con_config, publish_config)
 
     async def setup_in_connection(self, agora_service: AgoraService, connection: RTCConnection, local_user: LocalUser, sample_options: ExampleOptions):
-        media_node_factory = agora_service.create_media_node_factory()
-        yuv_data_sender = media_node_factory.create_video_frame_sender()
-        video_track = agora_service.create_custom_video_track_frame(yuv_data_sender)
         video_config = VideoEncoderConfiguration(
             frame_rate=sample_options.fps,
             codec_type=VideoCodecType.VIDEO_CODEC_H264,
@@ -31,6 +30,8 @@ class RTCProcessIMPL(RTCBaseProcess):
                 width=sample_options.width,
                 height=sample_options.height
             ),
+            bitrate=sample_options.bitrate,
+            min_bitrate=int(sample_options.bitrate/3),
             #disable or enable alpha encoding 
             #case1: enable alpha encoding:
                 # 1. encode_alpha = 1 
@@ -40,26 +41,15 @@ class RTCProcessIMPL(RTCBaseProcess):
                 #2. set ExternalVideoFrame::alpha_buffer = None
             encode_alpha=0
         )
-        video_track.set_video_encoder_configuration(video_config)
+        connection.set_video_encoder_configuration(video_config)
 
-        video_track.set_enabled(1)
-        local_user.publish_video(video_track)
+        connection.publish_video()
+        connection.publish_audio()
 
-        await self.send(sample_options, yuv_data_sender)
+        await self.send(sample_options, connection)
 
-        local_user.unpublish_video(video_track)
-        video_track.set_enabled(0)
-
-        yuv_data_sender.release()
-        video_track.release()
-        media_node_factory.release()
-
-        yuv_data_sender = None
-        video_track = None
-        media_node_factory = None
-
-    async def send(self, sample_options: ExampleOptions, yuv_data_sender):
-        yuv_task = asyncio.create_task(push_yuv_data_from_file(sample_options.width, sample_options.height, sample_options.fps, yuv_data_sender, sample_options.video_file, self._exit))
+    async def send(self, sample_options: ExampleOptions, connection: RTCConnection):
+        yuv_task = asyncio.create_task(push_yuv_data_from_file(sample_options.width, sample_options.height, sample_options.fps, connection, sample_options.video_file, self._exit))
         await yuv_task
         logger.info("send finish")
 
@@ -69,7 +59,37 @@ class RTCProcessIMPL(RTCBaseProcess):
 
 async def run():
     sample_options = parse_args_example()
-    rtc = RTCProcessIMPL()
+    sub_opt = AudioSubscriptionOptions(
+        packet_only=0,
+        pcm_data_only=1,
+        bytes_per_sample=2,
+        number_of_channels=1,
+        sample_rate_hz=16000
+    )
+    con_config = RTCConnConfig(
+        auto_subscribe_audio=1,
+        auto_subscribe_video=1,
+        client_role_type=ClientRoleType.CLIENT_ROLE_BROADCASTER,
+        channel_profile=ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
+        audio_recv_media_packet=0,
+        audio_subs_options=sub_opt,
+        enable_audio_recording_or_playout=0,
+    )
+    publish_config = RtcConnectionPublishConfig(
+        audio_profile=AudioProfileType.AUDIO_PROFILE_DEFAULT,
+        audio_scenario=AudioScenarioType.AUDIO_SCENARIO_AI_SERVER,
+        audio_publish_type=AudioPublishType.AUDIO_PUBLISH_TYPE_PCM,
+        video_publish_type=VideoPublishType.VIDEO_PUBLISH_TYPE_YUV,
+        is_publish_audio=True,
+        is_publish_video=True,
+        video_encoded_image_sender_options=SenderOptions(
+            codec_type=VideoCodecType.VIDEO_CODEC_H264,
+            target_bitrate=3600,
+            cc_mode=TCcMode.CC_ENABLED,
+
+        ),
+    )
+    rtc = RTCProcessIMPL(con_config, publish_config)
     await rtc.run(sample_options, get_log_path_with_filename(sample_options.channel_id, os.path.splitext(__file__)[0]))
 
 

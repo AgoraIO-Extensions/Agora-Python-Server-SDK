@@ -4,17 +4,26 @@
 - 支持Linux和Mac平台。
 - examples只是作为非常简单的演示，不建议在生产环境中使用。
 
-# 非常重要的通知 !!!
-- 一个进程只能有一个实例
-- 一个实例，可以有多个connection
+##  ❗ ❗逻辑关系，非常重要 ❗ ❗
+- 一个进程只能有一个service instance；在进程开始的时候，创建service；在进程结束的时候，销毁service。
+- 一个实例，可以有多个connection，connection可以根据业务需要，随时建立和销毁
 - 所有的observer或者是回调中，都不能在调用sdk自身的api，也不能在回调中做cpu耗时的工作，数据拷贝是可以的。
+- video codec支持情况：
+  - H264： 编码/解码都支持
+  - H265： 解码支持，编码不支持
+  - AV1： 编码/解码都支持，但编码分辨率必须大于360p，否则会回退到H264
+  - VP8： 编码/解码都支持
+  - VP9： 编码/解码都支持
+-如果要接收编码视频：
+  -video_subscription_options.encodedFrameOnly = 1
+  -然后在注册：register_video_encoded_frame_observer
 
 # 所需的操作系统和 Python 版本
 - 支持的 Linux 版本：
   - Ubuntu 18.04 LTS 及以上
   - CentOS 7.0 及以上
   
-- 支持的 Mac 版本:（仅支持开发测试）
+- 支持的 Mac 版本（仅支持开发测试）：
   - MacOS 13 及以上
 
 - Python 版本：
@@ -36,7 +45,67 @@ pip install agora_python_server_sdk
 python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.pcm --sampleRate=16000 --numOfChannels=1
 ```
 
+# todo:
+NOTE:
++[]？没有实现audio_encoded_frame_observer，需要实现。go也没有实现
+
+
+
+NOTE:
+0715版本，不能在onplaybackbeforemixing中，直接做echo audio frame back!
+
 # 更新日志
+## 2025.09.01 发布 2.3.0
+-- update rtc sdk, fixed 2 bugs
+-- 增加对AudioScenarioAiServer 类型scenario的支持
+-- 默认的AudioScenario是AudioScenarioAiServer
+-- 增加对同一个进程中的conneciton，允许配置为不同的scenario，profile
+-- 在创建connection的时候，增加publishconfigure，通过该configure来设置{scenario, profile,publishAudio, publishVideo,ect}
+-- conneciton中，增加了：
+  - RegisterLocalUserObserver, RegisterAudioFrameObserver, RegisterVideoFrameObserver,RegisterVideoEncodedFrameObserver
+  - PublishAudio/UnpublsihAudio, PublishVideo/UnpublsihVideo
+  - PushAudioPcmData/PushAudioEncodedData, PushVideoFrame/PushVideoEncodedData
+  - InterruptAudio：支持打断功能
+  - IsPushToRTCCompleted方法
+  - OnAIQoSCapabilityMissing回调接口的实现
+  - SendAudioMetaData方法
+  - 不在需要人工调用CreateDataStream，内部自动默认
+-- 不对外公开的方法：
+  - 不再需要开发者人工带用 newMediaNodeFactory
+  - 不在需要开发者人工调用：NewCustomAudioTrackPcm, NewCustomAudioTrackEncoded, NewCustomVideoTrack等
+  - 不在需要开发者人工调用：NewAudioPcmDataSender等sender
+  - 不在需要开发者人工调用 unregisterAudioFrameObserver, unregisterVideoFrameObserver等observer
+-- 集成方式： ❗具体集成方式，如何做升级，请咨询SA
+1. config = AgoraServiceConfig()
+2.agora_service = AgoraService()
+  agora_service.initialize(config)
+3.con = agora_service.create_rtc_connection(con_config, publish_config)
+4. register observer;
+  -4.1 con.register_observer(conHandler)
+  -4.2 con.register_audio_frame_observer(audioFrameObserver)
+  -4.3 con.register_local_user_observer(localUserObserver)
+5. con.connect(token, channelName, userId)
+6. con.publish_audio or con.publish_video
+7. con.push_audio_pcm_data/push_audio_encoded_data or con.push_video_frame/push_video_encoded_data
+8. con.disconnect
+9. con.release
+10.agora_service.release()
+Note1: 步骤1、2在进程启动的时候调用一次，后面不在需要调用；步骤10在进程退出的时候调用一次，后面不在需要调用。
+循环步骤3-9，可以支持多connection。
+
+Note2：
+  1、对AI场景，推荐用AudioScenarioAIServer，该模式针对ai的模式，内部做了优化，在降低延迟的同时，能提高弱网体验。(相比chorus，在iphone下，回环延迟低20～30ms，同时弱网下，体验更好)。服务端用AIServer scenario，客户端一定要用AIClient Scenario，否则，语音会有异常。（支持AIClient scenario的sdk版本请咨询SA）
+2、对非AI场景，可以配备别的scenario，推荐咨询agora技术支持，以确保在该设置下，能和客户的业务场景匹配
+3、在释放conneciton的时候，不再需要人工调用unregister observer，内部会自动unregister
+核心变更汇总：
+| **Before**                     | **After 2.3.0**                     |
+|-------------------------------|-------------------------------------|
+| Manual `CreateDataStream`     | ✅ Automatic                        |
+| Manual observer unregistration | ✅ Automatic on `Release()`         |
+| Fixed per-process scenario    | ✅ Multi-scenario per process      |
+| Client/Server scenario mismatch| ❗ `AIClient` mandatory for AI use |  
+ ❗ ❗关键提示：支持AICLient scenario的sdk版本请咨询SA
+
 ## 2025.04.28 发布 2.2.4
 -- 更新：更新rtc sdk 到版本4.4.32
 ## 2025.04.14 发布 2.2.3
@@ -100,7 +169,6 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 - 增加： on_volume_indication 回调
 - 增加： on_remote_video_track_state_changed 回调
 - 更新：更新有关的samples：audioconsume, vad sample
-
 ## 2024.11.15 发布 2.1.4
 - 修改videoFrame中的metadata的类型从str修改bytes类型，和c++保持一致；从而可以支持字节流；
 - 修改了内部对ExteranlVideoFrame的封装，从而支持字节流；对alpha编码的支持，做了逻辑判断，如果fill_alpha_buffer 为0 ，则不处理
@@ -122,7 +190,7 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 
 - 修复了一些 bug
 
-#### 常见用法Q&A
+### 常见用法Q&A
 ## serveice和进程的关系？
 - 一个进程只能有一个service，只能对service做一次初始化；
 - 一个service，只能有一个media_node_factory；
@@ -141,9 +209,6 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 - 当用户退出的时候，con.disconnect()并释放跟随该conn 的audio/video track，observer等，但不调用con.release();然后将该con 放回connection pool中；
 - 在进程退出的时候，释放和 connedtion pool（对每一个con.release()
 释放 service/media_node_factory 和 connedtion pool（对每一个con.release()），这样就可以保证资源的释放和性能最优
-
-
-
 
 ## VAD的使用
 # source code: voice_detection.py
@@ -250,7 +315,7 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ## LLM的结果什么时候交给TTS做合成？
   LLM的结果是异步返回的，而且都是流式返回的。应该按照什么时机将LLM的结果交给TTS做合成呢？
   需要考虑2个因素：
-  1. 确保TTS合成的语音是没有歧义：确保TTS合成的语音是没有歧义、而且是完整、连续的。比如LLM返回的文本是："中间的首都是北京吗？"如果我们给TTS的是：中  然后是：国首  然后是：是北   然后是：京吗？  这样合成会有歧义，因为"中"和"国"之间没有空格，"首"和"是"之间没有空格，"京"和"吗"之间没有空格。
+  1. 无歧义、连续、流畅：确保TTS合成的语音是没有歧义、而且是完整、连续的。比如LLM返回的文本是："中间的首都是北京吗？"如果我们给TTS的是：中  然后是：国首  然后是：是北   然后是：京吗？  这样合成会有歧义，因为"中"和"国"之间没有空格，"首"和"是"之间没有空格，"京"和"吗"之间没有空格。
   2. 确保整个流程延迟最低。LLM 生成完成后，在交给TTS，这样的处理方式，合成的语音一定是没有歧义，而且是连续的。但延迟会很大，对用户体验不友好。
   推荐的方案：
     将有LLM返回数据的时候：
@@ -281,11 +346,13 @@ startRmsThreshold 和 stopRmsThreshold:
 在嘈杂环境中可以调高到 -40 到 -30 之间，以减少误检。
 根据实际使用场景和音频特征进行微调可获得最佳效果。
 
-stopReecognizeCount: 反映在识别到非人声的情况下，需要等待多长时间才认为用户已经停止说话。可以用来控制说话人相邻语句的间隔，在该间隔内，VAD会将相邻的语句当作一段话。如果时间短，相邻语句就越容易被识别为2段话。通常推荐50～80
+stopReecognizeCount: 反映在识别到非人声的情况下，需要等待多长时间才认为用户已经停止说话。可以用来控制说话人相邻语句的间隔，在该间隔内，VAD会将相邻的语句当作一段话。如果该值短，相邻语句就越容易被识别为2段话。通常推荐50～80。
 比如：下午好，[interval_between_sentences]北京有哪些好玩的地方？
 如果说话人语气之间的间隔interval_between_sentences 大于stopReecognizeCount，那么VAD就会将上述识别为2个vad：
 vad1: 下午好
 vad2: 北京有哪些好玩的地方？
 如果interval_between_sentences 小于 stopReecognizeCount，那么VAD就会将上述识别为1个vad：
 vad： 下午好，北京有哪些好玩的地方？
+
 如果对延迟敏感，可以调低该值，或者咨询研发，在降低该值的情况下，应该如何在应用层做处理，在保障延迟的情况下，还能确保语意的连续性，不会产生AI被敏感的打断的感觉。
+

@@ -1,7 +1,7 @@
 #!env python
 
 from agora.rtc.video_frame_sender import ExternalVideoFrame, VideoFrameSender
-
+from agora.rtc.rtc_connection import RTCConnection
 from asyncio import Event
 import asyncio
 import datetime
@@ -14,7 +14,7 @@ import time
 logger = logging.getLogger(__name__)
 
 
-async def push_yuv_data_from_file(width, height, fps, video_sender: VideoFrameSender, video_file_path, _exit: Event):
+async def push_yuv_data_from_file(width, height, fps, connection: RTCConnection, video_file_path, _exit: Event):
     # logger.warning(f'push_yuv_data_from_file time:{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]}')
 
     first_frame = None
@@ -39,7 +39,7 @@ async def push_yuv_data_from_file(width, height, fps, video_sender: VideoFrameSe
             frame.timestamp = 0
             frame.metadata = bytearray(b'hello metadata')
             #frame.alpha_buffer = first_frame
-            ret = video_sender.send_video_frame(frame)
+            ret = connection.push_video_frame(frame)
             yuv_count += 1
             logger.info("send yuv: count,ret=%d, %s", yuv_count, ret)
             await asyncio.sleep(yuv_sendinterval)
@@ -136,7 +136,7 @@ def jpeg_to_bytearray(file_path):
         return width, height, byte_data
 
 
-async def push_jpeg_from_file(path, video_sender, fps, _exit:Event):
+async def push_jpeg_from_file(path, connection: RTCConnection, fps, _exit:Event):
     #file_path = '/Users/weihognqin/Downloads/zhipusource/image_67208e95d8c26bb498989948_1730186920.788217.jpeg'
     # 指定你想要遍历的目录路径 ， format： '/path/to/your/directory'
     print("path:", path)
@@ -193,7 +193,7 @@ async def push_jpeg_from_file(path, video_sender, fps, _exit:Event):
             frame.timestamp = 0
             frame.metadata = bytearray(b'hello metadata')
             #frame.alpha_buffer = first_frame
-            ret = video_sender.send_video_frame(frame)
+            ret = connection.push_video_frame(frame)
             rgb_count += 1
             logger.info("send jpg: count,ret=%d, %d, %d, %d, %d", rgb_count, ret, width, height,time.time()*1000)
 
