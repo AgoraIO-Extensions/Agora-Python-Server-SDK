@@ -9,7 +9,9 @@ from common.push_video_yuv_file import push_yuv_data_from_file
 from common.example_base import RTCBaseProcess
 from observer.audio_frame_observer import ExampleAudioFrameObserver
 from observer.video_frame_observer import ExampleVideoFrameObserver
-from agora.rtc.agora_service import AgoraService, LocalUser, RTCConnection
+from agora.rtc.agora_service import AgoraService
+from agora.rtc.rtc_connection import RTCConnection
+from agora.rtc.local_user import LocalUser
 from agora.rtc.agora_base import *
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -20,68 +22,69 @@ logger = logging.getLogger(__name__)
 
 
 class RTCProcessIMPL(RTCBaseProcess):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, con_config: RTCConnConfig, publish_config: RtcConnectionPublishConfig):
+        super().__init__(con_config, publish_config)
 
     async def setup_in_connection(self, agora_service: AgoraService, connection: RTCConnection, local_user: LocalUser, sample_options: ExampleOptions):
-        media_node_factory = agora_service.create_media_node_factory()
+        
         local_user.set_playback_audio_frame_before_mixing_parameters(1, 16000)
         audio_frame_observer = ExampleAudioFrameObserver(save_to_disk=sample_options.save_to_disk)
-        ret = local_user.register_audio_frame_observer(audio_frame_observer, 0, None)
-        if ret < 0:
-            logger.error(f"register_audio_frame_observer failed")
-            return
+        ret = connection.register_audio_frame_observer(audio_frame_observer, 0, None)
+        
         video_frame_observer = ExampleVideoFrameObserver(save_to_disk=sample_options.save_to_disk)
-        local_user.register_video_frame_observer(video_frame_observer)
+        connection.register_video_frame_observer(video_frame_observer)
 
-        pcm_data_sender = media_node_factory.create_audio_pcm_data_sender()
-        audio_track = agora_service.create_custom_audio_track_pcm(pcm_data_sender)
-        yuv_data_sender = media_node_factory.create_video_frame_sender()
-        video_track = agora_service.create_custom_video_track_frame(yuv_data_sender)
+        connection.publish_audio()
+        connection.publish_video()
 
-        audio_track.set_enabled(1)
-        local_user.publish_audio(audio_track)
-        video_track.set_enabled(1)
-        local_user.publish_video(video_track)
+        await self.send(sample_options, connection)
 
-        await self.send(sample_options, pcm_data_sender, yuv_data_sender)
 
-        local_user.unpublish_audio(audio_track)
-        local_user.unpublish_video(video_track)
-        audio_track.set_enabled(0)
-        video_track.set_enabled(0)
-        local_user.unregister_audio_frame_observer()
-        local_user.unregister_video_frame_observer()
-
-        pcm_data_sender.release()
-        audio_track.release()
-        yuv_data_sender.release()
-        video_track.release()
-        media_node_factory.release()
-
-        pcm_data_sender = None
-        audio_track = None
-        yuv_data_sender = None
-        video_track = None
-        media_node_factory = None
-        audio_frame_observer = None
-        video_frame_observer = None
-
-    async def send(self, sample_options: ExampleOptions, pcm_data_sender, yuv_data_sender):
-        pcm_task = asyncio.create_task(push_pcm_data_from_file(sample_options.sample_rate, sample_options.num_of_channels, pcm_data_sender, sample_options.audio_file, self._exit))
-        yuv_task = asyncio.create_task(push_yuv_data_from_file(sample_options.width, sample_options.height, sample_options.fps, yuv_data_sender, sample_options.video_file, self._exit))
+    async def send(self, sample_options: ExampleOptions, connection: RTCConnection):
+        pcm_task = asyncio.create_task(push_pcm_data_from_file(sample_options.sample_rate, sample_options.num_of_channels, connection, sample_options.audio_file, self._exit))
+        yuv_task = asyncio.create_task(push_yuv_data_from_file(sample_options.width, sample_options.height, sample_options.fps, connection, sample_options.video_file, self._exit))
         await pcm_task
         await yuv_task
         logger.info("send finish")
 
     def set_conn_config(self):
-        self._conn_config.auto_subscribe_video = 1
-        self._conn_config.auto_subscribe_audio = 1
+        pass
+    def set_serv_config(self):
+        self._serv_config.enable_video = 1
+        pass
+        
 
 
 async def run():
     sample_options = parse_args_example()
-    rtc = RTCProcessIMPL()
+    sub_opt = AudioSubscriptionOptions(
+        packet_only=0,
+        pcm_data_only=1,
+        bytes_per_sample=2,
+        number_of_channels=1,
+        sample_rate_hz=16000
+    )
+    con_config = RTCConnConfig(
+        auto_subscribe_audio=1,
+        auto_subscribe_video=1,
+        client_role_type=ClientRoleType.CLIENT_ROLE_BROADCASTER,
+        channel_profile=ChannelProfileType.CHANNEL_PROFILE_LIVE_BROADCASTING,
+        audio_recv_media_packet=0,
+        audio_subs_options=sub_opt,
+        enable_audio_recording_or_playout=0,
+    )
+    publish_config = RtcConnectionPublishConfig(
+        audio_profile=AudioProfileType.AUDIO_PROFILE_DEFAULT,
+        audio_scenario=AudioScenarioType.AUDIO_SCENARIO_AI_SERVER,
+        audio_publish_type=AudioPublishType.AUDIO_PUBLISH_TYPE_PCM,
+        video_publish_type=VideoPublishType.VIDEO_PUBLISH_TYPE_YUV,
+        is_publish_audio=True,
+        is_publish_video=True,
+        video_encoded_image_sender_options=SenderOptions(
+            codec_type=VideoCodecType.VIDEO_CODEC_H264,
+        ),
+    )
+    rtc = RTCProcessIMPL(con_config, publish_config)
     await rtc.run(sample_options, get_log_path_with_filename(sample_options.channel_id, os.path.splitext(__file__)[0]))
 
 

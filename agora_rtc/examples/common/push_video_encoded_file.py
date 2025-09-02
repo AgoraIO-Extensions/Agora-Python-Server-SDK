@@ -4,7 +4,8 @@ import itertools
 import av
 import av.packet
 from agora.rtc.agora_base import AudioCodecType
-from agora.rtc.video_encoded_image_sender import EncodedVideoFrameInfo, VideoEncodedImageSender
+from agora.rtc.video_encoded_image_sender import EncodedVideoFrameInfo
+from agora.rtc.rtc_connection import RTCConnection
 
 from asyncio import Event
 import logging
@@ -14,6 +15,27 @@ import os
 logger = logging.getLogger(__name__)
 
 
+def convert_intptr_to_bytes_without_copy(int_ptr:int, size:int):
+    '''
+    NOTE: need convert cytpe.ptr ie. c++ memory pointer to python bytes or bytearray without copy
+    mv = memoryview((ctypes.c_char * buffer_size).from_address(ctypes.addressof(buffer_ptr.contents)))
+
+    # 转换为 bytes 或 bytearray（仍无拷贝）
+    bytes_data = mv.tobytes()  # 如果需要不可变数据
+    byte_array = bytearray(mv)  # 如果需要可变数据
+    '''
+    #cast from int to void_P_ptr
+    #validity check
+    if int_ptr == 0:
+        logger.info("**** int_ptr is 0 **********")
+        return None
+    # cast from int to bytes without copy!!!!but user Must care the life cycle of the pointer
+    # The pointer returned by packet.buffer_ptr has the same life cycle as the packet
+    # In your case, packet might be freed when you've processed all packets, so the pointer is invalid.
+    buffer_ptr = ctypes.cast(int_ptr, ctypes.POINTER(ctypes.c_void_p))
+    mv = memoryview((ctypes.c_char * size).from_address(ctypes.addressof(buffer_ptr.contents)))
+    bytes_data = mv.tobytes()
+    return bytes_data
 
 #can work in file write: by wei on 0313
 def convert_to_annex_b(packet, sps_pss):
@@ -113,7 +135,7 @@ def get_sps_pps(codec_context):
     print(f"SPS: {sps.hex(), pps.hex()}")
     return sps+b"\x00\x00\x00\x01" + pps + b"\x00\x00\x00\x01"
 
-async def push_encoded_video_from_file(video_sender: VideoEncodedImageSender, sample_options, _exit: Event):
+async def push_encoded_video_from_file(connection: RTCConnection, sample_options, _exit: Event):
     frame_rate = 30
     video_file_path = sample_options.video_file
     frame_rate = sample_options.fps
@@ -206,7 +228,11 @@ async def push_encoded_video_from_file(video_sender: VideoEncodedImageSender, sa
         
         
         if is_h264_file:
-            ret = video_sender.send_encoded_video_image(packet.buffer_ptr, packet.buffer_size, encoded_video_frame_info)
+            bytes_data = convert_intptr_to_bytes_without_copy(packet.buffer_ptr, packet.buffer_size)
+            if bytes_data is None:
+                logger.info("bytes_data is None")
+                continue
+            ret = connection.push_video_encoded_data(bytes_data, encoded_video_frame_info)
         else:
 
             if packet.is_keyframe:
@@ -232,7 +258,11 @@ async def push_encoded_video_from_file(video_sender: VideoEncodedImageSender, sa
 
             # 获取指针的内存地址（转换为 int 类型）
                 #buffer_address = ctypes.addressof(buffer_ptr.contents)
-            ret = video_sender.send_encoded_video_image(new_packet.buffer_ptr, new_packet.buffer_size, encoded_video_frame_info)
+            bytes_data = convert_intptr_to_bytes_without_copy(new_packet.buffer_ptr, new_packet.buffer_size)
+            if bytes_data is None:
+                logger.info("bytes_data is None")
+                continue
+            ret = connection.push_video_encoded_data(bytes_data, encoded_video_frame_info)
         count += 1
         logger.info(f"count,ret={count}, {ret}")
         await asyncio.sleep(1.0/frame_rate)

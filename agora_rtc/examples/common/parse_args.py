@@ -42,7 +42,7 @@ def parse_args():
     parser.add_argument("--fps", type=int, help="Target frame rate for sending the video stream")
     parser.add_argument("--width", type=int, help="Image width for the YUV file to be sent")
     parser.add_argument("--height", type=int, help="Image height for the YUV file to be sent")
-    parser.add_argument("--bitrate", type=int, help="Target bitrate (bps) for encoding the YUV stream")
+    parser.add_argument("--bitrate", type=int, default=3600, help="Target bitrate (bps) for encoding the YUV stream")
     parser.add_argument("--message", help="The message to be sent")
     parser.add_argument("--hours", default="0", help="The time to run")
     parser.add_argument("--saveToDisk", default=0, help="The time to run")
