@@ -3,7 +3,7 @@ import ctypes
 
 from .agora_base import *
 from .media_node_factory import *
-from .rtc_connection import *
+
 from .audio_pcm_data_sender import *
 from .local_audio_track import *
 from .rtc_connection_observer import *
@@ -35,13 +35,14 @@ agora_service_create_custom_audio_track_pcm = agora_lib.agora_service_create_cus
 agora_service_create_custom_audio_track_pcm.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
 agora_service_create_custom_audio_track_pcm.restype = AGORA_HANDLE
 
+agora_service_create_direct_custom_audio_track_pcm = agora_lib.agora_service_create_direct_custom_audio_track_pcm
+agora_service_create_direct_custom_audio_track_pcm.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
+agora_service_create_direct_custom_audio_track_pcm.restype = AGORA_HANDLE
+
 agora_service_create_custom_audio_track_encoded = agora_lib.agora_service_create_custom_audio_track_encoded
 agora_service_create_custom_audio_track_encoded.argtypes = [AGORA_HANDLE, AGORA_HANDLE, ctypes.c_int]
 agora_service_create_custom_audio_track_encoded.restype = AGORA_HANDLE
 
-agora_rtc_conn_create = agora_lib.agora_rtc_conn_create
-agora_rtc_conn_create.restype = AGORA_HANDLE
-agora_rtc_conn_create.argtypes = [AGORA_HANDLE, ctypes.POINTER(RTCConnConfigInner)]
 
 agora_service_create_custom_video_track_frame = agora_lib.agora_service_create_custom_video_track_frame
 agora_service_create_custom_video_track_frame.restype = AGORA_HANDLE
@@ -71,6 +72,8 @@ class AgoraService:
 
         # set tag???
         self.inited = False
+        #default to None, and never create it manually by developer from ver2.3.0
+        self.media_node_factory = None
 
     def initialize(self, config: AgoraServiceConfig):
         if self.inited == True:
@@ -81,8 +84,9 @@ class AgoraService:
         if result == 0:
             self.inited = True
         logger.debug(f'Initialization result: {result}')
-        self._is_low_delay = True if  config.audio_scenario == AudioScenarioType.AUDIO_SCENARIO_CHORUS  else False
-        
+           
+        #create media node factory
+        self.media_node_factory = self._create_media_node_factory()
 
         # to enable plugin
         provider = "agora.builtin"
@@ -102,14 +106,6 @@ class AgoraService:
         if config.should_callbck_when_muted > 0:
             agora_parameter.set_parameters("{\"rtc.audio.enable_user_silence_packet\": true}")
 
-        
-        if config.log_path:
-            log_size = 512 * 1024
-            if config.log_size > 0:
-                log_size = config.log_size
-            agora_service_set_log_file(self.service_handle, ctypes.create_string_buffer(config.log_path.encode('utf-8')), log_size)
-            #change log level to error for testing
-            agora_service_set_log_filter(self.service_handle, 12)
         return result
 
     def release(self):
@@ -118,12 +114,15 @@ class AgoraService:
 
         if self.service_handle:
             agora_service_release(self.service_handle)
+        if self.media_node_factory:
+            self.media_node_factory.release()
+            self.media_node_factory = None
 
         self.inited = False
         self.service_handle = None
 
     # createMediaNodeFactory: to create a medianode factory object
-    def create_media_node_factory(self):
+    def _create_media_node_factory(self):
         if not self.inited:
             logger.error("AgoraService is not initialized. Please call initialize() first.")
             return None
@@ -136,29 +135,34 @@ class AgoraService:
         agora_parameter = agora_service_get_agora_parameter(self.service_handle)
         if not agora_parameter:
             return None
+        from .agora_parameter import AgoraParameter
         return AgoraParameter(agora_parameter)
 
-    def create_rtc_connection(self, con_config: RTCConnConfig):
+    def create_rtc_connection(self, con_config: RTCConnConfig, publish_config: RtcConnectionPublishConfig):
         if not self.inited:
             logger.error("AgoraService is not initialized. Please call initialize() first.")
             return None
-        rtc_conn_handle = agora_rtc_conn_create(self.service_handle, ctypes.byref(RTCConnConfigInner.create(con_config)))
-        if rtc_conn_handle is None:
-            return None
-        return RTCConnection(rtc_conn_handle, self._is_low_delay)
+        from .rtc_connection import RTCConnection
+        return RTCConnection(self, con_config, publish_config)
 
     # createCustomAudioTrackPcm: creatae a custom audio track from pcm data sender
-    def create_custom_audio_track_pcm(self, audio_pcm_data_sender: AudioPcmDataSender) -> LocalAudioTrack:
+    def _create_custom_audio_track_pcm(self, audio_pcm_data_sender: AudioPcmDataSender, scenario: AudioScenarioType) -> LocalAudioTrack:
         if not self.inited:
             logger.error("AgoraService is not initialized. Please call initialize() first.")
             return None
-        custom_audio_track = agora_service_create_custom_audio_track_pcm(self.service_handle, audio_pcm_data_sender.sender_handle)
+        if scenario == AudioScenarioType.AUDIO_SCENARIO_AI_SERVER:
+            custom_audio_track = agora_service_create_direct_custom_audio_track_pcm(self.service_handle, audio_pcm_data_sender.sender_handle)
+        else:
+            custom_audio_track = agora_service_create_custom_audio_track_pcm(self.service_handle, audio_pcm_data_sender.sender_handle)
         if custom_audio_track is None:
             return None
         local_track =  LocalAudioTrack(custom_audio_track)
         #default for ai senario to set min delay to 10ms
-        if local_track is not None:
+        if scenario != AudioScenarioType.AUDIO_SCENARIO_AI_SERVER:
             local_track.set_send_delay_ms(10)
+            local_track.set_max_buffer_audio_frame_number(100000)
+        #and set enable to true
+        local_track.set_enabled(True)
         return local_track
     # mix_mode: MIX_ENABLED = 0, MIX_DISABLED = 1
 

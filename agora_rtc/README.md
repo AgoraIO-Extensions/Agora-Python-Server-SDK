@@ -4,9 +4,19 @@
 - The examples are provided as very simple demonstrations and are not recommended for use in production environments.
 
 # Very Important Notice !!!
-- A process can only have one instance.
+- A process can only have one instance,and the instance created in process startup is the global instance,and released in process shutdown.
 - An instance can have multiple connections.
 - In all observers or callbacks, you must not call the SDK's own APIs, nor perform CPU-intensive tasks in the callbacks; data copying is allowed.
+- supported video codec:
+  - H264: support both encoding and decoding
+  - VP8: support both encoding and decoding
+  - VP9: support both encoding and decoding
+  - H265: only decoding is supported, encoding willl support in the future
+  - AV1: both encoding and decoding are suported but if video image's solution is less than 360p, the codec will be changed to H264
+- if you want to recive the encoded video data:
+  - set: video_subscription_options.encodedFrameOnly = 1
+  - and then register: set_encoded_video_frame_observer
+
 
 # Required Operating Systems and Python Versions
 - Supported Linux versions:
@@ -35,6 +45,157 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # Change log
+#2025.09.01  release 2.3.0
+
+Overview
+
+Agora Python SDK version 2.3.0 introduces significant enhancements for real-time audio and video communication, with particular optimizations for AI server scenarios. This release includes API improvements, automation of previously manual processes, and increased flexibility in connection configuration.
+
+New Features
+
+1. AudioScenarioAiServer Support
+
+• Added support for the AudioScenarioAiServer scenario type, now set as the default AudioScenario.
+
+• Enables configuration of different scenarios and profiles for connections within the same process.
+
+• Important: When using AI server scenario, client-side must use AIClient scenario to avoid audio abnormalities. Please consult Agora support for SDK versions supporting AIClient scenario.
+
+2. Enhanced Connection Configuration
+
+• Introduced PublishConfigure parameter in connection creation for setting:
+
+  • Scenario and profile configurations
+
+  • Audio/Video publication settings
+
+  • Other publication parameters
+
+• Added multiple observer registration methods to connections:
+
+  • RegisterLocalUserObserver
+
+  • RegisterAudioFrameObserver
+
+  • RegisterVideoFrameObserver
+
+  • RegisterVideoEncodedFrameObserver
+
+3. Stream Management Improvements
+
+• Added publication control methods:
+
+  • PublishAudio/UnpublishAudio
+
+  • PublishVideo/UnpublishVideo
+
+• Added data pushing methods:
+
+  • PushAudioPcmData/PushAudioEncodedData
+
+  • PushVideoFrame/PushVideoEncodedData
+
+• Added InterruptAudio method for supporting interruption functionality
+
+• Added IsPushToRTCCompleted method for checking push status
+
+• Added SendAudioMetaData method for audio metadata transmission
+
+4. Automation Enhancements
+
+• Eliminated manual CreateDataStream calls - now handled automatically
+
+• Automatic observer unregistration on Release() instead of manual unregistering
+
+• Internal handling of media node factory creation:
+
+  • No longer requires manual calls to newMediaNodeFactory
+
+  • Automatic handling of track creation (NewCustomAudioTrackPcm, NewCustomAudioTrackEncoded, NewCustomVideoTrack)
+
+  • Automatic management of audio data senders (NewAudioPcmDataSender)
+
+Integration Process
+
+The updated integration workflow is as follows:
+
+1. Initialize Agora Service (once per process startup):
+   config = AgoraServiceConfig()
+   agora_service = AgoraService()
+   agora_service.initialize(config)
+   
+
+2. Connection Management (can be looped for multiple connections):
+   # Create connection with configuration
+   con = agora_service.create_rtc_connection(con_config, publish_config)
+   
+   # Register observers
+   con.register_observer(conHandler)
+   con.register_audio_frame_observer(audioFrameObserver)
+   con.register_local_user_observer(localUserObserver)
+   
+   # Connect and publish
+   con.connect(token, channelName, userId)
+   con.publish_audio()  # or con.publish_video()
+   
+   # Push data
+   con.push_audio_pcm_data()  # or push_audio_encoded_data()
+   # or con.push_video_frame()/push_video_encoded_data()
+   
+   # Disconnect and release
+   con.disconnect()
+   con.release()
+   
+
+3. Release Agora Service (once during process termination):
+   agora_service.release()
+   
+
+Performance Recommendations
+
+1. For AI Scenarios:
+   • Use AudioScenarioAIServer for server-side applications
+
+   • Provides optimized performance with lower latency (20-30ms reduction on iPhone compared to chorus)
+
+   • Enhanced experience in weak network conditions
+
+   • Mandatory: Client must use AIClient scenario
+
+2. For Non-AI Scenarios:
+   • Consult Agora technical support for appropriate scenario configuration
+
+   • Ensure configuration matches specific business use cases
+
+Bug Fixes
+
+• Updated RTC SDK with 2 bug fixes
+
+Important Notes
+
+• Backward Compatibility: Review integration code for manual calls that are now automated
+
+• Scenario Matching: Ensure client-server scenario compatibility (AIServer requires AIClient)
+
+• Resource Management: Connection release now automatically handles observer unregistration
+
+• Consult Support: For specific integration guidance and upgrade assistance, contact Agora SA
+
+Summary of Core Changes
+
+Before After 2.3.0
+
+Manual CreateDataStream ✅ Automatic
+
+Manual observer unregistration ✅ Automatic on Release()
+
+Fixed per-process scenario ✅ Multi-scenario per process
+
+Client/Server scenario mismatch ❗ AIClient mandatory for AI use
+
+For detailed implementation guidance and version-specific support, please consult Agora technical support.
+
+
 ## 2025.04.28 Release 2.2.4
 -- Update: update rtc sdk from 4.4.31 to 4.4.32
 ## 2025.04.14 Release 2.2.3
@@ -54,6 +215,7 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
   - Added connection::agora_rtc_conn_enable_encryption.
 -- Additions:
   - Added connectionObserver::on_encryption_error (but not working for now, need to fix in the next monthly version 4.4.32).
+
 2025.02.26 Release 2.2.1
 --Update：
   ​- Reduced buffer size from ​180ms​ to ​100ms​ to minimize latency.
@@ -74,7 +236,6 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
   - Add the AudioMetaData interface: localuser::send_audio_meta_data. Done.
   - Add the OnAudioMetaDataReceived callback to localuserObserver::on_audio_meta_data_received. Done.
 -- Sample modifications.
-
 2024.12.17 Release 2.1.7
 --Changes:
 
@@ -102,7 +263,6 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
   -- Replaced the use of pacer with AudioConsumer for pushing PCM audio.
 - Updates:
   -- Updated the samples related to Pacer and VAD.
-
 ## 2024.12.03 release Version 2.1.5
 - Modifications:
   - LocalUser/audioTrack:
@@ -158,7 +318,6 @@ Fixed some bug.
 - Handle business operations.
 - When a user logs out, execute con.disconnect() and release the audio/video tracks and observers associated with the connection, but do not call con.release(); then put the connection back into the connection pool.
 - When the process exits, release the connection pool (release each con.release()), service/media_node_factory, and the connection pool (release each con.release()) to ensure resource release and optimal performance.
-
 ## Use of VAD
 # Source code: voice_detection.py
 # Sample code: example_audio_vad.py
@@ -189,7 +348,8 @@ Judge the value of state according to the returned state, and do corresponding p
 ### How to push the audio generated by TTS into the channel?
   # Source code: audio_consumer.py
   # Sample code: example_audio_consumer.py
-### How to release resources?
+
+### How to release resource?
 ## 如何释放资源？
     localuser.unpublish_audio(audio_track)
     localuser.unpublish_video(video_track)

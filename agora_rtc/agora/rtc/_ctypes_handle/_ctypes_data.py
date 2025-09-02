@@ -1133,6 +1133,11 @@ class AgoraServiceConfigInner(ctypes.Structure):
 
         ('use_string_uid', ctypes.c_int),
         ('domain_limit', ctypes.c_int),
+        ('log_level', ctypes.c_int),
+        ('log_file_path', ctypes.c_char_p),
+        ('log_file_size_kb', ctypes.c_uint32),
+        ('data_dir', ctypes.c_char_p),
+        ('config_dir', ctypes.c_char_p),
     ]
 
     def get(self):
@@ -1146,7 +1151,12 @@ class AgoraServiceConfigInner(ctypes.Structure):
             channel_profile=self.channel_profile,
             audio_scenario=self.audio_scenario,
             use_string_uid=self.use_string_uid,
-            domain_limit=self.domain_limit
+            domain_limit=self.domain_limit,
+            log_level=self.log_level,
+            log_path=self.log_file_path.decode() if self.log_file_path else "",
+            log_file_size_kb=self.log_file_size_kb,
+            data_dir=self.data_dir.decode() if self.data_dir else "",
+            config_dir=self.config_dir.decode() if self.config_dir else ""
         )
 
     @staticmethod
@@ -1156,12 +1166,17 @@ class AgoraServiceConfigInner(ctypes.Structure):
             config.enable_audio_device,
             config.enable_video,
             config.context,
-            config.appid.encode(),
+            config.appid.encode() if config.appid else None,
             config.area_code,
             config.channel_profile,
             config.audio_scenario,
             config.use_string_uid,
-            config.domain_limit
+            config.domain_limit,
+            config.log_level,
+            config.log_path.encode() if config.log_path else None,
+            config.log_file_size_kb,
+            config.data_dir.encode() if config.data_dir else None,
+            config.config_dir.encode() if config.config_dir else None
         )
 
 
@@ -1248,4 +1263,95 @@ class EncryptionConfigInner(ctypes.Structure):
             config.encryption_mode,
             encryption_key,
             encryption_kdf_salt
+        )
+
+
+class CapabilityItemInner(ctypes.Structure):
+    _fields_ = [
+        ("id", ctypes.c_uint8),
+        ("name", ctypes.c_char_p)
+    ]
+
+    def get(self):
+        return CapabilityItem(
+            id=self.id,
+            name=self.name.decode() if self.name else ""
+        )
+
+    @staticmethod
+    def create(item: CapabilityItem) -> 'CapabilityItemInner':
+        return CapabilityItemInner(
+            item.id,
+            item.name.encode() if item.name else None
+        )
+
+
+class CapabilityItemMapInner(ctypes.Structure):
+    _fields_ = [
+        ("item", ctypes.POINTER(CapabilityItemInner)),
+        ("size", ctypes.c_size_t)
+    ]
+
+    def get(self):
+        items = []
+        if self.item and self.size > 0:
+            for i in range(self.size):
+                items.append(self.item[i].get())
+        return CapabilityItemMap(
+            item=items,
+            size=self.size
+        )
+
+    @staticmethod
+    def create(item_map: CapabilityItemMap) -> 'CapabilityItemMapInner':
+        if item_map.item and len(item_map.item) > 0:
+            items_array = (CapabilityItemInner * len(item_map.item))()
+            for i, item in enumerate(item_map.item):
+                items_array[i] = CapabilityItemInner.create(item)
+            items_ptr = ctypes.cast(items_array, ctypes.POINTER(CapabilityItemInner))
+        else:
+            items_ptr = ctypes.POINTER(CapabilityItemInner)()
+        
+        return CapabilityItemMapInner(
+            items_ptr,
+            len(item_map.item) if item_map.item else 0
+        )
+
+
+class CapabilitiesInner(ctypes.Structure):
+    _fields_ = [
+        ("item_map", ctypes.POINTER(CapabilityItemMapInner)),
+        ("capability_type", ctypes.c_int)
+    ]
+
+    def get(self):
+        return Capabilities(
+            item_map=self.item_map.contents.get() if self.item_map else None,
+            capability_type=self.capability_type
+        )
+
+    @staticmethod
+    def create(capabilities: Capabilities) -> 'CapabilitiesInner':
+        item_map_ptr = None
+        if capabilities.item_map:
+            item_map_inner = CapabilityItemMapInner.create(capabilities.item_map)
+            item_map_ptr = ctypes.pointer(item_map_inner)
+        
+        return CapabilitiesInner(
+            item_map_ptr,
+            capabilities.capability_type
+        )
+
+
+
+class CapabilitiesItemMapInner(ctypes.Structure):
+    _fields_ = [
+        ("item", ctypes.POINTER(CapabilityItemInner)),
+        ("size", ctypes.c_size_t)
+    ]
+
+    def get(self):
+        return CapabilitiesItemMap(
+            item=self.item,
+            size=self.size
         )

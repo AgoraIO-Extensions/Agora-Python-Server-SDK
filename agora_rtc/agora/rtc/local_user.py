@@ -256,46 +256,55 @@ class LocalUser:
         self.video_encoded_frame_observer = None
 
     def _set_audio_map(self, track_handle, track: LocalAudioTrack):
+        return
         with self._audio_track_lock:
             # no need to theck key is existed or not,just do replace
             self._audio_track_map[track_handle] = track
 
     def get_audio_map(self, track_handle):
+        return
         with self._audio_track_lock:
             return self._audio_track_map.get(track_handle)
 
     def _del_audio_map(self, track_handle):
+        return
         with self._audio_track_lock:
             if track_handle not in self._audio_track_map:
                 return
             del self._audio_track_map[track_handle]
 
     def _set_video_map(self, track_handle, track: LocalVideoTrack):
+        return
         with self._video_track_lock:
             # no need to theck key is existed or not,just do replace
             self._video_track_map[track_handle] = track
 
     def get_video_map(self, track_handle):
+        return
         with self._video_track_lock:
             return self._video_track_map.get(track_handle)
 
     def del_video_map(self, track_handle):
+        return
         with self._video_track_lock:
             if track_handle not in self._video_track_map:
                 return
             del self._video_track_map[track_handle]
 
     def set_remote_audio_map(self, track_handle, track: RemoteAudioTrack, user_id_str):
+        return
         with self._remote_audio_track_lock:
             # to check key is existed or not,just do replace
             # userid is unique in a channel
             self._remote_audio_track_map[track_handle] = track
 
     def get_remote_audio_map(self, track_handle):
+        return
         with self._remote_audio_track_lock:
             return self._remote_audio_track_map.get(track_handle)
 
     def del_remote_audio_map(self, user_id_str):
+        return
         with self._remote_audio_track_lock:
             if user_id_str is None:
                 self._remote_audio_track_map.clear()
@@ -305,15 +314,18 @@ class LocalUser:
                         del self._remote_audio_track_map[key]
 
     def set_remote_video_map(self, track_handle, track: RemoteVideoTrack):
+        return
         with self._remote_video_track_lock:
             # no need to theck key is existed or not,just do replace
             self._remote_video_track_map[track_handle] = track
 
     def get_remote_video_map(self, track_handle):
+        return
         with self._remote_video_track_lock:
             return self._remote_video_track_map.get(track_handle)
 
     def del_remote_video_map(self, user_id_str):
+        return
         with self._remote_video_track_lock:
             if user_id_str is None:
                 self._remote_video_track_map.clear()
@@ -333,7 +345,7 @@ class LocalUser:
         return ret
 
     def set_audio_encoder_configuration(self, config: AudioEncoderConfiguration):
-        ret = agora_local_user_set_audio_encoder_config(self.user_handle, config)
+        ret = agora_local_user_set_audio_encoder_config(self.user_handle, ctypes.byref(AudioEncoderConfigurationInner.create(config)))
         return ret
 
     def get_local_audio_statistics(self):
@@ -345,7 +357,7 @@ class LocalUser:
 
         return detailed_stats
 
-    def publish_audio(self, agora_local_audio_track: LocalAudioTrack):
+    def _publish_audio(self, agora_local_audio_track: LocalAudioTrack):
         ret = agora_local_user_publish_audio(self.user_handle, agora_local_audio_track.track_handle)
         if ret < 0:
             logger.error("Failed to publish audio")
@@ -353,11 +365,11 @@ class LocalUser:
             self._set_audio_map(agora_local_audio_track.track_handle, agora_local_audio_track)
         return ret
 
-    def unpublish_audio(self, agora_local_audio_track: LocalAudioTrack):
+    def _unpublish_audio(self, agora_local_audio_track: LocalAudioTrack):
         ret = agora_local_user_unpublish_audio(self.user_handle, agora_local_audio_track.track_handle)
         return ret
 
-    def publish_video(self, agora_local_video_track: LocalVideoTrack):
+    def _publish_video(self, agora_local_video_track: LocalVideoTrack):
         ret = agora_local_user_publish_video(self.user_handle, agora_local_video_track.track_handle)
         if ret < 0:
             logger.error("Failed to publish video")
@@ -365,7 +377,7 @@ class LocalUser:
             self._set_video_map(agora_local_video_track.track_handle, agora_local_video_track)
         return ret
 
-    def unpublish_video(self, agora_local_video_track: LocalVideoTrack):
+    def _unpublish_video(self, agora_local_video_track: LocalVideoTrack):
         ret = agora_local_user_unpublish_video(self.user_handle, agora_local_video_track.track_handle)
         return ret
 
@@ -432,14 +444,14 @@ class LocalUser:
         ret = agora_local_user_set_playback_audio_frame_before_mixing_parameters(self.user_handle, channels, sample_rate_hz)
         return ret
 
-    def register_audio_frame_observer(self, observer: IAudioFrameObserver,  enable_vad: int, vad_configure):
+    def _register_audio_frame_observer(self, observer: IAudioFrameObserver,  enable_vad: int, vad_configure):
         if self.audio_frame_observer:
             self.unregister_audio_frame_observer()
         self.audio_frame_observer = AudioFrameObserverInner(observer, self, enable_vad, vad_configure)
         ret = agora_local_user_register_audio_frame_observer(self.user_handle, self.audio_frame_observer)
         return ret
 
-    def unregister_audio_frame_observer(self):
+    def _unregister_audio_frame_observer(self):
         ret = 0
         if self.audio_frame_observer:
             ret = agora_local_user_unregister_audio_frame_observer(self.user_handle)
@@ -464,7 +476,7 @@ class LocalUser:
     #     ret = agora_local_user_unregister_audio_spectrum_observer(self.user_handle, observer)
     #     return ret
 
-    def register_video_encoded_frame_observer(self, agora_video_encoded_frame_observer: IVideoEncodedFrameObserver):
+    def _register_video_encoded_frame_observer(self, agora_video_encoded_frame_observer: IVideoEncodedFrameObserver):
         if self.video_encoded_frame_observer_handler:
             self.unregister_video_encoded_frame_observer()
 
@@ -473,7 +485,7 @@ class LocalUser:
         ret = agora_local_user_register_video_encoded_frame_observer(self.user_handle, self.video_encoded_frame_observer_handler)
         return ret
 
-    def unregister_video_encoded_frame_observer(self):
+    def _unregister_video_encoded_frame_observer(self):
         ret = 0
         if self.video_encoded_frame_observer_handler:
             ret = agora_local_user_unregister_video_encoded_frame_observer(self.user_handle, self.video_encoded_frame_observer_handler)
@@ -482,7 +494,7 @@ class LocalUser:
         self.video_encoded_frame_observer = None
         return ret
 
-    def register_video_frame_observer(self, agora_video_frame_observer2: IVideoFrameObserver):
+    def _register_video_frame_observer(self, agora_video_frame_observer2: IVideoFrameObserver):
         if self.video_frame_observer_handler:
             self.unregister_video_frame_observer()
         self.video_frame_observer = VideoFrameObserverInner(agora_video_frame_observer2, self)
@@ -490,7 +502,7 @@ class LocalUser:
         ret = agora_local_user_register_video_frame_observer(self.user_handle, self.video_frame_observer_handler)
         return ret
 
-    def unregister_video_frame_observer(self):
+    def _unregister_video_frame_observer(self):
         ret = 0
         if self.video_frame_observer_handler:
             ret = agora_local_user_unregister_video_frame_observer(self.user_handle, self.video_frame_observer_handler)
@@ -549,14 +561,14 @@ class LocalUser:
         ret = agora_local_user_set_audio_volume_indication_parameters(self.user_handle, interval_in_ms, smooth, report_vad)
         return ret
 
-    def register_local_user_observer(self, observer: IRTCLocalUserObserver):
+    def _register_local_user_observer(self, observer: IRTCLocalUserObserver):
         user_observer_inner = RTCLocalUserObserverInner(observer, self)
         self.user_observer_inner = user_observer_inner
         self.user_observer = observer
         ret = agora_local_user_register_observer(self.user_handle, user_observer_inner)
         return ret
 
-    def unregister_local_user_observer(self):
+    def _unregister_local_user_observer(self):
         ret = agora_local_user_unregister_observer(self.user_handle)
         return ret
 
@@ -577,7 +589,7 @@ class LocalUser:
         ret = agora_local_user_send_intra_request(self.user_handle, uid_t)
         return ret
 
-    def release(self):
+    def _release(self):
         # clean all
         with self._remote_audio_track_lock:
             self._remote_audio_track_map.clear()
@@ -604,7 +616,7 @@ class LocalUser:
         ret = agora_local_user_set_audio_scenario(self.user_handle, scenario_type.value)
         return ret
     # data can be str or bytes/bytearray object,is diff to send_sream_message which is a str object
-    def send_audio_meta_data(self, data):
+    def _send_audio_meta_data(self, data):
         # chang to ctypes.c_char_p
         if isinstance(data, str):
             data = data.encode('utf-8')
