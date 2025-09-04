@@ -1000,7 +1000,6 @@ class RemoteAudioTrackStatsInner(ctypes.Structure):
             stats.received_bytes
         )
 
-
 class EncodedAudioFrameInfoInner(ctypes.Structure):
     _fields_ = [
         ('speech', ctypes.c_int),
@@ -1008,7 +1007,8 @@ class EncodedAudioFrameInfoInner(ctypes.Structure):
         ('sample_rate_hz', ctypes.c_int),
         ('samples_per_channel', ctypes.c_int),
         ('send_even_if_empty', ctypes.c_int),
-        ('number_of_channels', ctypes.c_int)
+        ('number_of_channels', ctypes.c_int),
+        ('capture_time_ms', ctypes.c_int64)
     ]
 
     @staticmethod
@@ -1019,7 +1019,8 @@ class EncodedAudioFrameInfoInner(ctypes.Structure):
             info.sample_rate,
             info.samples_per_channel,
             info.send_even_if_empty,
-            info.number_of_channels
+            info.number_of_channels,
+            info.capture_time_ms
         )
 
 
@@ -1067,6 +1068,10 @@ class AudioFrameInner(ctypes.Structure):
         ("buffer", ctypes.c_void_p),
         ("render_time_ms", ctypes.c_int64),
         ("avsync_type", ctypes.c_int),
+        ("presentation_ms", ctypes.c_int64),
+        ("audio_track_number", ctypes.c_int),
+        ("rtp_timestamp", ctypes.c_uint32),
+       
         ("far_field_flag", ctypes.c_int),
         ("rms", ctypes.c_int),
         ("voice_prob", ctypes.c_int),
@@ -1084,6 +1089,9 @@ class AudioFrameInner(ctypes.Structure):
             buffer=bytearray(ctypes.string_at(self.buffer, self.samples_per_channel * self.bytes_per_sample * self.channels)),
             render_time_ms=self.render_time_ms,
             avsync_type=self.avsync_type,
+            presentation_ms=self.presentation_ms,
+            audio_track_number=self.audio_track_number,
+            rtp_timestamp=self.rtp_timestamp,
             far_field_flag=self.far_field_flag,
             rms=self.rms,
             voice_prob=self.voice_prob,
@@ -1102,6 +1110,9 @@ class AudioFrameInner(ctypes.Structure):
             ctypes.cast(frame.buffer, ctypes.c_void_p),
             frame.render_time_ms,
             frame.avsync_type,
+            frame.presentation_ms,
+            frame.audio_track_number,
+            frame.rtp_timestamp,
             frame.far_field_flag,
             frame.rms,
             frame.voice_prob,
@@ -1192,7 +1203,8 @@ class EncodedVideoFrameInfoInner(ctypes.Structure):
         ("capture_time_ms", ctypes.c_int64),
         ("decode_time_ms", ctypes.c_int64),
         ("uid", ctypes.c_uint),
-        ("stream_type", ctypes.c_int)
+        ("stream_type", ctypes.c_int),
+        ("presentation_ms", ctypes.c_int64)
     ]
 
     def get(self):
@@ -1207,7 +1219,8 @@ class EncodedVideoFrameInfoInner(ctypes.Structure):
             capture_time_ms=self.capture_time_ms,
             decode_time_ms=self.decode_time_ms,
             uid=self.uid,
-            stream_type=self.stream_type
+            stream_type=self.stream_type,
+            presentation_ms=self.presentation_ms
         )
 
     @staticmethod
@@ -1223,7 +1236,8 @@ class EncodedVideoFrameInfoInner(ctypes.Structure):
             info.capture_time_ms,
             info.decode_time_ms,
             info.uid,
-            info.stream_type
+            info.stream_type,
+            info.presentation_ms
         )
     
 

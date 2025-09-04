@@ -214,6 +214,9 @@ class AudioFrame:
     buffer: bytearray
     render_time_ms: int
     avsync_type: int
+    presentation_ms: int
+    audio_track_number: int
+    rtp_timestamp: int
     far_field_flag: int
     rms: int
     voice_prob: int
@@ -396,6 +399,11 @@ class PcmAudioFrame:
     number_of_channels: int = 0
     sample_rate: int = 0
     timestamp: int = 0
+    present_time_ms: int = 0
+    '''
+    present_time_ms is the presentation time of the audio frame, in milliseconds.
+    timestamp is the capture time of the audio frame, in milliseconds.
+    '''
 
 
 @dataclass(kw_only=True)
@@ -405,13 +413,13 @@ class AudioEncoderConfiguration:
 
 @dataclass(kw_only=True)
 class EncodedAudioFrameInfo:
-    capture_timems: int = 0
+    speech: int = 1
     codec: AudioCodecType = AudioCodecType.AUDIO_CODEC_AACLC
-    number_of_channels: int = 1
     sample_rate: int = 16000
     samples_per_channel: int = 1024
     send_even_if_empty: int = 1
-    speech: int = 1
+    number_of_channels: int = 1
+    capture_time_ms: int = 0
 
 
 @dataclass(kw_only=True)
@@ -444,6 +452,7 @@ class EncodedVideoFrameInfo:
     decode_time_ms: int = 0
     uid: int = 0
     stream_type: int = 0
+    presentation_ms: int = 0
 
 
 @dataclass(kw_only=True)

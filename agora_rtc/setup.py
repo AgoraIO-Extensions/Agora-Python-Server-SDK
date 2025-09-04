@@ -49,6 +49,16 @@ class CustomInstallCommand(install):
         if arch == "aarch64" and sys.platform == 'linux':
           url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.32-20250425_150503-675674.zip"
      
+        #verison 2.3.0 0902 
+        #date: 20250829 version:
+        # fix a audio-dump thread leak bug
+        # add pts field in send video frame, and send audio frame
+        # add pts field in both audio and video frame callback
+        url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.32-20250829_160340-860733.zip"
+        if sys.platform == 'darwin':
+            url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.32_25418_FULL_20250829_1647_860754.zip"
+        if arch == "aarch64" and sys.platform == 'linux':
+            url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.32-20250829_160340-860733.zip"
 
 
         if os.path.exists(sdk_dir):

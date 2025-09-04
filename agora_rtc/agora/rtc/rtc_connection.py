@@ -154,29 +154,18 @@ class RTCConnection:
     #
     def disconnect(self) -> int:
         #1. unpublish all tracks
-        print("disconnect: unpublish all tracks")
         self.unpublish_audio()
-        print("disconnect: unpublish audio done")
         self.unpublish_video()
-        print("disconnect: unpublish video done")
 
         #2. unregister all observers, but except rtc connection observer
-        print("disconnect: unregister all observers")
         self._unregister_audio_frame_observer()
-        print("disconnect: unregister audio frame observer done")
         self._unregister_video_frame_observer()
-        print("disconnect: unregister video frame observer done")
         self._unregister_video_encoded_frame_observer()
-        print("disconnect: unregister video encoded frame observer done")
         self._unregister_audio_encoded_frame_observer()
-        print("disconnect: unregister audio encoded frame observer done")
-
         self._unregister_local_user_observer()
-        print("disconnect: unregister local user observer done")
         
 
         ret = agora_rtc_conn_disconnect(self.conn_handle)
-        print("disconnect: disconnect done")
         return ret
 
     # update token when token expired
@@ -388,7 +377,7 @@ class RTCConnection:
         for example, if the sample rate is 16000 and the channels is 1, the data length MUST be multiple of 16000 * 2 * 1 / 1000 = 32.
         
     """
-    def push_audio_pcm_data(self, data, sample_rate, channels)->int:
+    def push_audio_pcm_data(self, data, sample_rate, channels, start_pts:int=0)->int:
         ret = -1000
         if self._audio_sender is None:
             return -1001
@@ -406,6 +395,7 @@ class RTCConnection:
         frame.bytes_per_sample = 2
         frame.timestamp = 0
         frame.samples_per_channel = readLen // (channels * 2)
+        frame.present_time_ms = start_pts
 
         ret = self._audio_sender.send_audio_pcm_data(frame)
         self._pcm_consume_stats.add_pcm_data(readLen, sample_rate, channels)
