@@ -24,6 +24,64 @@ logger = logging.getLogger(__name__)
 sample_options = parse_args_example()
 logger.info(f"app_id: {sample_options.app_id}, channel_id: {sample_options.channel_id}, uid: {sample_options.user_id}")
 
+'''
+v2 :CombineToInt64 合并六个字段为 int64
+purpose: from sever to client end
+位分布: 高4位(version) | 16位(sessionid) | 16位(sentenceid) | 10位(chunkid) | 2位(isSessionEnd) | 16位(basepts)
+Note: 50ms is ok,100ms data is ok, 10ms data is  not work, the recved pts are all 0
+'''
+def combine_to_int64_v2(version, session_id, sentence_id, chunk_id, is_session_end, base_pts):
+    """
+    将六个字段合并为一个int64
+    位分布：高4位(version) | 16位(sessionid) | 16位(sentenceid) | 10位(chunkid) | 2位(isSessionEnd) | 16位(basepts)
+    """
+    # 检查各字段是否超出范围
+    if version < 0 or version > 0b0111:
+        raise ValueError("version must be between 0 and 7 (3 bits)")
+    if session_id < 0 or session_id > 0xFFFF:
+        raise ValueError("session_id must be between 0 and 65535 (16 bits)")
+    if sentence_id < 0 or sentence_id > 0xFFFF:
+        raise ValueError("sentence_id must be between 0 and 65535 (16 bits)")
+    if chunk_id < 0 or chunk_id > 0x3FF:
+        raise ValueError("chunk_id must be between 0 and 1023 (10 bits)")
+    if is_session_end < 0 or is_session_end > 0b11:
+        raise ValueError("is_session_end must be between 0 and 3 (2 bits)")
+    if base_pts < 0 or base_pts > 0xFFFF:
+        raise ValueError("base_pts must be between 0 and 65535 (16 bits)")
+    
+    # 合并字段
+    result = (version << 60) | \
+             (session_id << 44) | \
+             (sentence_id << 28) | \
+             (chunk_id << 18) | \
+             (is_session_end << 16) | \
+             base_pts
+    
+    # 转换为有符号int64（Python中int是无限精度的，所以需要处理负数情况）
+    if result > 0x7FFFFFFFFFFFFFFF:
+        result -= 0x10000000000000000
+    
+    return result
+
+def extract_from_int64_v2(combined):
+    """
+    从合并的int64中提取各个字段
+    """
+    # 处理负数（Python中int是无限精度的）
+    if combined < 0:
+        combined += 0x10000000000000000
+    
+    # 提取各个字段
+    version = (combined >> 60) & 0b1111
+    session_id = (combined >> 44) & 0xFFFF
+    sentence_id = (combined >> 28) & 0xFFFF
+    chunk_id = (combined >> 18) & 0x3FF
+    is_session_end = (combined >> 16) & 0b11
+    base_pts = combined & 0xFFFF
+    
+    return version, session_id, sentence_id, chunk_id, is_session_end, base_pts
+
+
 
 class ExampleAudioFrameObserver(IAudioFrameObserver):
     def __init__(self, connection, loop, enable_delay_mode=True) -> None:
@@ -34,6 +92,21 @@ class ExampleAudioFrameObserver(IAudioFrameObserver):
         self._data = bytearray()
         self._is_delay_pushed = False
         self._enable_delay_mode = enable_delay_mode  # default to true
+
+        # for v2
+        self._version = 4
+        self._session_id = 1
+        self._sentence_id = 1
+        self._chunk_id = 1
+        self._is_session_end = 0
+        self._base_pts = 0
+        self._frame_count = 1
+
+        # bytearray for 10 chunks
+        self._bytes_in_ms = 320
+        self._data = bytearray(self._bytes_in_ms*5)
+        self._data_view = memoryview(self._data)
+        self._index = 0
 
     def on_record_audio_frame(self, agora_local_user, channelId, frame):
         logger.info(f"on_record_audio_frame")
@@ -48,11 +121,41 @@ class ExampleAudioFrameObserver(IAudioFrameObserver):
         return 0
 
     def on_playback_audio_frame_before_mixing(self, agora_local_user, channelId, uid, audio_frame: AudioFrame, vad_result_state: int, vad_result_bytearray: bytearray):
-        # logger.info(f"on_playback_audio_frame_before_mixing: {audio_frame}")
+        logger.info(f"on_playback_audio_frame_before_mixing: {audio_frame.presentation_ms}")
        
-        self._loop.call_soon_threadsafe(
-            self._connection.push_audio_pcm_data,audio_frame.buffer, 16000, 1
-         )
+        self._is_session_end = 0
+        
+        
+        self._frame_count += 1
+        
+        if self._chunk_id > 3:
+            self._sentence_id += 1
+            self._chunk_id
+        if self._sentence_id > 3:
+            self._session_id += 1
+
+            self._chunk_id = 1
+            self._sentence_id = 1
+            self._is_session_end = 1
+        
+        #extend data to mv
+        mv = self._data_view[self._index*self._bytes_in_ms:(self._index+1)*self._bytes_in_ms]
+        mv[:] = audio_frame.buffer
+
+        self._index += 1
+
+        if self._index >= 5:
+            self._index = 0
+            self._chunk_id += 1
+            combined = combine_to_int64_v2(self._version, self._session_id, self._sentence_id, self._chunk_id, self._is_session_end, 0)
+            
+
+            print(f"on_playback_audio_frame_before_mixing: {audio_frame.presentation_ms},{audio_frame.render_time_ms}, {audio_frame.rtp_timestamp}, {combined}")
+            #combined = self._frame_count
+            
+            self._loop.call_soon_threadsafe(
+                self._connection.push_audio_pcm_data,self._data, 16000, 1, combined
+            )
         #self._connection.push_audio_pcm_data(audio_frame.buffer, 16000, 1)
         return 1
 
