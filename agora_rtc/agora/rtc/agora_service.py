@@ -105,6 +105,12 @@ class AgoraService:
         #versio 2.2.0 for callback when muted
         if config.should_callbck_when_muted > 0:
             agora_parameter.set_parameters("{\"rtc.audio.enable_user_silence_packet\": true}")
+        '''
+        date: 2025-09-09 
+	    to disable av1 resolution limitation: for any resolution, 
+	    it will be encoded as av1 if config is av1 or it only work for resolution >= 360p
+        '''
+        agora_parameter.set_parameters("{\"che.video.min_enc_level\": 0}")
 
         return result
 
