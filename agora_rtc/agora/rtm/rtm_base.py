@@ -98,7 +98,7 @@ class RtmPresenceEventType(IntEnum):
   RTM_PRESENCE_EVENT_TYPE_ERROR_OUT_OF_SERVICE = 7,
 
 
-@dataclass(kw_only=True)
+@dataclass
 class RtmLogConfig:
     file_path: str = ""
     file_size_kb: int = 5*1024
@@ -115,7 +115,7 @@ class RtmProxyConfig:
 
 @dataclass(kw_only=True)
 class RtmPrivateConfig:
-    servive_type: int = RtmServiceType.RTM_SERVICE_TYPE_NONE
+    service_type: RtmServiceType = RtmServiceType.RTM_SERVICE_TYPE_NONE
     access_point_hosts: list[str] = None
     
     def __post_init__(self):
@@ -148,8 +148,20 @@ class Metadata:
     pass
 class UserState:
     pass
+
+@dataclass
 class LinkStateEvent:
-    pass
+    current_state: int
+    previous_state: int
+    service_type: int
+    operation: int
+    reason_code: int
+    reason: str
+    affected_channels: list[str]
+    unrestored_channels: list[str]
+    is_resumed: bool
+    timestamp: int
+
 class HistoryMessage:
     pass
 class User:
@@ -159,6 +171,7 @@ class ChannelInfo:
 class ChannelInfoList:
     pass
 
+@dataclass
 class MessageEvent:
     channel_type: int
     message_type: int
@@ -170,6 +183,8 @@ class MessageEvent:
     custom_type: str
 
 
+
+@dataclass
 class PresenceEvent:
     type: int
     channel_type: int
@@ -180,6 +195,7 @@ class PresenceEvent:
     interval: IntervalInfo
     snapshot: SnapshotInfo
 
+@dataclass
 class TopicEvent:
     type: int
     channel_name: str
@@ -187,6 +203,7 @@ class TopicEvent:
     topic_infos: list[TopicInfo]
     topic_info_count: int
 
+@dataclass
 class LockEvent:
     channel_type: int
     event_type: int
@@ -194,17 +211,22 @@ class LockEvent:
     lock_detail_list: list[LockDetail]
     count: int
   
+@dataclass
 class StorageEvent:
     channel_type: int
     storage_type: int
     event_type: int
     target: str
     data: Metadata
+
+@dataclass
 class PublishOptions:
     channel_type: int = RtmChannelType.RTM_CHANNEL_TYPE_NONE
     message_type: int = RtmMessageType.RTM_MESSAGE_TYPE_BINARY
     custom_type: str = ""
     store_in_history: bool = False
+
+@dataclass
 class SubscribeOptions:
     with_message: bool = True
     with_metadata: bool = False

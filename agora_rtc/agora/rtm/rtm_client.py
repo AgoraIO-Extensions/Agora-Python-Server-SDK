@@ -61,11 +61,54 @@ def create_rtm_client(config: RtmConfig):
 
 class RTMClient:
     def __init__(self, config: RtmConfig) -> None:
+        self.client_handle = None
         self.config = config
+        self.is_valid = False
+        #check config
+        if config.log_config is None:
+            config.log_config = RtmLogConfig(
+                file_path="./logs/rtm.log",
+                file_size_kb=1024,
+                log_level=RtmLogLevel.RTM_LOG_LEVEL_INFO
+            )
+        if config.private_config is None:
+            config.private_config = RtmPrivateConfig(
+                service_type=RtmServiceType.RTM_SERVICE_TYPE_NONE,
+                access_point_hosts=None,
+            )
+        if config.proxy_config is None:
+            config.proxy_config = RtmProxyConfig(
+                proxy_type=RtmProxyType.RTM_PROXY_TYPE_NONE,
+                proxy_server="",
+                proxy_port=0,
+                proxy_username="",
+                proxy_password=""
+            )
+        if config.encryption_config is None:
+            config.encryption_config = RtmEncryptionConfig(
+                encryption_mode=RtmEncryptionMode.RTM_ENCRYPTION_MODE_NONE,
+                encryption_key=None,
+                encryption_salt=None
+            )
+        # realy create client
+        inner_log_config = RtmLogConfigInner.create(config.log_config)
+        inner_private_config = RtmPrivateConfigInner.create(config.private_config)
+        inner_proxy_config = RtmProxyConfigInner.create(config.proxy_config)
+        inner_encryption_config = RtmEncryptionConfigInner.create(config.encryption_config)
         ret = ctypes.c_int(0)
-        self.client_handle = agora_rtm_client_create(ctypes.byref(RtmConfigInner.create(config)), ctypes.byref(ret))
+
+        #register event handler from python to ctypes
+        
+        config_inner = RtmConfigInner.create(config)
+        c_event_handler = RtmEventHandlerInner(config.event_handler, self)
+        config_inner.eventHandler = ctypes.cast(ctypes.byref(c_event_handler), ctypes.c_void_p)
+        self.client_handle = agora_rtm_client_create(ctypes.byref(config_inner), ctypes.byref(ret))
         print(f"create_rtm_client ret: {ret.value}, client_handle: {self.client_handle}")
         print(f"error reason: {self.get_error_reason(ret.value)}")
+        self.is_valid = self.client_handle is not None and ret.value == 0
+    def _is_valid(self)->bool:
+        return self.is_valid
+       
         
     def release(self):
         if self.client_handle:
@@ -81,45 +124,51 @@ class RTMClient:
         ret = agora_rtm_client_login(self.client_handle, c_data, ctypes.byref(request_id))
         return ret, int(request_id.value)
        
-    def logout(self):
-        ret = agora_rtm_client_logout(self.client_handle)
-        if ret == 0:
-            return True
-        return False
-    def renew_token(self, token: str):
-        ret = agora_rtm_client_renew_token(self.client_handle, token.encode())
-        if ret == 0:
-            return True
-        return False
+    def logout(self)->(int, int):
+        request_id = ctypes.c_uint64(0)
+        ret = agora_rtm_client_logout(self.client_handle, ctypes.byref(request_id))
+        return ret, int(request_id.value)
+    def renew_token(self, token: str)->(int, int):
+        request_id = ctypes.c_uint64(0)
+        ret = agora_rtm_client_renew_token(self.client_handle, token.encode(), ctypes.byref(request_id))
+        return ret, int(request_id.value)
     def publish(self, channel_name: str, message: str, options: PublishOptions) ->(int, uint64_t):
-        ret = agora_rtm_client_publish(self.client_handle, channel_name.encode(), message.encode(), len(message), None, None)
-        if ret == 0:
-            return True
-        return False
-    def send_channel_message(self, channel_name: str, message: str, options: PublishOptions) ->(int, uint64_t):
-        ret = agora_rtm_client_send_channel_message(self.client_handle, channel_name.encode(), message.encode(), len(message), None, None)
-        if ret == 0:
-            return True
-        return False
-    def send_user_message(self, user_id: str, message: str, options: PublishOptions) ->(int, uint64_t):
-        ret = agora_rtm_client_send_user_message(self.client_handle, user_id.encode(), message.encode(), len(message), None, None)
-        if ret == 0:
-            return True
-        return False
+        inner_options = PublishOptionsInner.create(options)
+        request_id = ctypes.c_uint64(0) 
+        ret = agora_rtm_client_publish(self.client_handle, channel_name.encode(), message.encode(), len(message), ctypes.byref(inner_options), ctypes.byref(request_id))
+        return ret, int(request_id.value)
+     
+    def send_channel_message(self, channel_name: str, message: str) ->(int, uint64_t):
+        publish_options = PublishOptions(
+            channel_type=RtmChannelType.RTM_CHANNEL_TYPE_MESSAGE,
+            message_type=RtmMessageType.RTM_MESSAGE_TYPE_BINARY,
+            custom_type="",
+            store_in_history=False
+        )
+        ret, request_id = self.publish(channel_name, message, publish_options)
+        return ret, request_id
+    def send_user_message(self, user_id: str, message: str) ->(int, uint64_t):
+        publish_options = PublishOptions(
+            channel_type=RtmChannelType.RTM_CHANNEL_TYPE_USER,
+            message_type=RtmMessageType.RTM_MESSAGE_TYPE_BINARY,
+            custom_type="",
+            store_in_history=False
+        )
+        ret, request_id = self.publish(user_id, message, publish_options)
+        return ret, request_id
     def subscribe(self, channel_name: str, options: SubscribeOptions) ->(int, uint64_t):
-        ret = agora_rtm_client_subscribe(self.client_handle, channel_name.encode(), options.encode(), None)
-        if ret == 0:
-            return True
-        return False
+        inner_options = SubscribeOptionsInner.create(options)
+        request_id = ctypes.c_uint64(0) 
+        ret = agora_rtm_client_subscribe(self.client_handle, channel_name.encode(), ctypes.byref(inner_options), ctypes.byref(request_id))
+        return ret, int(request_id.value)
+       
     def unsubscribe(self, channel_name: str)->(int, uint64_t):
-        ret = agora_rtm_client_unsubscribe(self.client_handle, channel_name.encode(), None)
-        if ret == 0:
-            return True
+        request_id = ctypes.c_uint64(0)
+        ret = agora_rtm_client_unsubscribe(self.client_handle, channel_name.encode(), ctypes.byref(request_id))
+        return ret, int(request_id.value)
     def get_version(self)->str:
         ret = agora_rtm_client_get_version(self.client_handle)
-        if ret == 0:
-            return True
-        return False
+        return ret.decode('utf-8')
     def get_error_reason(self, error_code: int)->str:
         ret = agora_rtm_client_get_error_reason(error_code)
         if ret is None:
