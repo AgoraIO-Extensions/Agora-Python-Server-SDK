@@ -21,11 +21,30 @@ def get_file_md5(file_path):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
 
+def get_sdk_path():
+    agora_service_path = os.path.dirname(os.path.abspath(__file__))
+    # change from dir like: /home/xxx/agora_rtc/agora/rtc/agora_sdk to
+    # /home/xxx/agora/agora_sdk
+    # /home/xxx/agora/rtc
+    # /home/xxx/agora/rtm
+    parent_dir = os.path.dirname(agora_service_path)
+    sdk_dir = os.path.join(parent_dir, "agora_sdk")
+    
+    return sdk_dir
+
 
 def _check_download_and_extract_sdk():
     agora_service_path = os.path.dirname(os.path.abspath(__file__))
-    sdk_dir = os.path.join(agora_service_path, "agora_sdk")
-    zip_path = os.path.join(agora_service_path, "agora_rtc_sdk.zip")
+    # change from dir like: /home/xxx/agora_rtc/agora/rtc/agora_sdk to
+    # /home/xxx/agora_rtc/agora/agora_sdk
+    # /home/xxx/agora_rtc/agora/rtc
+    # /home/xxx/agora_rtc/agora/rtm
+    
+    sdk_dir = get_sdk_path()
+    agora_service_path = sdk_dir
+    zip_path = os.path.join(sdk_dir, "agora_rtc_sdk.zip")
+    logger.error(f"sdk_dir: {sdk_dir}")
+    logger.error(f"zip_path: {zip_path}")
 
     # for diff os and arch
     arch = platform.machine()
@@ -72,11 +91,12 @@ def _check_download_and_extract_sdk():
     if os.path.exists(zip_path):
         os.remove(zip_path)
 
-    logger.info(f"agora_service_path: {agora_service_path}")
-    logger.info(f"Downloading {url}...")
+    logger.error(f"agora_service_path: {agora_service_path}")
+    logger.error(f"Downloading {url}...")
     request.urlretrieve(url, zip_path)
 
-    logger.info(f"Extracting {zip_path}...")
+    logger.error(f"Extracting {zip_path}...")
+    agora_service_path = os.path.dirname(sdk_dir)
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         zip_ref.extractall(agora_service_path)
 
@@ -87,8 +107,7 @@ def _check_download_and_extract_sdk():
 
 _check_download_and_extract_sdk()
 
-sdk_dir = os.path.dirname(os.path.abspath(__file__))
-lib_path = os.path.join(sdk_dir, 'agora_sdk')
+lib_path = get_sdk_path()
 
 try:
     if sys.platform == 'darwin':
