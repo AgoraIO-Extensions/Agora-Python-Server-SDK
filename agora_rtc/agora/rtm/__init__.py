@@ -43,10 +43,14 @@ def _check_download_and_extract_rtm():
 
 
 
-_check_download_and_extract_rtm()
 
+
+#get so path: no need to check and download rtm sdk
+# we have pack the rtm sdk into rtc package
+# so no need to do downlaod and md5 check
 lib_path = get_sdk_path()
 logger.error(f"lib_path: {lib_path}")
+
 
 try:
     if sys.platform == 'darwin':
