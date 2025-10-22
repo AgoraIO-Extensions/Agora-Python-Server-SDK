@@ -16,9 +16,25 @@ class CustomInstallCommand(install):
         self.download_and_extract_sdk()
         install.run(self)
 
+    def get_sdk_path(self):
+        agora_service_path = os.path.join(site.getsitepackages()[0], 'agora', 'rtc')
+        parent_dir = os.path.dirname(agora_service_path)
+        agora_service_path = parent_dir
+        sdk_dir = os.path.join(agora_service_path, "agora_sdk")
+        return sdk_dir
+    def download_and_extract_rtm(self):
+        sdk_dir = self.get_sdk_path()
+        zip_path = os.path.join(sdk_dir, "agora_rtm_sdk.zip")
+        arch = platform.machine()
+        os_type = platform.system()
+        
+        pass
+
     def download_and_extract_sdk(self):
         print("download_and_extract_sdk--------------")
         agora_service_path = os.path.join(site.getsitepackages()[0], 'agora', 'rtc')
+        parent_dir = os.path.dirname(agora_service_path)
+        agora_service_path = parent_dir
         sdk_dir = os.path.join(agora_service_path, "agora_sdk")
         zip_path = os.path.join(agora_service_path, "agora_rtc_sdk.zip")
         arch = platform.machine()
@@ -89,7 +105,7 @@ setup(
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/AgoraIO-Extensions/Agora-Python-Server-SDK',
-    packages=["agora.rtc", "agora.rtc._ctypes_handle", "agora.rtc._utils","agora.rtc.utils"],
+    packages=["agora.rtc", "agora.rtc._ctypes_handle", "agora.rtc._utils","agora.rtc.utils","agora.rtm"],
     classifiers=[
         "Intended Audience :: Developers",
         'License :: OSI Approved :: MIT License',
