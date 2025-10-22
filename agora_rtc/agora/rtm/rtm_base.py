@@ -262,6 +262,8 @@ class IRtmEventHandler:
         pass
     def on_subscribe_result(self, request_id: int, channel_name: str, error_code: int):
         pass
+    def on_unsubscribe_result(self, request_id: int, channel_name: str, error_code: int):
+        pass
     def on_publish_result(self, request_id: int, error_code: int):
         pass
     def on_login_result(self, request_id: int, error_code: int):
