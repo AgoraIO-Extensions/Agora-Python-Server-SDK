@@ -166,6 +166,8 @@ class RTMClient:
         request_id = ctypes.c_uint64(0)
         ret = agora_rtm_client_unsubscribe(self.client_handle, channel_name.encode(), ctypes.byref(request_id))
         return ret, int(request_id.value)
+
+    
     def get_version(self)->str:
         ret = agora_rtm_client_get_version(self.client_handle)
         return ret.decode('utf-8')
