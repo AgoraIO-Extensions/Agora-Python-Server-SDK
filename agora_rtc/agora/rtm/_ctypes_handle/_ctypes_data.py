@@ -542,6 +542,7 @@ ON_SUBSCRIBE_TOPIC_RESULT = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_uint64
 ON_CONNECTION_STATE_CHANGED = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_char_p, ctypes.c_int, ctypes.c_int)
 ON_TOKEN_PRIVILEGE_WILL_EXPIRE = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_char_p)
 ON_SUBSCRIBE_RESULT = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_uint64, ctypes.c_char_p, ctypes.c_int)
+ON_UNSUBSCRIBE_RESULT = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_uint64, ctypes.c_char_p, ctypes.c_int)
 ON_PUBLISH_RESULT = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_uint64, ctypes.c_int)
 ON_LOGIN_RESULT = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_uint64, ctypes.c_int)
 ON_SET_CHANNEL_METADATA_RESULT = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_uint64, ctypes.c_char_p, ctypes.c_int, ctypes.c_int)
@@ -567,7 +568,7 @@ ON_PRESENCE_SET_STATE_RESULT = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_uin
 ON_PRESENCE_REMOVE_STATE_RESULT = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_uint64, ctypes.c_int)
 ON_PRESENCE_GET_STATE_RESULT = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_uint64, ctypes.POINTER(UserStateInner), ctypes.c_int, ctypes.c_int)
 ON_LINK_STATE_EVENT = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.POINTER(LinkStateEventInner))
-ON_GET_HISTORY_MESSAGES_RESULT = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_uint64, ctypes.POINTER(HistoryMessageInner), ctypes.c_int, ctypes.c_int)
+ON_GET_HISTORY_MESSAGES_RESULT = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_uint64, ctypes.POINTER(HistoryMessageInner), ctypes.c_size_t, ctypes.c_uint64, ctypes.c_int)
 ON_LOGOUT_RESULT = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_uint64, ctypes.c_int)
 ON_RENEW_TOKEN_RESULT = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_uint64, ctypes.c_int, ctypes.c_char_p, ctypes.c_int)
 ON_PUBLISH_TOPIC_MESSAGE_RESULT = ctypes.CFUNCTYPE(None, AGORA_HANDLE, ctypes.c_uint64, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_int)
@@ -590,6 +591,7 @@ class RtmEventHandlerInner(ctypes.Structure):
         ("onConnectionStateChanged", ON_CONNECTION_STATE_CHANGED),
         ("onTokenPrivilegeWillExpire", ON_TOKEN_PRIVILEGE_WILL_EXPIRE),
         ("onSubscribeResult", ON_SUBSCRIBE_RESULT),
+        ("onUnsubscribeResult", ON_UNSUBSCRIBE_RESULT),
         ("onPublishResult", ON_PUBLISH_RESULT),
         ("onLoginResult", ON_LOGIN_RESULT),
         ("onSetChannelMetadataResult", ON_SET_CHANNEL_METADATA_RESULT),
@@ -640,6 +642,7 @@ class RtmEventHandlerInner(ctypes.Structure):
         self.onConnectionStateChanged = ON_CONNECTION_STATE_CHANGED(self._on_connection_state_changed)
         self.onTokenPrivilegeWillExpire = ON_TOKEN_PRIVILEGE_WILL_EXPIRE(self._on_token_privilege_will_expire)
         self.onSubscribeResult = ON_SUBSCRIBE_RESULT(self._on_subscribe_result)
+        self.onUnsubscribeResult = ON_UNSUBSCRIBE_RESULT(self._on_unsubscribe_result)
         self.onPublishResult = ON_PUBLISH_RESULT(self._on_publish_result)
         self.onLoginResult = ON_LOGIN_RESULT(self._on_login_result)
         self.onSetChannelMetadataResult = ON_SET_CHANNEL_METADATA_RESULT(self._on_set_channel_metadata_result)
@@ -674,41 +677,79 @@ class RtmEventHandlerInner(ctypes.Structure):
         self.onUnsubscribeUserMetadataResult = ON_UNSUBSCRIBE_USER_METADATA_RESULT(self._on_unsubscribe_user_metadata_result)
         self.userData = ctypes.c_void_p(id(event_handler))
     def _on_message_event(self, event_handle, message_event_ptr):
-        message_event = message_event_ptr.contents if message_event_ptr is not None else None
-        if message_event is not None:
-            message_event = message_event.get()
-            print(f"on_message_event: {message_event}")
+        message_event_inner = message_event_ptr.contents if message_event_ptr is not None else None
+        if message_event_inner is not None and message_event_inner.get() is not None:
+            message_event = message_event_inner.get()
             self.event_handler.on_message_event(message_event)
-        else:
-            print(f"on_message_event: event is None")
-            self.event_handler.on_message_event(None)
-        self.event_handler.on_message_event(message_event)
     def _on_presence_event(self, event_handle, presence_event_ptr):
-        self.event_handler.on_presence_event(event)
+        presence_event_inner = presence_event_ptr.contents if presence_event_ptr is not None else None
+        if presence_event_inner is not None and presence_event_inner.get() is not None:
+            presence_event = presence_event_inner.get()
+            self.event_handler.on_presence_event(presence_event)
     def _on_topic_event(self, event_handle, topic_event_ptr):
-        self.event_handler.on_topic_event(event)
+        topic_event_inner = topic_event_ptr.contents if topic_event_ptr is not None else None
+        if topic_event_inner is not None and topic_event_inner.get() is not None:
+            topic_event = topic_event_inner.get()
+            self.event_handler.on_topic_event(topic_event)
     def _on_lock_event(self, event_handle, lock_event_ptr):
-        self.event_handler.on_lock_event(event)
+        lock_event_inner = lock_event_ptr.contents if lock_event_ptr is not None else None
+        if lock_event_inner is not None:
+            lock_event = lock_event_inner.get()
+            print(f"on_lock_event: {lock_event}")
+            self.event_handler.on_lock_event(lock_event)
+        else:
+            print(f"on_lock_event: event is None")
+            self.event_handler.on_lock_event(None)
     def _on_storage_event(self, event_handle, storage_event_ptr):
-        self.event_handler.on_storage_event(event)
+        storage_event_inner = storage_event_ptr.contents if storage_event_ptr is not None else None
+        if storage_event_inner is not None:
+            storage_event = storage_event_inner.get()
+            print(f"on_storage_event: {storage_event}")
+            self.event_handler.on_storage_event(storage_event)
+        else:
+            print(f"on_storage_event: event is None")
+            self.event_handler.on_storage_event(None)
     def _on_join_result(self, event_handle, request_id, channel_name, user_id, error_code):
         print(f"on_join_result: request_id: {request_id}, channel_name: {channel_name}, user_id: {user_id}, error_code: {error_code}")
-        self.event_handler.on_join_result(request_id, channel_name, user_id, error_code)
+        str_channel_name = channel_name.decode('utf-8') if channel_name is not None else ""
+        str_user_id = user_id.decode('utf-8') if user_id is not None else ""
+        self.event_handler.on_join_result(request_id, str_channel_name, str_user_id, error_code)
     def _on_leave_result(self, event_handle, request_id, channel_name, user_id, error_code):
-        self.event_handler.on_leave_result(request_id, channel_name, user_id, error_code)
+        str_channel_name = channel_name.decode('utf-8') if channel_name is not None else ""
+        str_user_id = user_id.decode('utf-8') if user_id is not None else ""
+        self.event_handler.on_leave_result(request_id, str_channel_name, str_user_id, error_code)
     def _on_join_topic_result(self, event_handle, request_id, channel_name, user_id, topic, meta, error_code):
-        self.event_handler.on_join_topic_result(request_id, channel_name, user_id, topic, meta, error_code)
+        str_channel_name = channel_name.decode('utf-8') if channel_name is not None else ""
+        str_user_id = user_id.decode('utf-8') if user_id is not None else ""
+        str_topic = topic.decode('utf-8') if topic is not None else ""
+        str_meta = meta.decode('utf-8') if meta is not None else ""
+        self.event_handler.on_join_topic_result(request_id, str_channel_name, str_user_id, str_topic, str_meta, error_code)
     def _on_leave_topic_result(self, event_handle, request_id, channel_name, user_id, topic, meta, error_code):
-        self.event_handler.on_leave_topic_result(request_id, channel_name, user_id, topic, meta, error_code)
+        str_channel_name = channel_name.decode('utf-8') if channel_name is not None else ""
+        str_user_id = user_id.decode('utf-8') if user_id is not None else ""
+        str_topic = topic.decode('utf-8') if topic is not None else ""
+        str_meta = meta.decode('utf-8') if meta is not None else ""
+        self.event_handler.on_leave_topic_result(request_id, str_channel_name, str_user_id, str_topic, str_meta, error_code)
     def _on_subscribe_topic_result(self, event_handle, request_id, channel_name, user_id, topic, succeed_users, failed_users, error_code):
-        self.event_handler.on_subscribe_topic_result(request_id, channel_name, user_id, topic, succeed_users, failed_users, error_code)
+        str_channel_name = channel_name.decode('utf-8') if channel_name is not None else ""
+        str_user_id = user_id.decode('utf-8') if user_id is not None else ""
+        str_topic = topic.decode('utf-8') if topic is not None else ""
+        str_succeed_users = succeed_users.decode('utf-8') if succeed_users is not None else ""
+        str_failed_users = failed_users.decode('utf-8') if failed_users is not None else ""
+        self.event_handler.on_subscribe_topic_result(request_id, str_channel_name, str_user_id, str_topic, str_succeed_users, str_failed_users, error_code)
     def _on_connection_state_changed(self, event_handle, channel_name, state, reason):
-        self.event_handler.on_connection_state_changed(channel_name, state, reason)
+        str_channel_name = channel_name.decode('utf-8') if channel_name is not None else ""
+        self.event_handler.on_connection_state_changed(str_channel_name, state, reason)
     def _on_token_privilege_will_expire(self, event_handle, channel_name):
-        self.event_handler.on_token_privilege_will_expire(channel_name)
+        str_channel_name = channel_name.decode('utf-8') if channel_name is not None else ""
+        self.event_handler.on_token_privilege_will_expire(str_channel_name)
 
     def _on_subscribe_result(self, event_handle, request_id, channel_name, error_code):
-        self.event_handler.on_subscribe_result(request_id, channel_name, error_code)
+        str_channel_name = channel_name.decode('utf-8') if channel_name is not None else ""
+        self.event_handler.on_subscribe_result(request_id, str_channel_name, error_code)
+    def _on_unsubscribe_result(self, event_handle, request_id, channel_name, error_code):
+        str_channel_name = channel_name.decode('utf-8') if channel_name is not None else ""
+        self.event_handler.on_unsubscribe_result(request_id, str_channel_name, error_code)
     def _on_publish_result(self, event_handle, request_id, error_code):
         print(f"on publish result: request_id {request_id}, {error_code}")
         self.event_handler.on_publish_result(request_id, error_code)
@@ -761,31 +802,51 @@ class RtmEventHandlerInner(ctypes.Structure):
         self.event_handler.on_presence_get_state_result(request_id, state, error_code)
     def _on_link_state_event(self, event_handle, link_state_event_ptr):
         #convert link_state_event_ptr to LinkStateEvent
-        print(f"on_link_state_event: {link_state_event_ptr}")
-        event = link_state_event_ptr.contents if link_state_event_ptr is not None else None
-        if event is not None:
-            link_state_event = event.get()
-            print(f"on_link_state_event: {link_state_event}")
+        #print(f"on_link_state_event: {link_state_event_ptr}")
+        event_inner = link_state_event_ptr.contents if link_state_event_ptr is not None else None
+        if event_inner is not None and event_inner.get() is not None:
+            link_state_event = event_inner.get()
+            #print(f"on_link_state_event: {link_state_event}")
             self.event_handler.on_link_state_event(link_state_event)
         else:
-            print(f"on_link_state_event: event is None")
+            #print(f"on_link_state_event: event is None")
             self.event_handler.on_link_state_event(None)
     def _on_get_history_messages_result(self, event_handle, request_id, history_messages, count, new_start, error_code):
-        link_state_event = link_state_event_ptr.contents.get() if link_state_event_ptr is not None else None
-        print(f"on_link_state_event: {link_state_event}")
-        self.event_handler.on_link_state_event(link_state_event)
-    def _on_get_history_messages_result(self, event_handle, request_id, history_messages, count, new_start, error_code):
-        self.event_handler.on_get_history_messages_result(request_id, history_messages, count, new_start, error_code)
+        history_messages_inner = history_messages.contents if history_messages is not None else None
+        if history_messages_inner is not None:
+            history_messages_list = []
+            for i in range(count):
+                history_message_inner = history_messages_inner.historyMessages[i].contents if history_messages_inner.historyMessages[i] is not None else None
+                if history_message_inner is not None:
+                    history_message = history_message_inner.get()
+                    history_messages_list.append(history_message)
+            self.event_handler.on_get_history_messages_result(request_id, history_messages_list, count, new_start, error_code)
+        else:
+            self.event_handler.on_get_history_messages_result(request_id, [], count, new_start, error_code)
     def _on_logout_result(self, event_handle, request_id, error_code):
         print(f"on logout result: request_id {request_id}, {error_code}")
         self.event_handler.on_logout_result(request_id, error_code)
     def _on_renew_token_result(self, event_handle, request_id, server_type, channel_name, error_code):
-        self.event_handler.on_renew_token_result(request_id, server_type, channel_name, error_code)
+        str_channel_name = channel_name.decode('utf-8') if channel_name is not None else ""
+        self.event_handler.on_renew_token_result(request_id, server_type, str_channel_name, error_code)
     def _on_publish_topic_message_result(self, event_handle, request_id, channel_name, topic, error_code):
-        self.event_handler.on_publish_topic_message_result(request_id, channel_name, topic, error_code)
+        str_channel_name = channel_name.decode('utf-8') if channel_name is not None else ""
+        str_topic = topic.decode('utf-8') if topic is not None else ""
+        self.event_handler.on_publish_topic_message_result(request_id, str_channel_name, str_topic, error_code)
     def _on_unsubscribe_topic_result(self, event_handle, request_id, channel_name, topic, error_code):
-        self.event_handler.on_unsubscribe_topic_result(request_id, channel_name, topic, error_code)
+        str_channel_name = channel_name.decode('utf-8') if channel_name is not None else ""
+        str_topic = topic.decode('utf-8') if topic is not None else ""
+        self.event_handler.on_unsubscribe_topic_result(request_id, str_channel_name, str_topic, error_code)
     def _on_get_subscribed_user_list_result(self, event_handle, request_id, channel_name, topic, users, error_code):
-        self.event_handler.on_get_subscribed_user_list_result(request_id, channel_name, topic, users, error_code)
+        str_channel_name = channel_name.decode('utf-8') if channel_name is not None else ""
+        str_topic = topic.decode('utf-8') if topic is not None else ""
+        user_list_inner = users.contents if users is not None else None
+        user_list = []
+        if user_list_inner is not None:
+            for i in range(user_list_inner.count):
+                user_id = user_list_inner.userIds[i].decode('utf-8') if user_list_inner.userIds[i] is not None else ""
+                user_list.append(user_id)
+        self.event_handler.on_get_subscribed_user_list_result(request_id, str_channel_name, str_topic, user_list, error_code)
     def _on_unsubscribe_user_metadata_result(self, event_handle, request_id, user_id, error_code):
-        self.event_handler.on_unsubscribe_user_metadata_result(request_id, user_id, error_code)
+        str_user_id = user_id.decode('utf-8') if user_id is not None else ""
+        self.event_handler.on_unsubscribe_user_metadata_result(request_id, str_user_id, error_code)
