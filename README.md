@@ -2,6 +2,8 @@
 - This is a Python SDK wrapper for the Agora RTC SDK.
 - It supports Linux and Mac platforms.
 - The examples are provided as very simple demonstrations and are not recommended for use in production environments.
+-rtc examples：https://github.com/AgoraIO-Extensions/Agora-python-Server-SDK/examples
+-rtm examples: https://github.com/AgoraIO-Extensions/Agora-python-Server-SDK/examples_rtm
 
 # Very Important Notice !!!
 - A process can only have one instance,and the instance created in process startup is the global instance,and released in process shutdown.

@@ -2,6 +2,8 @@
 - This is a Python SDK wrapper for the Agora RTC SDK.
 - It supports Linux and Mac platforms.
 - The examples are provided as very simple demonstrations and are not recommended for use in production environments.
+-rtc examples：https://github.com/AgoraIO-Extensions/Agora-python-Server-SDK/examples
+-rtm examples: https://github.com/AgoraIO-Extensions/Agora-python-Server-SDK/examples_rtm
 
 # Very Important Notice !!!
 - A process can only have one instance,and the instance created in process startup is the global instance,and released in process shutdown.
@@ -45,7 +47,9 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # Change log
-
+# 2025.10.23 release 2.3.3
+-- update: to support rtm
+-- adjust sdk's directory structure
 # 2025.10.09  release 2.3.1
 -- update arm64 rtc sdk:Fixed a JNI referencing issue in the previous arm64 build. This issue only outputs logs to the console and does not affect functionality.
 
