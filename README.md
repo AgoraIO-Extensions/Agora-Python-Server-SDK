@@ -45,6 +45,9 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # Change log
+# 2025.10.23 release 2.3.3
+-- update: to support rtm
+-- adjust sdk's directory structure
 # 2025.10.09  release 2.3.1
 -- update arm64 rtc sdk:Fixed a JNI referencing issue in the previous arm64 build. This issue only outputs logs to the console and does not affect functionality.
 

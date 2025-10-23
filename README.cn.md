@@ -3,6 +3,11 @@
 - 这是一个 Python SDK 封装的 Agora RTC SDK。
 - 支持Linux和Mac平台。
 - examples只是作为非常简单的演示，不建议在生产环境中使用。
+- sample参考git：
+rtc 用法sample： https://github.com/AgoraIO-Extensions/Agora-python-Server-SDK/examples
+rtm 用法sample： https://github.com/AgoraIO-Extensions/Agora-python-Server-SDK/examples_rtm
+- 如果有其他问题，请参考： https://github.com/AgoraIO-Extensions/Agora-python-Server-SDK/issues
+
 
 ##  ❗ ❗逻辑关系，非常重要 ❗ ❗
 - 一个进程只能有一个service instance；在进程开始的时候，创建service；在进程结束的时候，销毁service。
@@ -55,6 +60,10 @@ NOTE:
 0715版本，不能在onplaybackbeforemixing中，直接做echo audio frame back!
 
 # 更新日志
+## 2025.10.23 发布 2.3.2
+-- 支持rtm
+-- 调整sdk的目录结构
+
 ## 2025.10.09 发布 2.3.1
 -- update arm64 rtc sdk：修复了上一个arm64版本中对jni的引用问题。该问题只会在console输出日志，不会影响功能。
 ## 2025.09.01 发布 2.3.0
