@@ -141,11 +141,12 @@ def _check_download_and_extract_sdk():
         url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.32-20251009_145437-921455_20251023_1538.zip"
         rtc_md5 = "5c002f25d2b381e353082da4f835b4f2"
 
-
-    if os.path.exists(rtc_libfile_path) and get_file_md5(rtc_libfile_path) == rtc_md5:
+    is_file_exist = os.path.exists(rtc_libfile_path)
+    md5_value = get_file_md5(rtc_libfile_path)
+    if is_file_exist and md5_value == rtc_md5:
         return
 
-    logger.error("missing agora sdk, now download it, please wait for a while...")
+    logger.error(f"missing agora sdk, now download it, please wait for a while...: {rtc_libfile_path} {md5_value} {rtc_md5} {is_file_exist}")
     if os.path.exists(sdk_library_dir):
         os.system(f"rm -rf {sdk_library_dir}")
     os.makedirs(sdk_library_dir, exist_ok=True)
