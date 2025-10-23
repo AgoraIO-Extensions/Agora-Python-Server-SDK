@@ -114,7 +114,7 @@ def _check_download_and_extract_sdk():
     #url  = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.32-20250715_161625-791246.zip"
     #url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.32-20250829_160340-860733.zip"
     #fusion version: 20251023
-    url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.32-20250829_160340-860733_20251023_1855.zip "
+    url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.32-20250829_160340-860733_20251023_1855.zip"
     
         
            
