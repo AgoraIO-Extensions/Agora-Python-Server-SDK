@@ -194,23 +194,3 @@ else:
 if not os.path.exists(rtc_libfile_path):
     logger.error(f"library {rtc_libfile_path} not found")
     sys.exit(1)
-
-# 设置动态库搜索路径
-if sys.platform == 'win32':
-    # Windows: 使用 add_dll_directory (Python 3.8+)
-    if hasattr(os, 'add_dll_directory'):
-        os.add_dll_directory(sdk_library_dir)
-elif sys.platform == 'linux':
-    # Linux: 设置 LD_LIBRARY_PATH
-    existing_path = os.environ.get('LD_LIBRARY_PATH', '')
-    if sdk_library_dir not in existing_path:
-        os.environ['LD_LIBRARY_PATH'] = sdk_library_dir + (':' + existing_path if existing_path else '')
-elif sys.platform == 'darwin':
-    # macOS: 设置 DYLD_LIBRARY_PATH
-    existing_path = os.environ.get('DYLD_LIBRARY_PATH', '')
-    if sdk_library_dir not in existing_path:
-        os.environ['DYLD_LIBRARY_PATH'] = sdk_library_dir + (':' + existing_path if existing_path else '')
-
-#load public library for linux:
-if sys.platform == 'linux':
-    ctypes.CDLL(os.path.join(sdk_library_dir, 'libaosl.so'))
