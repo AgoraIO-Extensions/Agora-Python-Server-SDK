@@ -195,20 +195,21 @@ if not os.path.exists(rtc_libfile_path):
     logger.error(f"library {rtc_libfile_path} not found")
     sys.exit(1)
 
-#add environment variable for linux:
-# 在加载库之前添加这段代码
+# 设置动态库搜索路径
 if sys.platform == 'win32':
-    # Windows: 使用 add_dll_directory
+    # Windows: 使用 add_dll_directory (Python 3.8+)
     if hasattr(os, 'add_dll_directory'):
         os.add_dll_directory(sdk_library_dir)
 elif sys.platform == 'linux':
-    # Linux: 设置 LD_LIBRARY_PATH（可选，通常不需要）
-    if sdk_library_dir not in os.environ.get('LD_LIBRARY_PATH', ''):
-        os.environ['LD_LIBRARY_PATH'] = sdk_library_dir + ':' + os.environ.get('LD_LIBRARY_PATH', '')
+    # Linux: 设置 LD_LIBRARY_PATH
+    existing_path = os.environ.get('LD_LIBRARY_PATH', '')
+    if sdk_library_dir not in existing_path:
+        os.environ['LD_LIBRARY_PATH'] = sdk_library_dir + (':' + existing_path if existing_path else '')
 elif sys.platform == 'darwin':
-    # macOS: 设置 DYLD_LIBRARY_PATH（可选，通常不需要）
-    if sdk_library_dir not in os.environ.get('DYLD_LIBRARY_PATH', ''):
-        os.environ['DYLD_LIBRARY_PATH'] = sdk_library_dir + ':' + os.environ.get('DYLD_LIBRARY_PATH', '')
+    # macOS: 设置 DYLD_LIBRARY_PATH
+    existing_path = os.environ.get('DYLD_LIBRARY_PATH', '')
+    if sdk_library_dir not in existing_path:
+        os.environ['DYLD_LIBRARY_PATH'] = sdk_library_dir + (':' + existing_path if existing_path else '')
 
 #load public library for linux:
 if sys.platform == 'linux':
