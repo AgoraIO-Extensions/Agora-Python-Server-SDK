@@ -195,5 +195,6 @@ if not os.path.exists(rtc_libfile_path):
     logger.error(f"library {rtc_libfile_path} not found")
     sys.exit(1)
 
-#load the library when needed, i.e move to rtc/__init__.py and rtm/__init__.py
-
+#load public library for linux:
+if sys.platform == 'linux':
+    ctypes.CDLL(os.path.join(sdk_library_dir, 'libaosl.so'))
