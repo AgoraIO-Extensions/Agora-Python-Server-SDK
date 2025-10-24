@@ -46,6 +46,8 @@ pip install agora_python_server_sdk
 - 下载并解压 [test_data.zip](https://download.agora.io/demo/test/test_data_202408221437.zip) 到Agora-Python-Server-SDK目录
 
 ## 执行测试脚本
+在linux 下，需要设置环境变量,
+export LD_LIBRARY_PATH=/site_package/agora/agora_sdk/
 ```
 python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.pcm --sampleRate=16000 --numOfChannels=1
 ```

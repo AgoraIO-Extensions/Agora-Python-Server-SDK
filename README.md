@@ -42,6 +42,8 @@ pip install agora_python_server_sdk
 - Download and unzip [test_data.zip](https://download.agora.io/demo/test/test_data_202408221437.zip) to the Agora-Python-Server-SDK directory.
 
 ## Executing Test Script
+for linux os, should set env to ：/site_packages/agora/agora_sdk/, like:
+export LD_LIBRARY_PATH=/site_packages/agora/agora_sdk/
 ```
 python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx --userId=xxx --audioFile=./test_data/demo.pcm --sampleRate=16000 --numOfChannels=1
 ```
