@@ -47,10 +47,15 @@ no root dir, only so/dylib file in the root dir
 
 def get_file_md5(file_path):
     hash_md5 = hashlib.md5()
-    with open(file_path, "rb") as f:
-        for chunk in iter(lambda: f.read(4096), b""):
-            hash_md5.update(chunk)
-    return hash_md5.hexdigest()
+    try:
+        with open(file_path, "rb") as f:
+            for chunk in iter(lambda: f.read(4096), b""):
+                hash_md5.update(chunk)
+        return hash_md5.hexdigest()
+    except Exception as e:
+        logger.error(f"get_file_md5 error: {e}")
+        return ""
+
 
 #get agora root path, like: /home/xxx/agora
 def get_sdk_root_path():
@@ -142,8 +147,11 @@ def _check_download_and_extract_sdk():
         rtc_md5 = "5c002f25d2b381e353082da4f835b4f2"
 
     is_file_exist = os.path.exists(rtc_libfile_path)
-    md5_value = get_file_md5(rtc_libfile_path)
-    if is_file_exist and md5_value == rtc_md5:
+    if is_file_exist:
+        md5_value = get_file_md5(rtc_libfile_path)
+    else:
+        md5_value = ""
+    if md5_value == rtc_md5:
         return
 
     logger.error(f"missing agora sdk, now download it, please wait for a while...: {rtc_libfile_path} {md5_value} {rtc_md5} {is_file_exist}")
