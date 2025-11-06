@@ -1,0 +1,201 @@
+#!/usr/bin/env python
+
+import hashlib
+import ssl
+import zipfile
+import site
+import requests
+import ctypes
+import os
+import sys
+import platform
+import logging
+logger = logging.getLogger(__name__)
+ssl._create_default_https_context = ssl._create_unverified_context
+
+'''
+# this is the global init for agora python server sdk, include rtc and rtm
+# it will check the sdk version and download the latest sdk if needed
+path dir structure is:
+   /home/xxx/agora/
+                agora_sdk
+                    include
+                    *.so/*.dylib
+                rtc
+                    __init__.py
+                    rtc*.py
+                rtm
+                    __init__.py
+                    rtm*.py
+                __init__.py
+                setup.py
+                README.md
+                LICENSE
+                CHANGELOG.md
+                CONTRIBUTING.md
+                CODE_OF_CONDUCT.md
+                SECURITY.md
+                CONTRIBUTORS.md
+'''
+'''
+# requirement for package zip file:
+no root dir, only so/dylib file in the root dir
+'''
+
+
+
+
+def get_file_md5(file_path):
+    hash_md5 = hashlib.md5()
+    try:
+        with open(file_path, "rb") as f:
+            for chunk in iter(lambda: f.read(4096), b""):
+                hash_md5.update(chunk)
+        return hash_md5.hexdigest()
+    except Exception as e:
+        logger.error(f"get_file_md5 error: {e}")
+        return ""
+
+
+#get agora root path, like: /home/xxx/agora
+def get_sdk_root_path():
+    agora_path = os.path.dirname(os.path.abspath(__file__))
+    return agora_path
+#get agora 's library path, like: /home/xxx/agora/agora_sdk/
+def get_sdk_library_path():
+    agora_path = get_sdk_root_path()
+    library_path = os.path.join(agora_path, "agora_sdk")    
+    
+    return library_path
+def get_sdk_rtc_path():
+    agora_path = get_sdk_root_path()
+    rtc_path = os.path.join(agora_path, "rtc")
+    return rtc_path
+def get_sdk_rtm_path():
+    agora_path = get_sdk_root_path()
+    rtm_path = os.path.join(agora_path, "rtm")
+    return rtm_path
+
+
+#helper function to download file from url
+def download_file_with_progress(url, path):
+    response = requests.get(url, stream=True)
+    total_size = int(response.headers.get('content-length', 0))
+    block_size = 4096
+    wrote = 0
+    with open(path, 'wb') as f:
+        for data in response.iter_content(block_size):
+            wrote = wrote + len(data)
+            f.write(data)
+            if (total_size > 0):
+                percent = wrote * 100 / total_size
+                #print(f"Downloaded {percent}% of {total_size} bytes")
+                print(f"\rDownloading: ----{percent:.2f}%-----", end='', flush=True)
+    print("Downloading: ----100.00%-----\n")
+    return True
+
+
+def _check_download_and_extract_sdk():
+    agora_service_path = os.path.dirname(os.path.abspath(__file__))
+    # change from dir like: /home/xxx/agora_rtc/agora/rtc/agora_sdk to
+    # /home/xxx/agora_rtc/agora/agora_sdk
+    # /home/xxx/agora_rtc/agora/rtc
+    # /home/xxx/agora_rtc/agora/rtm
+    global sdk_library_dir, sdk_root_dir
+    
+    zip_path = os.path.join(sdk_root_dir, "agora_rtc_sdk.zip")
+    logger.error(f"sdk_library_dir: {sdk_library_dir}")
+    logger.error(f"zip_path: {zip_path}")
+
+    # for diff os and arch
+    arch = platform.machine()
+    os_type = platform.system()
+
+    
+
+    #url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.30-20241024_101940-398537.zip"
+    # version 2.2.0 for linux
+    #url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.31-20241223_111509-491956.zip"
+    #url  = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.32-20250715_161625-791246.zip"
+    #url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.32-20250829_160340-860733.zip"
+    #fusion version: 20251023
+    #url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.32-20250829_160340-860733_20251023_1855.zip"
+    #20251106 Fusion version: one sdk package include rtc and rtm
+    url = "https://download.agora.io/sdk/release/agora_rtc_sdk_x86_64-linux-gnu-v4.4.32.150_26715_SERVER_20251030_1807-aed.zip"
+         
+    rtc_libfile_path = os.path.join(sdk_library_dir, "libagora_rtc_sdk.so")
+    #rtc_md5 = "7031dd10d1681cd88fd89d68c5b54282"
+    #rtc_md5 = "7eb8042e43246f95f188549d8711d1bf"
+    rtc_md5 = "821cb1a388279648fcb204ca795e6476"
+    if sys.platform == 'darwin':
+        #url = "https://download.agora.io/sdk/release/agora_rtc_sdk_mac_rel.v4.4.30_22472_FULL_20241024_1224_398653.zip"
+        # version   2.2.0 for mac
+        #url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.31_23136_FULL_20241223_1245_492039.zip"
+        #url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.32_24915_FULL_20250715_1710_791284.zip"
+        #url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.32_25418_FULL_20250829_1647_860754.zip"
+        #20251023 Fusion version: one sdk package include rtc and rtm
+        #url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.32_25418_FULL_20250829_1647_860754_20251023_1441.zip"
+        url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.30_25869_FULL_20251030_1836_953684-aed.zip"
+    
+          
+        
+
+        rtc_libfile_path = os.path.join(sdk_library_dir, "libAgoraRtcKit.dylib")
+        #rtc_md5 = "ca3ca14f9e2b7d97eb2594d1f32dab9f"
+        #rtc_md5 = "df0ec3b5073d17dee76cc4d97c13699a"
+        rtc_md5 = "5b9940d3fca033a53ac30216d5c39be6"
+    if arch == "aarch64" and sys.platform == 'linux':
+        #url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.31-20250307_175457-603878.zip"
+        #url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.32-20250425_150503-675674.zip"
+        #url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.32-20251009_145437-921455.zip"
+        url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.32-20251009_145437-921455_20251023_1538.zip"
+        rtc_md5 = "5c002f25d2b381e353082da4f835b4f2"
+
+    is_file_exist = os.path.exists(rtc_libfile_path)
+    if is_file_exist:
+        md5_value = get_file_md5(rtc_libfile_path)
+    else:
+        md5_value = ""
+    if md5_value == rtc_md5:
+        return
+
+    logger.error(f"missing agora sdk, now download it, please wait for a while...: {rtc_libfile_path} {md5_value} {rtc_md5} {is_file_exist}")
+    if os.path.exists(sdk_library_dir):
+        os.system(f"rm -rf {sdk_library_dir}")
+    os.makedirs(sdk_library_dir, exist_ok=True)
+    if os.path.exists(zip_path):
+        os.remove(zip_path)
+
+    logger.error(f"sdk_library_dir: {sdk_library_dir}")
+    logger.error(f"Downloading {url}...")
+    download_file_with_progress(url, zip_path)
+
+
+    logger.error(f"Extracting {zip_path}...")
+    
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        zip_ref.extractall(sdk_root_dir)
+
+    if os.path.exists(zip_path):
+        os.remove(zip_path)
+    logger.error("download done, continue...")
+
+
+
+sdk_root_dir = get_sdk_root_path()
+sdk_rtc_dir = get_sdk_rtc_path()
+sdk_rtm_dir = get_sdk_rtm_path()
+sdk_library_dir = get_sdk_library_path()
+
+_check_download_and_extract_sdk()
+
+
+if sys.platform == 'darwin':
+    rtc_libfile_path = os.path.join(sdk_library_dir, 'libAgoraRtcKit.dylib')
+else:
+    rtc_libfile_path = os.path.join(sdk_library_dir, 'libagora_rtc_sdk.so')
+
+#check if the library exists
+if not os.path.exists(rtc_libfile_path):
+    logger.error(f"library {rtc_libfile_path} not found")
+    sys.exit(1)
