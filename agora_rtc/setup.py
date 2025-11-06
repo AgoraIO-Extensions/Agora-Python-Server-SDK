@@ -120,7 +120,7 @@ setup(
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/AgoraIO-Extensions/Agora-Python-Server-SDK',
-    packages=["agora.rtc", "agora.rtc._ctypes_handle", "agora.rtc._utils","agora.rtc.utils","agora.rtm","agora.rtm._ctypes_handle","agora.examples","agora.rtm_examples"],
+    packages=["agora.rtc", "agora.rtc._ctypes_handle", "agora.rtc._utils","agora.rtc.utils","agora.rtm","agora.rtm._ctypes_handle"],
     classifiers=[
         "Intended Audience :: Developers",
         'License :: OSI Approved :: MIT License',
