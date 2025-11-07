@@ -62,9 +62,10 @@ NOTE:
 0715版本，不能在onplaybackbeforemixing中，直接做echo audio frame back!
 
 # 更新日志
-## 2025.10.23 发布 2.3.2
--- 支持rtm
+## 2025.10.23 发布 2.3.2：同时支持rtc和rtm
+-- 支持rtm；在改包中，同时支持rtc和rtm
 -- 调整sdk的目录结构
+-- 更新sdk版本
 
 ## 2025.10.09 发布 2.3.1
 -- update arm64 rtc sdk：修复了上一个arm64版本中对jni的引用问题。该问题只会在console输出日志，不会影响功能。
