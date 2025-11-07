@@ -4,7 +4,7 @@ import hashlib
 import ssl
 import zipfile
 import site
-import requests
+from urllib import request
 import ctypes
 import os
 import sys
@@ -77,22 +77,23 @@ def get_sdk_rtm_path():
     return rtm_path
 
 
-#helper function to download file from url
-def download_file_with_progress(url, path):
-    response = requests.get(url, stream=True)
-    total_size = int(response.headers.get('content-length', 0))
-    block_size = 4096
-    wrote = 0
-    with open(path, 'wb') as f:
-        for data in response.iter_content(block_size):
-            wrote = wrote + len(data)
-            f.write(data)
-            if (total_size > 0):
-                percent = wrote * 100 / total_size
-                #print(f"Downloaded {percent}% of {total_size} bytes")
-                print(f"\rDownloading: ----{percent:.2f}%-----", end='', flush=True)
-    print("Downloading: ----100.00%-----\n")
-    return True
+#helper function to download file from ur
+def report_progress(blocknum, blocksize, totalsize):
+    """
+    下载进度回调函数
+    """
+    if totalsize > 0:
+        # 计算下载进度百分比
+        percent = min(100, (blocknum * blocksize) / totalsize * 100)
+        # 使用回车符覆盖当前行，实现进度原地更新
+        print(f"\rDownloading: ----{percent:.2f}%-----", end='', flush=True)
+        # 当下载完成（或计算值超过100%）时换行
+        if percent >= 100:
+            print("Downloading: ----100.00%-----\n")
+    else:
+        # 如果无法获取文件总大小，则显示已下载的字节数
+        downloaded = blocknum * blocksize
+        print(f"\rDownloading: ----{downloaded} bytes-----", end='', flush=True)
 
 
 def _check_download_and_extract_sdk():
@@ -119,14 +120,13 @@ def _check_download_and_extract_sdk():
     #url  = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.32-20250715_161625-791246.zip"
     #url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.32-20250829_160340-860733.zip"
     #fusion version: 20251023
-    #url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.32-20250829_160340-860733_20251023_1855.zip"
-    #20251106 Fusion version: one sdk package include rtc and rtm
-    url = "https://download.agora.io/sdk/release/agora_rtc_sdk_x86_64-linux-gnu-v4.4.32.150_26715_SERVER_20251030_1807-aed.zip"
-         
+
+    url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.32-20250829_160340-860733-aed_20251107_1642.zip"
+
+          
     rtc_libfile_path = os.path.join(sdk_library_dir, "libagora_rtc_sdk.so")
     #rtc_md5 = "7031dd10d1681cd88fd89d68c5b54282"
-    #rtc_md5 = "7eb8042e43246f95f188549d8711d1bf"
-    rtc_md5 = "821cb1a388279648fcb204ca795e6476"
+    rtc_md5 = "7eb8042e43246f95f188549d8711d1bf"
     if sys.platform == 'darwin':
         #url = "https://download.agora.io/sdk/release/agora_rtc_sdk_mac_rel.v4.4.30_22472_FULL_20241024_1224_398653.zip"
         # version   2.2.0 for mac
@@ -134,16 +134,13 @@ def _check_download_and_extract_sdk():
         #url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.32_24915_FULL_20250715_1710_791284.zip"
         #url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.32_25418_FULL_20250829_1647_860754.zip"
         #20251023 Fusion version: one sdk package include rtc and rtm
-        #url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.32_25418_FULL_20250829_1647_860754_20251023_1441.zip"
-        url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.30_25869_FULL_20251030_1836_953684-aed.zip"
-    
-          
+        url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.32_25418_FULL_20250829_1647_860754-aed_20251107_1639.zip"
+
         
 
         rtc_libfile_path = os.path.join(sdk_library_dir, "libAgoraRtcKit.dylib")
         #rtc_md5 = "ca3ca14f9e2b7d97eb2594d1f32dab9f"
-        #rtc_md5 = "df0ec3b5073d17dee76cc4d97c13699a"
-        rtc_md5 = "5b9940d3fca033a53ac30216d5c39be6"
+        rtc_md5 = "df0ec3b5073d17dee76cc4d97c13699a"
     if arch == "aarch64" and sys.platform == 'linux':
         #url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.31-20250307_175457-603878.zip"
         #url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.32-20250425_150503-675674.zip"
@@ -168,7 +165,8 @@ def _check_download_and_extract_sdk():
 
     logger.error(f"sdk_library_dir: {sdk_library_dir}")
     logger.error(f"Downloading {url}...")
-    download_file_with_progress(url, zip_path)
+    #download_file_with_progress(url, zip_path)
+    request.urlretrieve(url, zip_path,reporthook=report_progress)
 
 
     logger.error(f"Extracting {zip_path}...")

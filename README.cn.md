@@ -62,6 +62,9 @@ NOTE:
 0715版本，不能在onplaybackbeforemixing中，直接做echo audio frame back!
 
 # 更新日志
+## 2025.11.07 发布 2.3.3
+-- update sdk
+-- 用urllib来做下载
 ## 2025.10.23 发布 2.3.2
 -- 支持rtm
 -- 调整sdk的目录结构
