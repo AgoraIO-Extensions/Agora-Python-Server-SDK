@@ -83,15 +83,15 @@ def report_progress(blocknum, blocksize, totalsize):
     下载进度回调函数
     """
     if totalsize > 0:
-        # 计算下载进度百分比
+        # calculate download progress percentage
         percent = min(100, (blocknum * blocksize) / totalsize * 100)
-        # 使用回车符覆盖当前行，实现进度原地更新
+        # use carriage return to overwrite current line, to update progress in place
         print(f"\rDownloading: ----{percent:.2f}%-----", end='', flush=True)
-        # 当下载完成（或计算值超过100%）时换行
+        # when download is complete (or calculated value exceeds 100%)
         if percent >= 100:
             print("Downloading: ----100.00%-----\n")
     else:
-        # 如果无法获取文件总大小，则显示已下载的字节数
+        # if cannot get file total size, show downloaded bytes
         downloaded = blocknum * blocksize
         print(f"\rDownloading: ----{downloaded} bytes-----", end='', flush=True)
 
