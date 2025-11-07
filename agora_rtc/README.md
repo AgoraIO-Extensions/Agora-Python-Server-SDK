@@ -49,6 +49,10 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # Change log
+# 2025.11.07 release 2.3.3
+-- update: to support rtm
+-- adjust sdk's directory structure
+-- change requests to urllib
 # 2025.10.23 release 2.3.2: support rtc and rtm in one package
 -- update: to support rtm.can support both rtc and rtm in one package.
 -- adjust sdk's directory structure
