@@ -22,10 +22,12 @@ try:
     if sys.platform == 'darwin':
         lib_agora_rtc_path = os.path.join(lib_dir, 'libAgoraRtcKit.dylib')
         agora_lib = ctypes.CDLL(lib_agora_rtc_path)
+        ctypes.CDLL(os.path.join(lib_dir, 'libAgoraAiNoiseSuppressionExtension.dylib'))
 
     elif sys.platform == 'linux':
         lib_agora_rtc_path = os.path.join(lib_dir, 'libagora_rtc_sdk.so')
-        #ctypes.CDLL(os.path.join(lib_dir, 'libagora-fdkaac.so'))
+        ctypes.CDLL(os.path.join(lib_dir, 'libagora-fdkaac.so'))
+        ctypes.CDLL(os.path.join(lib_dir, 'libagora_ai_noise_suppression_extension.so'))
         agora_lib = ctypes.CDLL(lib_agora_rtc_path)
 except OSError as e:
     logger.error(f"Error loading the library: {e}")

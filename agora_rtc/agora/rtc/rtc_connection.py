@@ -2,7 +2,7 @@ import time
 import ctypes
 
 from .agora_base import *
-from .agora_service import AgoraService
+from .agora_service import AgoraService, _set_filter_property_by_track
 from .local_user import LocalUser
 from .rtc_connection_observer import IRTCConnectionObserver
 from ._ctypes_handle._audio_frame_observer import AudioFrameObserverInner
@@ -515,33 +515,31 @@ class RTCConnection:
             self._capabilities_observer_obj = None
         return 0
 
-    def _set_apm_filter_properties(self, remote_audio_track_handle, user_id_str):
+    def _set_apm_filter_properties(self, remote_audio_track_handle, user_id_str)->int:
         ret = -1000
         is_enabled = self.rtc_engine.enable_apm
         if not is_enabled:
-            return 0
+            return -1001
         apm_config = self.rtc_engine.apm_config
         if apm_config is None:
-            return 0
-        apm_config_json = apm_config.to_json_string()
+            return -1002
+        apm_config_json = apm_config._to_json_string()
         if apm_config_json is None:
-            return 0
+            return -1003
         #Load AINS resource
-        ret = AgoraService._set_filter_property_by_track(remote_audio_track_handle, "audio_processing_remote_playback", "apm_load_resource", "ains", False)
-        if ret != 0:
-            logger.error(f"Failed to set apm_load_resource, error: {ret}")
-    
+        ret = _set_filter_property_by_track(remote_audio_track_handle, "audio_processing_remote_playback", "apm_load_resource", "ains", False)
+        
+        print(f"**********APM: to set apm_load_resource, error: {ret}")
+        
 
 	    #Set APM configuration
-        ret = AgoraService._set_filter_property_by_track(remote_audio_track_handle, "audio_processing_remote_playback", "apm_config", apm_config_json, False)
-        if ret != 0:
-            logger.error(f"Failed to set apm_config, error: {ret}")
+        ret = _set_filter_property_by_track(remote_audio_track_handle, "audio_processing_remote_playback", "apm_config", apm_config_json, False)
+        print(f"**********APM: to set apm_config, error: {ret}, apm_config_json: {apm_config_json}")
         #Enable dump
         if apm_config.enable_dump:
-            ret = AgoraService._set_filter_property_by_track(remote_audio_track_handle, "audio_processing_remote_playback", "apm_dump", "true", False)
-            if ret != 0:
-                logger.error(f"Failed to enable apm_dump, error: {ret}")
-        return 0
+            ret = _set_filter_property_by_track(remote_audio_track_handle, "audio_processing_remote_playback", "apm_dump", "true", False)
+            print(f"**********APM: to enable apm_dump, error: {ret}")
+        return ret
     
     
     

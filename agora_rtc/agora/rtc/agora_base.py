@@ -382,8 +382,8 @@ class AgoraServiceConfig:
     data_dir: str = ""
     config_dir: str = "" #format like: "./agora_rtc_log"
     #20251110 Fusion version: with apm filter
-    enable_apm: bool = False,
-    apm_config: APMConfig = None,
+    enable_apm: bool = False
+    apm_config: APMConfig = None
 
 
 
