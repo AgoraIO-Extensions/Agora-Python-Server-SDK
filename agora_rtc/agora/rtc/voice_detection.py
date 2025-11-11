@@ -33,6 +33,9 @@ class  AudioVadConfigV2():
 
         self.start_rms = rmsThreshold #default to -50
         self.stop_rms = rmsThreshold #default to -50
+        # for apm mode:
+        self.enable_adaptive_rms_threshold = True
+        self.adaptive_rms_threshold_factor = 0.67 #default to 0.67, and 2/3 to pass
         
         pass
 
@@ -63,6 +66,15 @@ class AudioVadV2():
         #trend queue: not impl in this version date: 2024-10-29
         self._trend_queue = None #deque(maxlen=self._vad_configure.stop_recognize_count)  
         self._trend_window = self._vad_configure.stop_recognize_count//2
+        self._voice_count = 0
+        self._silence_count = 0
+        self._total_voice_rms = 0
+        self._ref_avg_rms_in_last_session = 0
+
+        #convert rms from -120, 0 to range from 0 to 127, respond to db: -127db, to 0db
+        self._vad_configure.start_rms = 127 + self._vad_configure.start_rms
+        self._vad_configure.stop_rms = 127 + self._vad_configure.stop_rms
+        
 
  
         
@@ -140,6 +152,15 @@ class AudioVadV2():
         size, full = self._push_to_start(data)
         state = self._cur_state
         bytes = bytearray()
+
+        if data._is_activity == True:
+            self._voice_count += 1
+            self._total_voice_rms += data._audio_frame.rms
+        else:
+            self._voice_count = 0
+            self._total_voice_rms = 0
+        
+        
        
         
         if full == True:
@@ -147,12 +168,18 @@ class AudioVadV2():
             #检查start中的比例是否符合阈值,如果符合阈值，zhi，则将start中的数据全部送入到pre中，并且将pre清空，同时将start清空，同时将当前状态设置为speaking
             total, silence_count = self._get_silence_count(self._start_queue, self._vad_configure.pre_start_recognize_count)
             total -= self._vad_configure.pre_start_recognize_count
-            if (total - silence_count) / total >= self._vad_configure.activePercent:
+            if self._voice_count >= self._vad_configure.start_recognize_count:
                 state = self._vad_state_startspeaking
                 #move pre & start to a new bytearray
                 
                 self._move_deque(bytes, self._start_queue)
                 self._clear_queue(self._start_queue)
+
+                #update ref
+                self._ref_avg_rms_in_last_session = self._total_voice_rms / self._voice_count
+                self._voice_count = 0
+                self._total_voice_rms = 0
+                self._silence_count = 0
                
                 #and clear pre &start
                 self._clear_queue(self._stop_queue)
@@ -167,16 +194,24 @@ class AudioVadV2():
         size, full = self._push_to_stop(data)
         #print(f"stop: {size}, {full}")
 
+        if data._is_activity == True:
+            self._silence_count = 0
+        else:
+            self._silence_count += 1
+
         
         if full == True:
             #trend check
             trend = self._get_trend(self._stop_queue)
             #检查stop中的比例是否符合阈值,
             #   如果符合阈值，同时清空stop 清空，并且将当前状态设置为non-speaking
-            total, silence_count = self._get_silence_count(self._stop_queue,0)
-            if (silence_count) / total >= (self._vad_configure.inactivePercent):
+            
+            if self._silence_count >= (self._vad_configure._stop_recognize_count):
                 state = self._vad_state_stopspeaking
                 self._clear_queue(self._stop_queue)
+                self._voice_count = 0
+                self._total_voice_rms = 0
+                self._silence_count = 0
                 #print(f"stop speaking: {len(self._start_queue)}, {silence_count}, {total}, {trend}")
         return state, data._audio_frame.buffer 
         

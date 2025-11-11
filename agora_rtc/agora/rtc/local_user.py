@@ -624,3 +624,6 @@ class LocalUser:
         size = len(data)
         ret = agora_local_user_send_aduio_meta_data(self.user_handle, c_data, ctypes.c_size_t(size))
         return ret
+    def _set_apm_filter_properties(self, remote_audio_track_handle, user_id_str):
+        ret = self.connection._set_apm_filter_properties(remote_audio_track_handle, user_id_str)
+        return ret

@@ -122,11 +122,20 @@ def _check_download_and_extract_sdk():
     #fusion version: 20251023
 
     url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.32-20250829_160340-860733-aed_20251107_1642.zip"
-
+    #20251110 Fusion version: with apm filter
+    mac_sdk="https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.30_25869_FULL_20251030_1836_953684-aed.zip"
+    linux_sdk = "https://download.agora.io/sdk/release/agora_rtc_sdk_x86_64-linux-gnu-v4.4.32.150_26715_SERVER_20251030_1807-aed.zip"
+    
           
-    rtc_libfile_path = os.path.join(sdk_library_dir, "libagora_rtc_sdk.so")
+    linux_libfile_path = os.path.join(sdk_library_dir, "libagora_rtc_sdk.so")
+    mac_libfile_path = os.path.join(sdk_library_dir, "libAgoraRtcKit.dylib")
+    linux_md5 = "821cb1a388279648fcb204ca795e6476"
+    mac_md5 = "5b9940d3fca033a53ac30216d5c39be6"
+
     #rtc_md5 = "7031dd10d1681cd88fd89d68c5b54282"
-    rtc_md5 = "7eb8042e43246f95f188549d8711d1bf"
+    url = linux_sdk
+    rtc_md5 = linux_md5
+    rtc_libfile_path = linux_libfile_path
     if sys.platform == 'darwin':
         #url = "https://download.agora.io/sdk/release/agora_rtc_sdk_mac_rel.v4.4.30_22472_FULL_20241024_1224_398653.zip"
         # version   2.2.0 for mac
@@ -134,13 +143,12 @@ def _check_download_and_extract_sdk():
         #url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.32_24915_FULL_20250715_1710_791284.zip"
         #url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.32_25418_FULL_20250829_1647_860754.zip"
         #20251023 Fusion version: one sdk package include rtc and rtm
-        url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.32_25418_FULL_20250829_1647_860754-aed_20251107_1639.zip"
+        #url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.32_25418_FULL_20250829_1647_860754-aed_20251107_1639.zip"
+        url = mac_sdk
 
-        
-
-        rtc_libfile_path = os.path.join(sdk_library_dir, "libAgoraRtcKit.dylib")
+        rtc_libfile_path = mac_libfile_path
         #rtc_md5 = "ca3ca14f9e2b7d97eb2594d1f32dab9f"
-        rtc_md5 = "df0ec3b5073d17dee76cc4d97c13699a"
+        rtc_md5 = mac_md5
     if arch == "aarch64" and sys.platform == 'linux':
         #url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.31-20250307_175457-603878.zip"
         #url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.32-20250425_150503-675674.zip"
@@ -197,3 +205,6 @@ else:
 if not os.path.exists(rtc_libfile_path):
     logger.error(f"library {rtc_libfile_path} not found")
     sys.exit(1)
+
+# 显式导出这些变量，确保子模块可以导入
+__all__ = ['sdk_library_dir', 'sdk_rtc_dir', 'sdk_rtm_dir', 'sdk_root_dir']

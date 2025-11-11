@@ -297,6 +297,63 @@ class VideoFrame():
     alpha_buffer: bytearray = None
     alpha_mode: int = 0
 
+@dataclass(kw_only=True)
+class AiNsConfig:
+	ns_enabled: bool = True
+	ai_ns_enabled: bool = True
+	ai_ns_model_pref: int = 10
+	nsng_alg_route: int = 12
+	nsng_predef_agg: int = 11
+@dataclass(kw_only=True)
+class AiAecConfig:
+	enabled: bool = False
+	split_srate_for_48k: int = 16000
+
+@dataclass(kw_only=True)
+class BghvsCConfig:
+	enabled: bool = True
+	vad_thr: float = 0.8
+
+@dataclass(kw_only=True)
+class AgcConfig:
+	enabled: bool = False
+
+@dataclass(kw_only=True)
+class APMConfig:
+    ai_ns_config: AiNsConfig = field(default_factory=AiNsConfig)
+    ai_aec_config: AiAecConfig = field(default_factory=AiAecConfig)
+    bghvs_c_config: BghvsCConfig = field(default_factory=BghvsCConfig)
+    agc_config: AgcConfig = field(default_factory=AgcConfig)
+    enable_dump: bool = False
+    
+    def _to_json_string(self):
+        import json
+        config_dict = {
+            "aec": {
+                "enabled": self.ai_aec_config.enabled,
+                "split_srate_for_48k": self.ai_aec_config.split_srate_for_48k
+            },
+            "bghvs": {
+                "enabled": self.bghvs_c_config.enabled,
+                "vadThr": self.bghvs_c_config.vad_thr
+            },
+            "agc": {
+                "enabled": self.agc_config.enabled
+            },
+            "ans": {
+                "enabled": self.ai_ns_config.ns_enabled
+            },
+            "sf_st_cfg": {
+                "enabled": self.ai_ns_config.ai_ns_enabled,
+                "ainsModelPref": self.ai_ns_config.ai_ns_model_pref
+            },
+            "sf_ext_cfg": {
+                "nsngAlgRoute": self.ai_ns_config.nsng_alg_route,
+                "nsngPredefAgg": self.ai_ns_config.nsng_predef_agg
+            }
+        }
+        return json.dumps(config_dict, separators=(',', ':'))
+    
 
 @dataclass(kw_only=True)
 class AgoraServiceConfig:
@@ -324,6 +381,11 @@ class AgoraServiceConfig:
     log_file_size_kb: int = 5*1024
     data_dir: str = ""
     config_dir: str = "" #format like: "./agora_rtc_log"
+    #20251110 Fusion version: with apm filter
+    enable_apm: bool = False,
+    apm_config: APMConfig = None,
+
+
 
 
 @dataclass(kw_only=True)

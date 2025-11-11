@@ -62,6 +62,25 @@ NOTE:
 0715版本，不能在onplaybackbeforemixing中，直接做echo audio frame back!
 
 # 更新日志
+## 2.3.4 fro apm ? not released
+-- update sdk to apm version: 4.4.32/1025版本
+-- 增加configure，支持设置是否使用apm
+-- 更新setup和init.py里面的方法，ok，包括版本/URL、md5等
+-- 总体链路代码ok，需要测试？？
+-- todo：
+  -[]？需要添加vad算法更新
+  -[]？需要添加vaddump的修改
+  -[]？修改vad 算法，支持设置vad的开关
+  -[]？增加vad configrue的参数设置
+  -[]？每次都需要下载，查看md5不对？？
+  -[]？增加vad的开关设置
+  -[]？增加vad的开关设置
+  -[]？增加vad的开关设置
+  -[]？增加vad的开关设置
+  -[]？增加vad的开关设置
+  -[]？增加vad的开关设置
+
+  
 ## 2025.11.07 发布 2.3.3
 -- update sdk
 -- 用urllib来做下载

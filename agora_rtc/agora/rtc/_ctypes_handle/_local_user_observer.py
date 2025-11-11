@@ -186,6 +186,8 @@ class RTCLocalUserObserverInner(ctypes.Structure):
     def _on_user_audio_track_subscribed(self, local_user_handle, user_id, remote_audio_track_handle):
         logger.debug(f"LocalUserCB _on_user_audio_track_subscribed: {local_user_handle}, {user_id}, {remote_audio_track_handle}")
         user_id_str = user_id.decode('utf-8') if user_id else ""
+        #add apm filter for remote audio track
+        self.local_user._set_apm_filter_properties(remote_audio_track_handle,user_id_str)
         # note: this is a pointer to agora::rtc::IRemoteAudioTrack
         remote_audio_track = RemoteAudioTrack(remote_audio_track_handle, user_id_str)
         # map to localuser to save reference

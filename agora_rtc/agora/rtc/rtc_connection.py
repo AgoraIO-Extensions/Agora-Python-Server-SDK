@@ -514,6 +514,34 @@ class RTCConnection:
         if self._capabilities_observer_obj:
             self._capabilities_observer_obj = None
         return 0
+
+    def _set_apm_filter_properties(self, remote_audio_track_handle, user_id_str):
+        ret = -1000
+        is_enabled = self.rtc_engine.enable_apm
+        if not is_enabled:
+            return 0
+        apm_config = self.rtc_engine.apm_config
+        if apm_config is None:
+            return 0
+        apm_config_json = apm_config.to_json_string()
+        if apm_config_json is None:
+            return 0
+        #Load AINS resource
+        ret = AgoraService._set_filter_property_by_track(remote_audio_track_handle, "audio_processing_remote_playback", "apm_load_resource", "ains", False)
+        if ret != 0:
+            logger.error(f"Failed to set apm_load_resource, error: {ret}")
+    
+
+	    #Set APM configuration
+        ret = AgoraService._set_filter_property_by_track(remote_audio_track_handle, "audio_processing_remote_playback", "apm_config", apm_config_json, False)
+        if ret != 0:
+            logger.error(f"Failed to set apm_config, error: {ret}")
+        #Enable dump
+        if apm_config.enable_dump:
+            ret = AgoraService._set_filter_property_by_track(remote_audio_track_handle, "audio_processing_remote_playback", "apm_dump", "true", False)
+            if ret != 0:
+                logger.error(f"Failed to enable apm_dump, error: {ret}")
+        return 0
     
     
     
