@@ -192,8 +192,11 @@ if sys.platform == 'darwin':
     rtc_libfile_path = os.path.join(sdk_library_dir, 'libAgoraRtcKit.dylib')
 else:
     rtc_libfile_path = os.path.join(sdk_library_dir, 'libagora_rtc_sdk.so')
+    ctypes.CDLL(os.path.join(sdk_library_dir, 'libaosl.so'))
 
 #check if the library exists
 if not os.path.exists(rtc_libfile_path):
     logger.error(f"library {rtc_libfile_path} not found")
     sys.exit(1)
+# import these variables to the sub modules
+__all__ = ['sdk_library_dir', 'sdk_rtc_dir', 'sdk_rtm_dir', 'sdk_root_dir']

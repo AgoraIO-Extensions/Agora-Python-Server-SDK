@@ -107,12 +107,12 @@ class CustomInstallCommand(install):
 
 setup(
     name='agora_python_server_sdk',
-    version='2.3.3',
+    version='2.3.4',
     description='A Python SDK for Agora Server',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/AgoraIO-Extensions/Agora-Python-Server-SDK',
-    packages=["agora.rtc", "agora.rtc._ctypes_handle", "agora.rtc._utils","agora.rtc.utils","agora.rtm","agora.rtm._ctypes_handle"],
+    packages=["agora", "agora.rtc", "agora.rtc._ctypes_handle", "agora.rtc._utils","agora.rtc.utils","agora.rtm","agora.rtm._ctypes_handle"],
     classifiers=[
         "Intended Audience :: Developers",
         'License :: OSI Approved :: MIT License',
