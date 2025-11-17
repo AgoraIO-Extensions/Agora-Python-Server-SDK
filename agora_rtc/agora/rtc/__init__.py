@@ -31,6 +31,7 @@ try:
         ctypes.CDLL(os.path.join(lib_dir, 'libagora-ffmpeg.so'))
         ctypes.CDLL(os.path.join(lib_dir, 'libagora-soundtouch.so'))
         agora_lib = ctypes.CDLL(lib_agora_rtc_path)
+        # should load it or the ains can not work
         ctypes.CDLL(os.path.join(lib_dir, 'libagora_ai_noise_suppression_extension.so'))
 except OSError as e:
     logger.error(f"Error loading the library: {e}")
