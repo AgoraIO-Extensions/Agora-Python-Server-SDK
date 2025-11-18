@@ -61,26 +61,35 @@ NOTE:
 NOTE:
 0715版本，不能在onplaybackbeforemixing中，直接做echo audio frame back!
 
+todo: 
++[]？idleMode的支持？？
++[]？next
+
 # 更新日志
-## 2.3.4 fro apm ? not released
+## 2025.11.18 发布 2.4.0 版本
 -- update sdk to apm version: 4.4.32/1025版本
 -- 增加configure，支持设置是否使用apm
 -- 更新setup和init.py里面的方法，ok，包括版本/URL、md5等
--- 总体链路代码ok，需要测试？？
+-- 总体链路代码ok，需要测试？？ ok
+-- 增加了对rtm的支持，在一个sdk内，可以同时使用rtc和rtm
 -- todo：
-  -[]？需要添加vad算法更新
-  -[]？需要添加vaddump的修改
-  -[]？修改vad 算法，支持设置vad的开关
-  -[]？增加vad configrue的参数设置
-  -[]？每次都需要下载，查看md5不对？？
-  -[]？增加vad的开关设置
-  -[]？增加vad的开关设置
-  -[]？增加vad的开关设置
-  -[]？增加vad的开关设置
-  -[]？增加vad的开关设置
-  -[]？增加vad的开关设置
-
+  -[]需要添加vad算法更新 ok
+  -[]需要添加vaddump的修改 ok
+  -[]修改apm 算法，支持设置vad的开关, ok
+  -[]增加vad configrue的参数设置, ok
+  -[]每次都需要下载，查看md5不对？？ ok
+  NOTE： 
+  apm功能，也就是服务端回声消除、降噪、自动增益、背景人声消除等功能。
+  通常情况下，aec/ains/agc等已经在客户端实现，服务端不需要再实现，除非有特殊需求。
+  如果想启用apm功能，请联系agora技术支持。
+  NOTE：
+  有关rtc的Sample，参考：https://github.com/AgoraIO-Extensions/Agora-Python-Server-SDK/tree/main/agora_rtc/examples
+  如何使用rtm，参考：https://github.com/AgoraIO-Extensions/Agora-Python-Server-SDK/tree/main/agora_rtc/rtm_examples
   
+
+
+## 2025.11.11 发布 2.3.4
+-- 修复了在setup的时候，没有带入agora/__init__.py里面的配置，导致setup的时候，没有下载sdk的问题
 ## 2025.11.07 发布 2.3.3
 -- update sdk
 -- 用urllib来做下载

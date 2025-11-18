@@ -142,24 +142,24 @@ class MyAudioFrameObserver(IAudioFrameObserver):
         # Create a task to enqueue the frame
         #asyncio.create_task(self._processor.enqueue_frame(audio_frame, vad_result_bytearray, vad_result_state))
         
+        self._vad_dump.write(audio_frame, vad_result_bytearray, vad_result_state)
+        if vad_result_bytearray is not None:
+            if vad_result_state == 1:
+                # start speaking: then start send bytes(not audio_frame) to ARS
+                print(f"vad v2 start speaking{uid}")
+            elif vad_result_state == 2:
+                # continue send bytes to ARS
+                pass
+            elif vad_result_state == 3:
+                # stop speaking: send bytes to ARS and then then stop  ARS
+                print(f"vad v2 stop speaking:{uid}")
+            else:
+                logger.info(f"unknown state:{uid}")
         if (self._is_loop == 1):
             self._audio_queue.put(audio_frame)
             #ret = self._conn.push_audio_pcm_data(audio_frame.buffer, audio_frame.samples_per_sec, audio_frame.channels)
             #print(f"push_audio_pcm_data ret: {ret}")
-        else:
-            self._vad_dump.write(audio_frame, vad_result_bytearray, vad_result_state)
-            if vad_result_bytearray is not None:
-                if vad_result_state == 1:
-                    # start speaking: then start send bytes(not audio_frame) to ARS
-                    print("vad v2 start speaking")
-                elif vad_result_state == 2:
-                    # continue send bytes to ARS
-                    pass
-                elif vad_result_state == 3:
-                    # stop speaking: send bytes to ARS and then then stop  ARS
-                    print("vad v2 stop speaking:")
-                else:
-                    logger.info("unknown state")
+       
         return 1
 
     def on_get_audio_frame_position(self, agora_local_user):
@@ -398,6 +398,10 @@ def main():
     config.log_file_size_kb = 1024
     config.data_dir = "./agora_rtc_log"
     config.config_dir = "./agora_rtc_log"
+    #apm related config: if want to use apm, please ontact with us.
+    #in common, no need to enable it.
+    # note: enable_apm is a switch that controls whether intermediate processed audio data will be dumped to local disk. 
+    # Only use it in debug mode.
     config.enable_apm = True
     config.apm_config = APMConfig(
             ai_aec_config=AiAecConfig(enabled=False),
@@ -490,7 +494,7 @@ def main():
     '''
 
     
-    # set video low delay mode
+    # set video low delay mode:only for test, do not use in production
     
     agora_parameter.set_parameters("{\"che.video.vpr.enable\":false}")
     agora_parameter.set_parameters("{\"rtc.video.avsync\":false}")
@@ -529,7 +533,8 @@ def main():
     audio_queue = Queue()
     video_queue = Queue()
     audio_observer = MyAudioFrameObserver(connection, 1, audio_queue)
-    vad_configure  = AudioVadConfigV2(16, 30, 50, 0.7, 0.5, 70, 70, -50)
+    #vad_configure  = AudioVadConfigV2(16, 30, 50, 0.7, 0.5, 70, 70, -50)
+    vad_configure = AudioVadConfigV2()
     connection.register_audio_frame_observer(audio_observer, 1, vad_configure)
 
     #videoframe observer
