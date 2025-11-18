@@ -49,6 +49,25 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # Change log
+## 2025.11.18 Release version 2.4.0
+-- Update SDK to APM version: 4.4.32/1025
+-- Add configure support for enabling/disabling APM
+-- Update methods in setup.py and __init__.py, ok, including version/URL, md5, etc.
+-- Overall code pipeline ok, needs testing?? ok
+-- Add support to rtm, one single sdk supports both rtm and rtc, ok
+-- todo:
+  -[] Need to add VAD algorithm update ok
+  -[] Need to add vad_dump modifications ok
+  -[] Modify APM algorithm to support VAD switch, ok
+  -[] Add VAD configure parameter settings, ok
+  -[] Download every time, check md5 mismatch?? ok
+  NOTE:
+  APM features, i.e., server-side echo cancellation, noise suppression, automatic gain control, background voice removal, etc.
+  Normally, AEC/AINS/AGC, etc., are already implemented on the client side, and the server side does not need to implement them again, unless there are special requirements.
+  If you want to enable APM features, please contact Agora technical support.
+  NOTE：
+  How to use rtc,please ref to: https://github.com/AgoraIO-Extensions/Agora-Python-Server-SDK/tree/main/agora_rtc/examples
+  Hot to use rtm,please ref to ://github.com/AgoraIO-Extensions/Agora-Python-Server-SDK/tree/main/agora_rtc/rtm_examples
 # 2025.11.07 release 2.3.3
 -- update: to support rtm
 -- adjust sdk's directory structure

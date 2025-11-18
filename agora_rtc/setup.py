@@ -80,6 +80,12 @@ class CustomInstallCommand(install):
         url = "https://download.agora.io/sdk/release/agora_rtc_sdk-x86_64-linux-gnu-v4.4.32-20250829_160340-860733-aed_20251107_1642.zip"
         if sys.platform == 'darwin':
             url = "https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.32_25418_FULL_20250829_1647_860754-aed_20251107_1639.zip"
+
+        #20251110 Fusion version: with apm filter
+        mac_sdk="https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.30_25869_FULL_20251030_1836_953684-aed.zip"
+        url = "https://download.agora.io/sdk/release/agora_rtc_sdk_x86_64-linux-gnu-v4.4.32.150_26715_SERVER_20251030_1807-aed.zip"
+        if sys.platform == 'darwin':
+            url = mac_sdk
    
        
         if arch == "aarch64" and sys.platform == 'linux':
@@ -107,12 +113,12 @@ class CustomInstallCommand(install):
 
 setup(
     name='agora_python_server_sdk',
-    version='2.3.3',
+    version='2.4.0',
     description='A Python SDK for Agora Server',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/AgoraIO-Extensions/Agora-Python-Server-SDK',
-    packages=["agora.rtc", "agora.rtc._ctypes_handle", "agora.rtc._utils","agora.rtc.utils","agora.rtm","agora.rtm._ctypes_handle"],
+    packages=["agora", "agora.rtc", "agora.rtc._ctypes_handle", "agora.rtc._utils","agora.rtc.utils","agora.rtm","agora.rtm._ctypes_handle"],
     classifiers=[
         "Intended Audience :: Developers",
         'License :: OSI Approved :: MIT License',
