@@ -65,6 +65,14 @@ agora_service_set_log_filter = agora_lib.agora_service_set_log_filter
 agora_service_set_log_filter.restype = AGORA_API_C_INT
 agora_service_set_log_filter.argtypes = [AGORA_HANDLE, ctypes.c_uint]
 
+agora_audio_track_enable_audio_filter = agora_lib.agora_audio_track_enable_audio_filter
+agora_audio_track_enable_audio_filter.restype = ctypes.c_int
+agora_audio_track_enable_audio_filter.argtypes = [AGORA_HANDLE, ctypes.c_char_p, ctypes.c_int, ctypes.c_int]
+
+agora_audio_track_set_filter_property = agora_lib.agora_audio_track_set_filter_property
+agora_audio_track_set_filter_property.restype = ctypes.c_int
+agora_audio_track_set_filter_property.argtypes = [AGORA_HANDLE, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_int]
+
 
 class AgoraService:
     def __init__(self) -> None:
@@ -74,6 +82,8 @@ class AgoraService:
         self.inited = False
         #default to None, and never create it manually by developer from ver2.3.0
         self.media_node_factory = None
+        self.enable_apm = False
+        self.apm_config = None
 
     def initialize(self, config: AgoraServiceConfig):
         if self.inited == True:
@@ -101,7 +111,14 @@ class AgoraService:
 
         # force audio vad v2 to be enabled
         agora_parameter.set_parameters("{\"che.audio.label.enable\": true}")
-
+        # for apm filter: to enable apm filter
+        generator = "audio_processing_remote_playback"
+        cgenerator = generator.encode('utf-8')
+        ctrak = ctypes.c_char_p(None)
+        result = agora_service_enable_extension(self.service_handle, cprovider, cgenerator, ctrak, 1)
+        if result != 0:
+            logger.error(f"Failed to enable audio processing remote playback filter. Error code: {result}")
+       
         #versio 2.2.0 for callback when muted
         if config.should_callbck_when_muted > 0:
             agora_parameter.set_parameters("{\"rtc.audio.enable_user_silence_packet\": true}")
@@ -111,6 +128,17 @@ class AgoraService:
 	    it will be encoded as av1 if config is av1 or it only work for resolution >= 360p
         '''
         agora_parameter.set_parameters("{\"che.video.min_enc_level\": 0}")
+
+        #keep & save apm config
+        self.enable_apm = config.enable_apm
+        if self.enable_apm:
+            if config.apm_config is None:
+                self.apm_config = APMConfig()
+            else:
+                self.apm_config = config.apm_config
+        else:
+            self.apm_config = None
+        
 
         return result
 
@@ -210,3 +238,27 @@ class AgoraService:
         else:
             logger.error(f"Failed to set log file. Error code: {result}")
         return result
+    #apm related:
+#apm related api
+def _get_audio_filter_position(is_local_track: bool = False) -> int:
+    if is_local_track:
+        return 3
+    return 2
+
+def _enable_audio_filter_by_track(track: any, name: str, enable: bool, is_local_track: bool) -> int:
+    if track is None:
+        return -1000
+    c_name = ctypes.c_char_p(name.encode('utf-8'))
+    c_enable = ctypes.c_int(0)
+    if enable:
+        c_enable = ctypes.c_int(1)
+    position = _get_audio_filter_position(is_local_track)
+    return int(agora_audio_track_enable_audio_filter(track, c_name, c_enable, ctypes.c_int(position)))
+def _set_filter_property_by_track(track: any, name: str, key: str, value: str, is_local_track: bool) -> int:
+    if track is None:
+        return -1000
+    c_name = ctypes.c_char_p(name.encode('utf-8'))
+    c_key = ctypes.c_char_p(key.encode('utf-8'))
+    c_value = ctypes.c_char_p(value.encode('utf-8'))
+    position = _get_audio_filter_position(is_local_track)
+    return int(agora_audio_track_set_filter_property(track, c_name, c_key, c_value, ctypes.c_int(position)))

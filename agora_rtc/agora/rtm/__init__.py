@@ -30,6 +30,7 @@ try:
     elif sys.platform == 'linux':
         lib_agora_rtm_path = os.path.join(sdk_library_dir, 'libagora_rtm_sdk_c.so')
         rtm_lib = ctypes.CDLL(lib_agora_rtm_path)
+        ctypes.CDLL(os.path.join(sdk_library_dir, 'libagora_rtm_sdk.so'))
 except OSError as e:
     logger.error(f"Error loading the library: {e}")
     logger.error(f"Attempted to load from: {lib_agora_rtm_path}")
