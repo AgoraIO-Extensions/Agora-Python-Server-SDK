@@ -10,8 +10,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 class  AudioVadConfigV2():
-    def __init__(self, preStartRecognizeCount:int, startRecognizeCount:int, stopRecognizeCount:int, 
-                 activePercent:float, inactivePercent:float, start_voiceprob: int, stop_voiceporb:int, rmsThreshold:float):
+    def __init__(self, preStartRecognizeCount:int=16, startRecognizeCount:int=30, stopRecognizeCount:int=50, 
+                 activePercent:float=0.7, inactivePercent:float=0.5, start_voiceprob: int=70, stop_voiceporb:int=50, rmsThreshold:int=-50):
         self.start_recognize_count = startRecognizeCount
         self.pre_start_recognize_count = preStartRecognizeCount
         self.stop_recognize_count = stopRecognizeCount
@@ -31,11 +31,12 @@ class  AudioVadConfigV2():
         # In a quiet environment, it can be set to -50;   
         # in a noisy environment, it can be set to a value between -40 and -30.
 
-        self.start_rms = rmsThreshold #default to -50
-        self.stop_rms = rmsThreshold #default to -50
+        self.start_rms = rmsThreshold #default to -70
+        self.stop_rms = rmsThreshold #default to -70
         # for apm mode:
-        self.enable_adaptive_rms_threshold = True
-        self.adaptive_rms_threshold_factor = 0.67 #default to 0.67, and 2/3 to pass
+        self.enable_adaptive_rms_threshold : bool = True
+        self.adaptive_rms_threshold_factor : float = 0.67 #default to 0.67, and 2/3 to pass
+        print(f"vadconfigure start_rms: {self.start_rms}, stop_rms: {self.stop_rms}")
         
         pass
 
@@ -66,20 +67,17 @@ class AudioVadV2():
         #trend queue: not impl in this version date: 2024-10-29
         self._trend_queue = None #deque(maxlen=self._vad_configure.stop_recognize_count)  
         self._trend_window = self._vad_configure.stop_recognize_count//2
-        self._voice_count = 0
-        self._silence_count = 0
-        self._total_voice_rms = 0
-        self._ref_avg_rms_in_last_session = 0
+        self._voice_count : int = 0
+        self._silence_count : int = 0
+        self._total_voice_rms : int = 0
+        self._ref_avg_rms_in_last_session : int = 0
 
         #convert rms from -120, 0 to range from 0 to 127, respond to db: -127db, to 0db
         self._vad_configure.start_rms = 127 + self._vad_configure.start_rms
         self._vad_configure.stop_rms = 127 + self._vad_configure.stop_rms
-        
+        print(f"vad instance start_rms: {self._vad_configure.start_rms}, stop_rms: {self._vad_configure.stop_rms}")
+        pass
 
- 
-        
-        
-    
     def _push_to_start(self, data: VadDataV2) -> tuple[int,bool]:
         self._start_queue.append(data)
         size = len(self._start_queue)
@@ -164,10 +162,6 @@ class AudioVadV2():
        
         
         if full == True:
-            #存在一定的问题：如果pre中就已经是开始在说话了，这个时候就会出现问题，或者漏掉的情况
-            #检查start中的比例是否符合阈值,如果符合阈值，zhi，则将start中的数据全部送入到pre中，并且将pre清空，同时将start清空，同时将当前状态设置为speaking
-            total, silence_count = self._get_silence_count(self._start_queue, self._vad_configure.pre_start_recognize_count)
-            total -= self._vad_configure.pre_start_recognize_count
             if self._voice_count >= self._vad_configure.start_recognize_count:
                 state = self._vad_state_startspeaking
                 #move pre & start to a new bytearray
@@ -176,7 +170,7 @@ class AudioVadV2():
                 self._clear_queue(self._start_queue)
 
                 #update ref
-                self._ref_avg_rms_in_last_session = self._total_voice_rms / self._voice_count
+                self._ref_avg_rms_in_last_session = int(self._total_voice_rms / self._voice_count)
                 self._voice_count = 0
                 self._total_voice_rms = 0
                 self._silence_count = 0
@@ -200,13 +194,8 @@ class AudioVadV2():
             self._silence_count += 1
 
         
-        if full == True:
-            #trend check
-            trend = self._get_trend(self._stop_queue)
-            #检查stop中的比例是否符合阈值,
-            #   如果符合阈值，同时清空stop 清空，并且将当前状态设置为non-speaking
-            
-            if self._silence_count >= (self._vad_configure._stop_recognize_count):
+        if full == True:    
+            if self._silence_count >= (self._vad_configure.stop_recognize_count):
                 state = self._vad_state_stopspeaking
                 self._clear_queue(self._stop_queue)
                 self._voice_count = 0
@@ -253,6 +242,11 @@ class AudioVadV2():
         #default: shoud never happen
         return int(-100), bytearray()
     
+    def _get_ref_active_avg_rms(self) -> int:
+        if self._vad_configure.enable_adaptive_rms_threshold and self._ref_avg_rms_in_last_session > 0:
+            return int(float(self._ref_avg_rms_in_last_session)*self._vad_configure.adaptive_rms_threshold_factor) #half of avg as threshold value
+        return self._vad_configure.start_rms
+       
     """
     def _is_vad_active(self, data: AudioFrame) -> bool:
     """
@@ -270,6 +264,11 @@ class AudioVadV2():
         #case2
         #if data.far_field_flag == 1 and data.voice_prob > voice_prob :#and data.pitch > 0 : #voice: from 75 to 50
         #case4: rms > -40
-        if data.far_field_flag == 1 and data.voice_prob > voice_prob and data.rms > rms_prob :#and data.pitch > 0 : #voice: from 75 to 50
+        #if data.far_field_flag == 1 and data.voice_prob > voice_prob and data.rms > rms_prob :#and data.pitch > 0 : #voice: from 75 to 50
+        #date: 2025-10-29 for sdk which support apm filter, and in this version, we don't need to use farfield flag to detect speech, so we don't need to use farfield flag to detect speech
+        refRms = self._get_ref_active_avg_rms()
+        active = (data.voice_prob == 1) or (data.rms > refRms)
+        #print(f"active: {active}, voice_prob: {data.voice_prob}, rms: {data.rms}, refRms: {refRms}")
+        if active:
             return True
         return False
