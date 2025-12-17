@@ -95,7 +95,16 @@ def report_progress(blocknum, blocksize, totalsize):
         downloaded = blocknum * blocksize
         print(f"\rDownloading: ----{downloaded} bytes-----", end='', flush=True)
 
-
+def _get_url_from_version_file(path: str):
+    if not os.path.exists(path):
+        return ""
+    try:
+        with open(path, 'r') as f:
+            lines = f.readline()
+            return lines
+    except Exception as e:
+        logger.error(f"Failed to read version file: {e}")
+        return ""
 def _check_download_and_extract_sdk():
     agora_service_path = os.path.dirname(os.path.abspath(__file__))
     # change from dir like: /home/xxx/agora_rtc/agora/rtc/agora_sdk to
@@ -125,12 +134,20 @@ def _check_download_and_extract_sdk():
     #20251110 Fusion version: with apm filter
     mac_sdk="https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.30_25869_FULL_20251030_1836_953684-aed.zip"
     linux_sdk = "https://download.agora.io/sdk/release/agora_rtc_sdk_x86_64-linux-gnu-v4.4.32.150_26715_SERVER_20251030_1807-aed.zip"
+
+    linux_sdk = "https://download.agora.io/sdk/release/agora_rtc_sdk_x86_64-linux-gnu-Agora_Native_SDK_for_Linux_x64_zhourui_26895_SERVER_20251121_1628_987405_20251021_1427-3a.zip"
+    mac_sdk="https://download.agora.io/sdk/release/agora_sdk_mac_Agora_Native_SDK_for_Mac_zhourui_26101_FULL_20251121_2135_987705_20251021_1427-3a.zip"
+
+    linux_sdk="https://download.agora.io/sdk/release/agora_rtc_sdk_x86_64-linux-gnu-v4.4.32.154_26982_SERVER_20251210_1745_994155_20251021_1427-3a.zip"
+    mac_sdk="https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.32.154_26308_FULL_20251210_1756_994156_20251021_1427-3a.zip"
+
+
     
           
     linux_libfile_path = os.path.join(sdk_library_dir, "libagora_rtc_sdk.so")
     mac_libfile_path = os.path.join(sdk_library_dir, "libAgoraRtcKit.dylib")
-    linux_md5 = "821cb1a388279648fcb204ca795e6476"
-    mac_md5 = "5b9940d3fca033a53ac30216d5c39be6"
+    linux_md5 = "e89043f0db667c207d9308d3515a67ed"
+    mac_md5 = "f63e8af2047a53643a1ceb0a4b24b802"
 
     #rtc_md5 = "7031dd10d1681cd88fd89d68c5b54282"
     url = linux_sdk
@@ -156,6 +173,7 @@ def _check_download_and_extract_sdk():
         url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.32-20251009_145437-921455_20251023_1538.zip"
         rtc_md5 = "5c002f25d2b381e353082da4f835b4f2"
 
+    '''
     is_file_exist = os.path.exists(rtc_libfile_path)
     if is_file_exist:
         md5_value = get_file_md5(rtc_libfile_path)
@@ -163,8 +181,15 @@ def _check_download_and_extract_sdk():
         md5_value = ""
     if md5_value == rtc_md5:
         return
+    '''
+    is_file_exist = os.path.exists(rtc_libfile_path)
+    version_url = _get_url_from_version_file(os.path.join(sdk_root_dir, "version.txt"))
+    if version_url == url and is_file_exist:
+        return
+        
+    #change from md5 check to url check
 
-    logger.error(f"missing agora sdk, now download it, please wait for a while...: {rtc_libfile_path} {md5_value} {rtc_md5} {is_file_exist}")
+    logger.error(f"missing agora sdk, now download it, please wait for a while...: {rtc_libfile_path} {version_url} {url} {is_file_exist}")
     if os.path.exists(sdk_library_dir):
         os.system(f"rm -rf {sdk_library_dir}")
     os.makedirs(sdk_library_dir, exist_ok=True)
@@ -184,6 +209,9 @@ def _check_download_and_extract_sdk():
 
     if os.path.exists(zip_path):
         os.remove(zip_path)
+    #write version url to version.txt
+    with open(os.path.join(sdk_root_dir, "version.txt"), "w") as f:
+        f.write(url)
     logger.error("download done, continue...")
 
 
@@ -207,5 +235,5 @@ if not os.path.exists(rtc_libfile_path):
     logger.error(f"library {rtc_libfile_path} not found")
     sys.exit(1)
 
-# 显式导出这些变量，确保子模块可以导入
+# Explicitly export these variables to ensure that submodules can import them
 __all__ = ['sdk_library_dir', 'sdk_rtc_dir', 'sdk_rtm_dir', 'sdk_root_dir']

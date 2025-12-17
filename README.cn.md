@@ -26,7 +26,7 @@ rtm 用法sample： https://github.com/AgoraIO-Extensions/Agora-python-Server-SD
 # 所需的操作系统和 Python 版本
 - 支持的 Linux 版本：
   - Ubuntu 18.04 LTS 及以上
-  - CentOS 7.0 及以上
+  - CentOS 8.0 及以上
   
 - 支持的 Mac 版本（仅支持开发测试）：
   - MacOS 13 及以上
@@ -66,26 +66,35 @@ todo:
 +[]？next
 
 # 更新日志
+## 2025.12.17 发布 2.4.1 版本
+
+- 更新 SDK 到 154 版本。
+- 增加对外部来源音频数据的 VAD（语音活动检测）、以及 **背景人声消除**、**噪声抑制**、**回声消除**、**自动增益控制**、**3A 算法**，通过 `external_Audio_Processor` 支持。
+- 修改了 LocalUser 的返回值，便于与 SDK 错误码区分。
+- 增加了 `example_external_Audio_Processor.py`，用于演示如何处理外部音频数据。
+
+---
+
 ## 2025.11.18 发布 2.4.0 版本
--- update sdk to apm version: 4.4.32/1025版本
--- 增加configure，支持设置是否使用apm
--- 更新setup和init.py里面的方法，ok，包括版本/URL、md5等
--- 总体链路代码ok，需要测试？？ ok
--- 增加了对rtm的支持，在一个sdk内，可以同时使用rtc和rtm
--- todo：
-  -[]需要添加vad算法更新 ok
-  -[]需要添加vaddump的修改 ok
-  -[]修改apm 算法，支持设置vad的开关, ok
-  -[]增加vad configrue的参数设置, ok
-  -[]每次都需要下载，查看md5不对？？ ok
-  NOTE： 
-  apm功能，也就是服务端回声消除、降噪、自动增益、背景人声消除等功能。
-  通常情况下，aec/ains/agc等已经在客户端实现，服务端不需要再实现，除非有特殊需求。
-  如果想启用apm功能，请联系agora技术支持。
-  NOTE：
-  有关rtc的Sample，参考：https://github.com/AgoraIO-Extensions/Agora-Python-Server-SDK/tree/main/agora_rtc/examples
-  如何使用rtm，参考：https://github.com/AgoraIO-Extensions/Agora-Python-Server-SDK/tree/main/agora_rtc/rtm_examples
-  
+
+- 更新 SDK 至 APM 版本：4.4.32 / 1025 版本。
+- 增加 `configure` 配置，支持设置是否使用 APM。
+- 更新了 `setup` 和 `__init__.py` 里的相关方法，包括版本/URL、MD5 校验等内容。
+- 主链路代码已完善，需要进一步测试（已基本完成）。
+- 增加了对 RTM 的支持：同一 SDK 内可同时使用 RTC 和 RTM。
+- Todo/已完成事项：
+    - [x] 添加 VAD 算法更新；
+    - [x] 添加 vaddump 的修改；
+    - [x] 修改 APM 算法，支持设置 VAD 开关；
+    - [x] 增加 VAD configure 参数设置；
+    - [x] 每次都需要下载，已修正通过校验 MD5 判断。
+- **NOTE：**  
+  - APM 功能即服务端回声消除、降噪、自动增益、背景人声消除等。
+  - 通常 AEC/AINS/AGC 等在客户端已实现，服务端无需重复，除非有特殊需求。
+  - 若需要开启 APM 功能，请联系 Agora 技术支持。
+
+- **RTC 示例**：[agora_rtc/examples](https://github.com/AgoraIO-Extensions/Agora-Python-Server-SDK/tree/main/agora_rtc/examples)
+- **RTM 用法示例**：[agora_rtc/rtm_examples](https://github.com/AgoraIO-Extensions/Agora-Python-Server-SDK/tree/main/agora_rtc/rtm_examples)
 
 
 ## 2025.11.11 发布 2.3.4

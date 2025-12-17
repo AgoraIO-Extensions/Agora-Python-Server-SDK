@@ -131,6 +131,7 @@ class MyAudioFrameObserver(IAudioFrameObserver):
 
     def on_playback_audio_frame(self, agora_local_user, channelId, frame):
         logger.info(f"on_playback_audio_frame")
+        print(f"on_playback_audio_frame: {len(frame.buffer)}")
         return 0
 
     def on_ear_monitoring_audio_frame(self, agora_local_user, frame):
@@ -505,9 +506,9 @@ def main():
     #agora_parameter.set_parameters("{\"rtc.enable_voqa_jitter\":false}") #会额外的增加延迟，因此去掉
     
     #end
-
+    now = time.time()*1000
     connection.connect(appid, channel_id, uid)
-
+    print(f"connect time = {time.time()*1000-now}")
     # step2:
     
   
@@ -529,7 +530,8 @@ def main():
     #localuser.register_video_frame_observer(video_observer)
 
     # note: set_playback_audio_frame_before_mixing_parameters must be call before register_audio_frame_observer
-    localuser.set_playback_audio_frame_before_mixing_parameters(1, 16000)
+    #localuser.set_playback_audio_frame_before_mixing_parameters(1, 16000)
+    localuser.set_playback_audio_frame_parameters(1, 16000, 1, 320)
     audio_queue = Queue()
     video_queue = Queue()
     audio_observer = MyAudioFrameObserver(connection, 1, audio_queue)
