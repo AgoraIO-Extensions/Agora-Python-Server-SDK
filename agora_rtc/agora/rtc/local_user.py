@@ -383,7 +383,7 @@ class LocalUser:
 
     def subscribe_audio(self, user_id):
         if user_id is None:
-            return -1
+            return -1000
         uid_str = user_id.encode('utf-8')
         #ret = agora_local_user_subscribe_audio(self.user_handle, ctypes.create_string_buffer(uid_str))
         # note：both ctypes.create_string_buffer and ctypes.c_char_p are all can change python's str to c_char_p
@@ -398,7 +398,7 @@ class LocalUser:
     def unsubscribe_audio(self, user_id):
         #validity check
         if user_id is None:
-            return -1
+            return -1000
         uid_str = user_id.encode('utf-8')
         ret = agora_local_user_unsubscribe_audio(self.user_handle, ctypes.c_char_p(uid_str))
         if ret < 0:
@@ -517,7 +517,7 @@ class LocalUser:
 
     def subscribe_video(self, user_id, options: VideoSubscriptionOptions):
         if user_id is None:
-            return -1
+            return -1000
         uid_str = user_id.encode('utf-8')
 
         
@@ -540,7 +540,7 @@ class LocalUser:
 
     def unsubscribe_video(self, user_id):
         if user_id is None:
-            return -1
+            return -1000
         uid_str = user_id.encode('utf-8')
         ret = agora_local_user_unsubscribe_video(self.user_handle, ctypes.c_char_p(uid_str))
         if ret < 0:

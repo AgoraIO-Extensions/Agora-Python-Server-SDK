@@ -118,6 +118,12 @@ class AgoraService:
         result = agora_service_enable_extension(self.service_handle, cprovider, cgenerator, ctrak, 1)
         if result != 0:
             logger.error(f"Failed to enable audio processing remote playback filter. Error code: {result}")
+        if config.enable_apm:
+            generator = "audio_processing_pcm_source"
+            cgenerator = generator.encode('utf-8')
+            result = agora_service_enable_extension(self.service_handle, cprovider, cgenerator, ctrak, 1)
+            if result != 0:
+                logger.error(f"Failed to enable audio processing pcm source filter. Error code: {result}")
        
         #versio 2.2.0 for callback when muted
         if config.should_callbck_when_muted > 0:

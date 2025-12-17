@@ -23,7 +23,7 @@
 # Required Operating Systems and Python Versions
 - Supported Linux versions:
   - Ubuntu 18.04 LTS and above
-  - CentOS 7.0 and above
+  - CentOS 8.0 and above
   
 - Supported Mac versions:
   - MacOS 13 and above(only for coding and testing)
@@ -49,25 +49,44 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # Change log
-## 2025.11.18 Release version 2.4.0
--- Update SDK to APM version: 4.4.32/1025
--- Add configure support for enabling/disabling APM
--- Update methods in setup.py and __init__.py, ok, including version/URL, md5, etc.
--- Overall code pipeline ok, needs testing?? ok
--- Add support to rtm, one single sdk supports both rtm and rtc, ok
--- todo:
-  -[] Need to add VAD algorithm update ok
-  -[] Need to add vad_dump modifications ok
-  -[] Modify APM algorithm to support VAD switch, ok
-  -[] Add VAD configure parameter settings, ok
-  -[] Download every time, check md5 mismatch?? ok
-  NOTE:
-  APM features, i.e., server-side echo cancellation, noise suppression, automatic gain control, background voice removal, etc.
-  Normally, AEC/AINS/AGC, etc., are already implemented on the client side, and the server side does not need to implement them again, unless there are special requirements.
-  If you want to enable APM features, please contact Agora technical support.
-  NOTE：
-  How to use rtc,please ref to: https://github.com/AgoraIO-Extensions/Agora-Python-Server-SDK/tree/main/agora_rtc/examples
-  Hot to use rtm,please ref to ://github.com/AgoraIO-Extensions/Agora-Python-Server-SDK/tree/main/agora_rtc/rtm_examples
+## 2025.12.17 Release 2.4.1
+
+- Updated RTC SDK to version 154.
+- Added support for VAD (Voice Activity Detection) for external audio sources, including:
+  - **Background voice removal**
+  - **Noise suppression**
+  - **Echo cancellation**
+  - **Automatic gain control**
+  - **Other 3A algorithms**  
+  All supported via the `external_Audio_Processor`.
+- Modified LocalUser return values for clearer SDK error code distinction.
+- Added `example_external_Audio_Processor.py` to demonstrate external audio data processing.
+
+---
+
+## 2025.11.18 Release 2.4.0
+
+- Updated SDK to APM version: `4.4.32/1025`
+- Added configuration support to enable/disable APM.
+- Updated methods in `setup.py` and `__init__.py`, including version/URL and MD5 processing.
+- Completed main code pipeline (**further testing recommended**).
+- Added RTM support: one SDK now supports both RTC and RTM.
+
+**To-Do Items:**
+- [x] Add VAD algorithm update
+- [x] Add vad_dump modifications
+- [x] Add APM algorithm VAD switch support
+- [x] Add VAD configuration parameter setting
+- [x] Download and check for MD5 mismatch on every download
+
+**Notes:**
+- **APM features** include server-side echo cancellation, noise suppression, automatic gain control, background voice removal, and more.
+- Typically, AEC/AINS/AGC, etc., are handled on the client; server-side activation is only necessary for specific requirements.
+- If you need to enable APM, please contact Agora technical support.
+
+**Usage Examples:**  
+- [RTC usage example](https://github.com/AgoraIO-Extensions/Agora-Python-Server-SDK/tree/main/agora_rtc/examples)  
+- [RTM usage example](https://github.com/AgoraIO-Extensions/Agora-Python-Server-SDK/tree/main/agora_rtc/rtm_examples)
 # 2025.11.07 release 2.3.3
 -- update: to support rtm
 -- adjust sdk's directory structure

@@ -1369,3 +1369,48 @@ class CapabilitiesItemMapInner(ctypes.Structure):
             item=self.item,
             size=self.size
         )
+
+class AudioSinkWantesInner(ctypes.Structure):
+    _fields_ = [
+        ("samples_per_sec", ctypes.c_int),
+        ("channels", ctypes.c_uint32),
+    ]
+    pass
+class AudioLabelInner(ctypes.Structure):
+    _fields_ = [
+        ("far_filed_flag", ctypes.c_int),
+        ("rms", ctypes.c_int),
+        ("voice_prob", ctypes.c_int),
+        ("music_prob", ctypes.c_int),
+        ("pitch", ctypes.c_int),
+    ]
+class AudioPcmFrameInner(ctypes.Structure):
+    _fields_ = [
+        ("capture_timestamp", ctypes.c_uint32),
+        ("samples_per_channel", ctypes.c_uint32),
+        ("sample_rate_hz", ctypes.c_int),
+        ("num_channels", ctypes.c_uint32),
+        ("bytes_per_sample", ctypes.c_uint32),
+        ("data", ctypes.c_int16*3840),
+        ("audio_label", AudioLabelInner),
+    ]
+    def get(self):
+        return AudioFrame(
+            type=0,
+            samples_per_channel=self.samples_per_channel,
+            bytes_per_sample=self.bytes_per_sample,
+            channels=self.num_channels,
+            samples_per_sec=self.sample_rate_hz,
+            buffer=bytearray(ctypes.string_at(self.data, self.samples_per_channel * self.bytes_per_sample * self.num_channels)),
+            render_time_ms=self.capture_timestamp,
+            avsync_type=0,
+            presentation_ms=0,
+            audio_track_number=0,
+            rtp_timestamp=0,
+            far_field_flag=self.audio_label.far_filed_flag,
+            rms=self.audio_label.rms,
+            voice_prob=self.audio_label.voice_prob,
+            music_prob=self.audio_label.music_prob,
+            pitch=self.audio_label.pitch
+        )
+    pass

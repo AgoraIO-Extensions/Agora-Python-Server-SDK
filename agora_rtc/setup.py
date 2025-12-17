@@ -84,6 +84,16 @@ class CustomInstallCommand(install):
         #20251110 Fusion version: with apm filter
         mac_sdk="https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.30_25869_FULL_20251030_1836_953684-aed.zip"
         url = "https://download.agora.io/sdk/release/agora_rtc_sdk_x86_64-linux-gnu-v4.4.32.150_26715_SERVER_20251030_1807-aed.zip"
+        #date:20251124 update sdk for fix the issue of auto load so and auto load ains resource
+        url = "https://download.agora.io/sdk/release/agora_rtc_sdk_x86_64-linux-gnu-Agora_Native_SDK_for_Linux_x64_zhourui_26895_SERVER_20251121_1628_987405_20251021_1427-3a.zip"
+        mac_sdk="https://download.agora.io/sdk/release/agora_sdk_mac_Agora_Native_SDK_for_Mac_zhourui_26101_FULL_20251121_2135_987705_20251021_1427-3a.zip"
+        #added local track apm filter
+        #date:20251217 for incremental sending mode support
+        url="https://download.agora.io/sdk/release/agora_rtc_sdk_x86_64-linux-gnu-v4.4.32.154_26982_SERVER_20251210_1745_994155_20251021_1427-3a.zip"
+        mac_sdk="https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.32.154_26308_FULL_20251210_1756_994156_20251021_1427-3a.zip"
+
+      
+        
         if sys.platform == 'darwin':
             url = mac_sdk
    
@@ -109,11 +119,14 @@ class CustomInstallCommand(install):
 
         if os.path.exists(zip_path):
             os.remove(zip_path)
+        #write version url to version.txt ,to replace the md5 check
+        with open(os.path.join(agora_service_path, "version.txt"), "w") as f:
+            f.write(url)
 
 
 setup(
     name='agora_python_server_sdk',
-    version='2.4.0',
+    version='2.4.1',
     description='A Python SDK for Agora Server',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
