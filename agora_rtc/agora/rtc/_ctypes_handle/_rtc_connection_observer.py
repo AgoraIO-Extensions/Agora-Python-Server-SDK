@@ -288,7 +288,7 @@ class CapabilitiesObserverInner(ctypes.Structure):
         self.on_capabilities_changed = ON_CAPABILITIES_CHANGED_CALLBACK(self._on_capabilities_changed)
         
     def _on_capabilities_changed(self, agora_capabilities_observer, ptr_caps_inner, size):
-        print(f"ConnCB _on_capabilities_changed: {agora_capabilities_observer}, {ptr_caps_inner}, {size}")
+        logger.debug(f"ConnCB _on_capabilities_changed: {agora_capabilities_observer}, {ptr_caps_inner}, {size}")
         
         # 正确解析C指针数组
         # 方法1: 使用ctypes.cast将指针转换为数组
