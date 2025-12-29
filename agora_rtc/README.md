@@ -49,6 +49,28 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # Change log
+## 2025.12.29 Release Version 2.4.2
+
+- Added **incremental send mode** support.
+- New `connection::send_intra_request` API, allowing you to initiate an intra request to remote users and trigger them to send a key frame.
+
+#### Example usage of incremental send mode
+
+```python
+# Configure incremental send parameters
+publish_config.send_external_audio_parameters = SendExternalAudioParameters(
+    enabled=True,
+    send_ms=2000,
+    send_speed=2,
+    deliver_mute_data_for_fake_adm=False
+)
+
+# Create an RTC connection
+connection = agora_service.create_rtc_connection(con_config, publish_config)
+```
+
+
+
 ## 2025.12.17 Release 2.4.1
 
 - Updated RTC SDK to version 154.

@@ -61,11 +61,47 @@ NOTE:
 NOTE:
 0715版本，不能在onplaybackbeforemixing中，直接做echo audio frame back!
 
-todo: 
-+[]？idleMode的支持？？
-+[]？next
+todo: for 2.4.2 version
++[]？增量发送模式的支持
++[]？增加一个intrarequest的api接口
+测试数据：
+diff = received_key_frame_time - sent_intra_request_time <inms>
+end device: mac and android
+mac send intra request, and mac observe encoded frame, and record the diff
+test result:
+on_encoded_video_frame, diff=170.5400390625
+on_encoded_video_frame, diff=171.925048828125
+on_encoded_video_frame, diff=148.743896484375
+on_encoded_video_frame, diff=107.363037109375
+on_encoded_video_frame, diff=181.798828125
+on_encoded_video_frame, diff=163.4169921875
+on_encoded_video_frame, diff=139.85107421875
+on_encoded_video_frame, diff=140.7177734375
+conclusion: the diff is not stable, but seems to less than 200ms.
+
 
 # 更新日志
+## 2025.12.29 发布 2.4.2 版本
+
+- 支持**增量发送模式**。
+- 新增 `connection::send_intra_request` API，可向远端用户发起 intra request，触发远端发送关键帧。
+
+#### 增量发送模式的用法示例
+
+```python
+# 配置增量发送参数
+publish_config.send_external_audio_parameters = SendExternalAudioParameters(
+    enabled=True,
+    send_ms=2000,
+    send_speed=2,
+    deliver_mute_data_for_fake_adm=False
+)
+
+# 创建 RTC 连接
+connection = agora_service.create_rtc_connection(con_config, publish_config)
+```
+
+
 ## 2025.12.17 发布 2.4.1 版本
 
 - 更新 SDK 到 154 版本。
