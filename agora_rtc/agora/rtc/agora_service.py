@@ -186,11 +186,11 @@ class AgoraService:
         return RTCConnection(self, con_config, publish_config)
 
     # createCustomAudioTrackPcm: creatae a custom audio track from pcm data sender
-    def _create_custom_audio_track_pcm(self, audio_pcm_data_sender: AudioPcmDataSender, scenario: AudioScenarioType) -> LocalAudioTrack:
+    def _create_custom_audio_track_pcm(self, audio_pcm_data_sender: AudioPcmDataSender, scenario: AudioScenarioType, is_extra_audio: bool) -> LocalAudioTrack:
         if not self.inited:
             logger.error("AgoraService is not initialized. Please call initialize() first.")
             return None
-        if scenario == AudioScenarioType.AUDIO_SCENARIO_AI_SERVER:
+        if scenario == AudioScenarioType.AUDIO_SCENARIO_AI_SERVER and is_extra_audio == False:
             custom_audio_track = agora_service_create_direct_custom_audio_track_pcm(self.service_handle, audio_pcm_data_sender.sender_handle)
         else:
             custom_audio_track = agora_service_create_custom_audio_track_pcm(self.service_handle, audio_pcm_data_sender.sender_handle)
@@ -198,10 +198,10 @@ class AgoraService:
             return None
         local_track =  LocalAudioTrack(custom_audio_track)
         #default for ai senario to set min delay to 10ms
-        if scenario != AudioScenarioType.AUDIO_SCENARIO_AI_SERVER:
-            local_track.set_send_delay_ms(10)
-            local_track.set_max_buffer_audio_frame_number(100000)
+       
+        local_track.set_max_buffer_audio_frame_number(100000)
         #and set enable to true
+        local_track.set_send_delay_ms(10)
         local_track.set_enabled(True)
         return local_track
     # mix_mode: MIX_ENABLED = 0, MIX_DISABLED = 1
