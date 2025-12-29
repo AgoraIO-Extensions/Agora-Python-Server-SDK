@@ -230,7 +230,9 @@ agora_local_user_send_aduio_meta_data = agora_lib.agora_local_user_send_audio_me
 agora_local_user_send_aduio_meta_data.restype = AGORA_API_C_INT
 agora_local_user_send_aduio_meta_data.argtypes = [AGORA_HANDLE, ctypes.c_char_p, ctypes.c_size_t]
 
-
+agora_local_user_send_intra_request = agora_lib.agora_local_user_send_intra_request
+agora_local_user_send_intra_request.restype = AGORA_API_C_INT
+agora_local_user_send_intra_request.argtypes = [AGORA_HANDLE, ctypes.c_char_p]
 
 
 class LocalUser:
@@ -628,3 +630,16 @@ class LocalUser:
         ret = self.connection._set_apm_filter_properties(remote_audio_track_handle, user_id_str)
         print(f"**********LocalUser _set_apm_filter_properties: {ret}")
         return ret
+        pass
+    def _send_intra_request(self, remote_uid: str) -> int:
+        #validity check
+        if remote_uid is None:
+            return -1000
+        if self.user_handle is None:
+            return -1001
+        uid_str = remote_uid.encode('utf-8')
+        ret = agora_local_user_send_intra_request(self.user_handle, ctypes.c_char_p(uid_str))
+        if ret < 0:
+            logger.error("Failed to send intra request")
+        return ret
+        pass

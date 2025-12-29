@@ -83,6 +83,13 @@ agora_local_user_unregister_capabilities_observer = agora_lib.agora_local_user_u
 agora_local_user_unregister_capabilities_observer.restype = AGORA_API_C_INT
 agora_local_user_unregister_capabilities_observer.argtypes = [AGORA_HANDLE, AGORA_HANDLE]
 
+agora_local_audio_track_set_total_extra_send_ms = agora_lib.agora_local_audio_track_set_total_extra_send_ms
+agora_local_audio_track_set_total_extra_send_ms.restype = AGORA_API_C_INT
+agora_local_audio_track_set_total_extra_send_ms.argtypes = [AGORA_HANDLE, ctypes.c_uint64]
+
+#global variable
+_is_deliver_mute_data_has_set: bool = False
+
 class RTCConnection:
     def __init__(self, service: AgoraService, conn_config: RTCConnConfig, publish_config: RtcConnectionPublishConfig) -> None:
         self.conn_handle = None
@@ -90,6 +97,7 @@ class RTCConnection:
         self.local_user = None
         self.rtc_engine = service
         self._con_observer = None
+        self._agora_parameter = None
         #1 create conn_handle
         self.conn_handle = agora_rtc_conn_create(self.rtc_engine.service_handle, ctypes.byref(RTCConnConfigInner.create(conn_config)))
         if self.conn_handle is None:
@@ -98,6 +106,7 @@ class RTCConnection:
         self.local_user_handle = agora_rtc_conn_get_local_user(self.conn_handle)
         if self.local_user_handle:
             self.local_user = LocalUser(self.local_user_handle, self)
+        self._agora_parameter = self._init_agora_parameter()
         #keep publish_config
         self.publish_config = publish_config
         #and prepare track and sender for publish
@@ -107,6 +116,9 @@ class RTCConnection:
         self._audio_encoded_sender = None
         self._video_sender = None
         self._video_encoded_sender = None
+        # for external audio parameters
+        self._send_external_audio_parameters = publish_config.send_external_audio_parameters
+        
         self._pcm_consume_stats = PcmConsumeStats()
         self._prepare_publish_track_and_sender()
         #3 set profile and scenario
@@ -123,12 +135,15 @@ class RTCConnection:
         self._capabilities_observer_obj = None
         if self.publish_config.audio_scenario == AudioScenarioType.AUDIO_SCENARIO_AI_SERVER:
             self._register_capabilities_observer()
+        # for external audio parameters
+        self._set_send_external_send_frame_speed(self._send_external_audio_parameters)
 
     def _prepare_publish_track_and_sender(self)->int:
         if self.publish_config.is_publish_audio:
            if self.publish_config.audio_publish_type == AudioPublishType.AUDIO_PUBLISH_TYPE_PCM:
                self._audio_sender = self.rtc_engine.media_node_factory.create_audio_pcm_data_sender()
-               self._audio_track = self.rtc_engine._create_custom_audio_track_pcm(self._audio_sender, self.publish_config.audio_scenario)
+               is_extra_audio = self._is_support_send_external_audio()
+               self._audio_track = self.rtc_engine._create_custom_audio_track_pcm(self._audio_sender, self.publish_config.audio_scenario, is_extra_audio)
            elif self.publish_config.audio_publish_type == AudioPublishType.AUDIO_PUBLISH_TYPE_ENCODED_PCM:
                self._audio_encoded_sender = self.rtc_engine.media_node_factory.create_audio_encoded_frame_sender()
                self._audio_track = self.rtc_engine.create_custom_audio_track_encoded(self._audio_encoded_sender, 1)#mix_mode: MIX_ENABLED = 0, MIX_DISABLED = 1
@@ -203,11 +218,13 @@ class RTCConnection:
         return ret
 
     #
-    def get_agora_parameter(self):
+    def _init_agora_parameter(self):
         agora_parameter = agora_rtc_conn_get_agora_parameter(self.conn_handle)
         if not agora_parameter:
             return None
         return AgoraParameter(agora_parameter)
+    def get_agora_parameter(self):
+        return self._agora_parameter
 
     #
 
@@ -397,6 +414,11 @@ class RTCConnection:
         frame.samples_per_channel = readLen // (channels * 2)
         frame.present_time_ms = start_pts
 
+        #check if a new round or not. if new round should call _set_total_extra_send_ms()
+        is_new_round = self._pcm_consume_stats.is_new_round()
+        if is_new_round:
+            self._set_total_extra_send_ms()
+
         ret = self._audio_sender.send_audio_pcm_data(frame)
         self._pcm_consume_stats.add_pcm_data(readLen, sample_rate, channels)
         return ret
@@ -431,8 +453,9 @@ class RTCConnection:
         
         updated_track = None
         delayed_del_track = None
+        is_extra_audio = False
         if self._audio_sender:
-            updated_track = self.rtc_engine._create_custom_audio_track_pcm(self._audio_sender, scenario)
+            updated_track = self.rtc_engine._create_custom_audio_track_pcm(self._audio_sender, scenario, is_extra_audio)
         elif self._audio_encoded_sender:
             updated_track = self.rtc_engine.create_custom_audio_track_encoded(self._audio_encoded_sender, scenario)
             
@@ -440,6 +463,8 @@ class RTCConnection:
             delayed_del_track = self._audio_track
             self._audio_track = updated_track
             self._audio_track.set_enabled(True)
+            self._audio_track.set_send_delay_ms(10)
+            self._audio_track.set_max_buffer_audio_frame_number(100000)
       
         if delayed_del_track:
             delayed_del_track.release()
@@ -467,10 +492,10 @@ class RTCConnection:
         item_index = 0
         for cap in capabilities:
             item_index = 0
-            print(f"Capability[{index}] - Type: {cap.capability_type}")
+            logger.debug(f"Capability[{index}] - Type: {cap.capability_type}")
             index += 1
             for item in cap.item_map.item:
-                print(f"Item[{item_index}] - ID: {item.id}, Name: {item.name}")
+                logger.debug(f"Item[{item_index}] - ID: {item.id}, Name: {item.name}")
                 item_index += 1
                 if cap.capability_type == 19 and item.name and item.name.upper() == "SUPPORT":
                     fallback_scenario = False
@@ -541,5 +566,64 @@ class RTCConnection:
             print(f"**********APM: to enable apm_dump, error: {ret}")
         return ret
     
+    def _set_send_external_send_frame_speed(self, send_external_audio_parameters: SendExternalAudioParameters)->int:
+        ret = -1000
+        if send_external_audio_parameters == None or send_external_audio_parameters.enabled == False or send_external_audio_parameters.send_ms <= 0 or send_external_audio_parameters.send_speed <= 1:
+            return -1001
+        speed = send_external_audio_parameters.send_speed
+        if speed < 1:
+            speed = 1
+        if speed > 5:
+            speed = 5
+        #set send speed for fake adm to connection level
+        params = '{"che.audio.extra_send_frames_per_interval_for_fake_adm": %d}' % speed
+
+        if (self._agora_parameter is None):
+            return -1002
+        ret = self._agora_parameter.set_parameters(params)
+       
     
+        # set deliver mute data for fake adm to service level and only once
+        self._set_deliver_mute_data_for_fake_adm(send_external_audio_parameters.deliver_mute_data_for_fake_adm)
+        
+        return ret
+        pass
+
+    def _set_deliver_mute_data_for_fake_adm(self, deliver_mute_data_for_fake_adm: bool)->int:
+        ret = -1000
+        global _is_deliver_mute_data_has_set
+        if deliver_mute_data_for_fake_adm == False and _is_deliver_mute_data_has_set == False:
+            params = '{"che.audio.deliver_mute_data_for_fake_adm": false}'
+            rtc_parameter = self.rtc_engine.get_agora_parameter()
+            if rtc_parameter is not None:
+                ret = rtc_parameter.set_parameters(params)
+                _is_deliver_mute_data_has_set = True
+        return ret
+    def _is_support_send_external_audio(self)->bool:
+        ret = False
+        if ((self._send_external_audio_parameters is not None)
+         and (self._send_external_audio_parameters.enabled == True)
+         and (self._send_external_audio_parameters.send_ms > 0)
+         and (self._send_external_audio_parameters.send_speed > 1)):
+            ret = True
+        return ret
+        pass
+    #only valid after call this api
+    #and default call before each round
+    def _set_total_extra_send_ms(self)->int:
+        is_support = self._is_support_send_external_audio()
+        if is_support == False:
+            return 0
+        send_ms = self._send_external_audio_parameters.send_ms
+        ret = agora_local_audio_track_set_total_extra_send_ms(self._audio_track.track_handle, ctypes.c_uint64(send_ms))
+    
+        return ret
+        pass
+    def send_intra_request(self, remote_uid: str) -> int:
+        ret = -1000
+        if self.local_user is None:
+            return -1001
+        ret = self.local_user._send_intra_request(remote_uid)
+        return ret
+        pass
     

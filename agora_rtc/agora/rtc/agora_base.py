@@ -427,6 +427,18 @@ class SenderOptions:
     cc_mode: TCcMode = TCcMode.CC_ENABLED
     codec_type: VideoCodecType = VideoCodecType.VIDEO_CODEC_H264
 
+'''
+note: DeliverMuteDataForFakeAdm can only set to rtc engine level, can not
+set to connection level
+so if once a connection has set to true, wihich will affect all the connections,
+'''
+@dataclass(kw_only=True)
+class SendExternalAudioParameters:
+    enabled: bool = False
+    send_ms: int = 0
+    send_speed: int = 0
+    deliver_mute_data_for_fake_adm: bool = False
+
 
 @dataclass(kw_only=True)
 class RtcConnectionPublishConfig:
@@ -437,6 +449,7 @@ class RtcConnectionPublishConfig:
 	audio_publish_type: AudioPublishType = AudioPublishType.AUDIO_PUBLISH_TYPE_PCM
 	video_publish_type: VideoPublishType = VideoPublishType.VIDEO_PUBLISH_TYPE_NONE
 	video_encoded_image_sender_options: 'SenderOptions' = field(default_factory=SenderOptions)
+	send_external_audio_parameters: 'SendExternalAudioParameters | None' = None
 
 @dataclass(kw_only=True)
 class VideoSubscriptionOptions:
