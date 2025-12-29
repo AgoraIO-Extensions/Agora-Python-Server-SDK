@@ -45,6 +45,13 @@ def local_get_log_path_with_filename():
     log_path = "./log/agorasdk.log"
     return log_path
 
+'''
+event manager
+'''
+#global variable
+g_send_intra_request_time = 0
+
+
 
 # observer
 #@profile
@@ -131,7 +138,7 @@ class MyAudioFrameObserver(IAudioFrameObserver):
 
     def on_playback_audio_frame(self, agora_local_user, channelId, frame):
         logger.info(f"on_playback_audio_frame")
-        print(f"on_playback_audio_frame: {len(frame.buffer)}")
+        #print(f"on_playback_audio_frame: {len(frame.buffer)}")
         return 0
 
     def on_ear_monitoring_audio_frame(self, agora_local_user, frame):
@@ -177,12 +184,13 @@ local user observer
 
 #@profile
 class MyLocalUserObserver(IRTCLocalUserObserver):
-    def __init__(self, local_user):
+    def __init__(self, local_user, event_queue: Queue):
         super().__init__()
         self._local_user = local_user
-
+        self._event_queue = event_queue
     def on_stream_message(self, local_user, user_id, stream_id, data, length):
         logger.info(f"on_stream_message, user_id={user_id}, stream_id={stream_id}, data={data}, length={length}")
+        self._event_queue.put(bytearray(data))
         pass
 
     def on_user_info_updated(self, local_user, user_id, msg, val):
@@ -225,11 +233,14 @@ class MyLocalUserObserver(IRTCLocalUserObserver):
         #print(f"on_local_audio_track_statistics: stats={stats.sent_bitrate}")
         pass
     def on_remote_audio_track_statistics(self, agora_local_user, remote_audio_track, stats:RemoteAudioTrackStats):
-        print(f"on_remote_audio_track_statistics: track={remote_audio_track}, stats={stats.jitter_buffer_delay}, uid = {stats.uid}")
+        #print(f"on_remote_audio_track_statistics: track={remote_audio_track}, stats={stats.jitter_buffer_delay}, uid = {stats.uid}")
+        pass
     def on_local_video_track_statistics(self, agora_local_user, local_video_track, stats:LocalVideoTrackStats):
-        print(f"on_local_video_track_statistics: stats={stats.input_frame_rate}, {stats.capture_frame_rate}, {stats.encode_frame_rate}, {stats.render_frame_rate}")
+        #print(f"on_local_video_track_statistics: stats={stats.input_frame_rate}, {stats.capture_frame_rate}, {stats.encode_frame_rate}, {stats.render_frame_rate}")
+        pass
     def on_remote_video_track_statistics(self, agora_local_user, remote_video_track, stats:RemoteVideoTrackStats):
-        print(f"on_remote_video_track_statistics: {stats.uid},{stats.renderer_output_frame_rate}, {stats.frame_render_delay_ms}")
+        #print(f"on_remote_video_track_statistics: {stats.uid},{stats.renderer_output_frame_rate}, {stats.frame_render_delay_ms}")
+        pass
     
 class MyVideoFrameObserver(IVideoFrameObserver):
     def __init__(self, conn: RTCConnection, save_to_disk=0):
@@ -289,9 +300,10 @@ class MyVideoFrameObserver(IVideoFrameObserver):
 class MyConnectionObserver(IRTCConnectionObserver):
     def __init__(self):
         super().__init__()
+        self.remote_user_id = None
     def on_connected(self, agora_rtc_conn, conn_info, reason):
         logger.info(f"on_connected, agora_rtc_conn={agora_rtc_conn}, local_user_id={conn_info.local_user_id}, state={conn_info.state}, internal_uid={conn_info.internal_uid} ,reason={reason}")
-
+        
     def on_disconnected(self, agora_rtc_conn, conn_info, reason):
         logger.info(f"on_disconnected, agora_rtc_conn={agora_rtc_conn}, local_user_id={conn_info.local_user_id}, state={conn_info.state}, internal_uid={conn_info.internal_uid} ,reason={reason}")
 
@@ -300,6 +312,7 @@ class MyConnectionObserver(IRTCConnectionObserver):
 
     def on_user_joined(self, agora_rtc_conn, user_id):
         logger.info(f"on_user_joined, agora_rtc_conn={agora_rtc_conn}, user_id={user_id}")
+        self.remote_user_id = user_id
 
     def on_encryption_error(self, agora_rtc_conn, error_type):
         print(f"********on_encryption_error, agora_rtc_conn={agora_rtc_conn}, error_type={error_type}")
@@ -307,6 +320,20 @@ class MyConnectionObserver(IRTCConnectionObserver):
         print(f"********on_aiqos_capability_missing, agora_rtc_conn={agora_rtc_conn}, recommend_audio_scenario={recommend_audio_scenario}")
         specified_scenario = AudioScenarioType.AUDIO_SCENARIO_GAME_STREAMING
         return specified_scenario
+
+class MyEncodedVideoFrameObserver(IVideoEncodedFrameObserver):
+    def __init__(self, conn: RTCConnection):
+        super().__init__()
+        self._conn = conn
+    def on_encoded_video_frame(self, uid, image_buffer, length, video_encoded_frame_info:EncodedVideoFrameInfo):
+        #print(f"on_encoded_video_frame, uid={uid}, length={length}, codec_type={video_encoded_frame_info.codec_type}, width={video_encoded_frame_info.width}, height={video_encoded_frame_info.height}, frames_per_second={video_encoded_frame_info.frames_per_second}, frame_type={video_encoded_frame_info.frame_type}, rotation={video_encoded_frame_info.rotation}, track_id={video_encoded_frame_info.track_id}, capture_time_ms={video_encoded_frame_info.capture_time_ms}, decode_time_ms={video_encoded_frame_info.decode_time_ms}, uid={video_encoded_frame_info.uid}, stream_type={video_encoded_frame_info.stream_type}")
+        if video_encoded_frame_info.frame_type == 3:
+            current_time = time.time()*1000
+            global g_send_intra_request_time
+            diff = current_time - g_send_intra_request_time
+            print(f"on_encoded_video_frame, diff={diff}")
+        return 1
+        pass
 
 # sig handleer
 def signal_handler(signal, frame):
@@ -367,7 +394,6 @@ def test_encryption_config():
 
 
 
-
 #@profile
 def main():
 
@@ -386,6 +412,20 @@ def main():
    
     uid = "99999"
     is_encrypt = 1
+    #input source pcm file and format
+    
+    pcm_file_path = "./test_data/demo.pcm"
+    sample_rate = 16000
+    channels = 1
+    
+
+    if len(sys.argv) > 5:
+        pcm_file_path = sys.argv[3]
+        sample_rate = int(sys.argv[4])
+        channels = int(sys.argv[5])
+
+    print(f"pcm_file_path: {pcm_file_path}, sample_rate: {sample_rate}, channels: {channels}")
+    len_in_seconds = sample_rate * channels * 2 
 
 
     print("appid:", appid, "channel_id:", channel_id)
@@ -464,6 +504,17 @@ def main():
             codec_type=VideoCodecType.VIDEO_CODEC_H264
         )
     )
+
+    print(f"_____publish_config: {publish_config}")
+    publish_config.send_external_audio_parameters = SendExternalAudioParameters(
+        enabled=True,
+        send_ms=2000,
+        send_speed=2,
+        deliver_mute_data_for_fake_adm=False
+    )
+    print(f"_____publish_config: {publish_config}")
+    
+ 
     connection = agora_service.create_rtc_connection(con_config, publish_config)
     agora_parameter = connection.get_agora_parameter()
     conn_observer = MyConnectionObserver()
@@ -514,14 +565,16 @@ def main():
   
     # video frame observer
     video_observer = MyVideoFrameObserver(connection, 0)
+    video_encoded_observer = MyEncodedVideoFrameObserver(connection)
     
     
 
     audio_consumer  = AudioConsumer(pcm_sender= None, sample_rate=16000, channels=1)
 
     # step3: localuser:must regiseter before connect
+    event_queue = Queue()
     localuser = connection.get_local_user()
-    local_observer = MyLocalUserObserver(localuser)
+    local_observer = MyLocalUserObserver(localuser, event_queue)
     # enable volume indication
     #localuser.set_audio_volume_indication_parameters(100, 1, 3)
    
@@ -540,7 +593,8 @@ def main():
     connection.register_audio_frame_observer(audio_observer, 1, vad_configure)
 
     #videoframe observer
-    connection.register_video_frame_observer(video_observer)
+    #connection.register_video_frame_observer(video_observer)
+    connection.register_video_encoded_frame_observer(video_encoded_observer)
   
     connection.publish_video()
 
@@ -576,7 +630,7 @@ def main():
 
     #open for consumer
     frame_buffer = bytearray(320)
-    audio_file = open ("../test_data/demo.pcm", "rb")
+    audio_file = open ("./test_data/demo.pcm", "rb")
     file_to_consumer(audio_file, frame_buffer, audio_consumer)
 
     audio_frame = PcmAudioFrame()
@@ -593,6 +647,16 @@ def main():
     audio_file.seek(320*100)
 
     #connection.update_audio_scenario(AudioScenarioType.AUDIO_SCENARIO_CHORUS)
+    total_bytes = 10*len_in_seconds
+    audio_buffer = bytearray(total_bytes)
+    read_len = 0
+    with open(pcm_file_path, "rb") as audio_file:
+        read_len = audio_file.readinto(audio_buffer)
+        #seek to beginning of the file
+        audio_file.seek(0)
+
+    #event index
+    event_index = 0
     # recv mode
     while g_runing:
         """
@@ -619,10 +683,25 @@ def main():
         str = "test"
         #byte_str = str.encode('utf-8')
         #localuser.send_audio_meta_data(str)
+       
+        #round to multiple of len_in_millisecondson_remote_audio_track_statistics
         while not audio_queue.empty():
             audio_frame = audio_queue.get()
             ret = connection.push_audio_pcm_data(audio_frame.buffer, audio_frame.samples_per_sec, audio_frame.channels)
             #print(f"push_audio_pcm_data ret = {ret}")
+        #check event queue
+        if not event_queue.empty():
+            data = event_queue.get()
+            event_index += 1
+            if event_index % 2 == 0:
+                connection.interrupt_audio()
+                print("interrupt audio")
+                global g_send_intra_request_time
+                g_send_intra_request_time = time.time()*1000
+                connection.send_intra_request(conn_observer.remote_user_id)
+            else:
+                connection.push_audio_pcm_data(audio_buffer, sample_rate, channels)
+                print("push audio pcm data")
         time.sleep(0.05)
         #connection.send_stream_message("stream test")
         #connection.send_audio_meta_data("audio meta data test")
