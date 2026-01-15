@@ -35,7 +35,7 @@ class RTCBaseProcess():
                 audio_publish_type=AudioPublishType.AUDIO_PUBLISH_TYPE_ENCODED_PCM,
                 video_publish_type=VideoPublishType.VIDEO_PUBLISH_TYPE_YUV,
                 video_encoded_image_sender_options=SenderOptions(
-                    target_bitrate=4160,
+                    target_bitrate=6500,
                     cc_mode=TCcMode.CC_ENABLED,
                     codec_type=VideoCodecType.VIDEO_CODEC_H264,
                 )

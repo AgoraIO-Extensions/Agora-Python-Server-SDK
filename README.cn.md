@@ -81,6 +81,11 @@ conclusion: the diff is not stable, but seems to less than 200ms.
 
 
 # 更新日志
+
+## 2026.01.15 发布 2.4.3 版本
+
+- **修复bug**：在调用 `interrupt_audio` 时，重置 `pcm_consumer_.reset()` 的状态，这样调用后，`is_push_rtc_completed` 会返回 `true`。
+
 ## 2025.12.29 发布 2.4.2 版本
 
 - 支持**增量发送模式**。

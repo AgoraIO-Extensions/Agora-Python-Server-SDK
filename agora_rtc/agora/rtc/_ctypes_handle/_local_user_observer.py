@@ -171,7 +171,7 @@ class RTCLocalUserObserverInner(ctypes.Structure):
     def _on_audio_track_publication_failure(self, local_user_handle, local_audio_track_handle, error_code):
         logger.debug(f"LocalUserCB _on_audio_track_publication_failure: {local_user_handle}, {local_audio_track_handle}, {error_code}")
         audio_track = self.local_user.get_audio_map(local_audio_track_handle)
-        self.local_user.del_audio_map(local_audio_track_handle)
+        self.local_user._del_audio_map(local_audio_track_handle)
         self.local_user_observer.on_audio_track_publication_failure(self.local_user, audio_track, error_code)
 
     def _on_local_audio_track_state_changed(self, local_user_handle, local_audio_track_handle, state, error):
