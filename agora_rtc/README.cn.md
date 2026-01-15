@@ -61,11 +61,31 @@ NOTE:
 NOTE:
 0715版本，不能在onplaybackbeforemixing中，直接做echo audio frame back!
 
-todo: 
-+[]？idleMode的支持？？
-+[]？next
+todo: for 2.4.2 version
++[]？增量发送模式的支持
++[]？增加一个intrarequest的api接口
+测试数据：
+diff = received_key_frame_time - sent_intra_request_time <inms>
+end device: mac and android
+mac send intra request, and mac observe encoded frame, and record the diff
+test result:
+on_encoded_video_frame, diff=170.5400390625
+on_encoded_video_frame, diff=171.925048828125
+on_encoded_video_frame, diff=148.743896484375
+on_encoded_video_frame, diff=107.363037109375
+on_encoded_video_frame, diff=181.798828125
+on_encoded_video_frame, diff=163.4169921875
+on_encoded_video_frame, diff=139.85107421875
+on_encoded_video_frame, diff=140.7177734375
+conclusion: the diff is not stable, but seems to less than 200ms.
+
 
 # 更新日志
+
+## 2026.01.15 发布 2.4.3 版本
+
+- **修复bug**：在调用 `interrupt_audio` 时，重置 `pcm_consumer_.reset()` 的状态，这样调用后，`is_push_rtc_completed` 会返回 `true`。
+
 ## 2025.12.29 发布 2.4.2 版本
 
 - 支持**增量发送模式**。
