@@ -354,6 +354,8 @@ class RTCConnection:
         ret = -1000
         if self.local_user and self._audio_track:
             ret = self.local_user._unpublish_audio(self._audio_track)
+        #reset pcm consumer state now
+        self._pcm_consume_stats.reset()
         return ret
     def publish_video(self)->int:
         ret = -1000
@@ -374,6 +376,9 @@ class RTCConnection:
             self.publish_audio()
         elif self._audio_track:
             self._audio_track.clear_sender_buffer()
+
+        # reset pcm consumer to new state now
+        self._pcm_consume_stats.reset()
         return ret
     def send_audio_meta_data(self, data)->int:
         ret = -1000
