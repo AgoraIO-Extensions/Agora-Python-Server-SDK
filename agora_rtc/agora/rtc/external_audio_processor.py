@@ -87,7 +87,7 @@ class ExternalAudioProcessor:
         self._is_initialized = False
         #do create sender and track
         self._pcm_sender = self._engine.media_node_factory.create_audio_pcm_data_sender()
-        self._local_audio_track = self._engine._create_custom_audio_track_pcm(self._pcm_sender, AudioScenarioType.AUDIO_SCENARIO_DEFAULT)
+        self._local_audio_track = self._engine._create_custom_audio_track_pcm(self._pcm_sender, AudioScenarioType.AUDIO_SCENARIO_DEFAULT, False)
         self._audio_sink = self._create_audio_sink()
         self._vad_instance = None
         self._observer = None
@@ -207,12 +207,13 @@ class ExternalAudioProcessor:
         
         return ret
     def _do_result_frame(self, audio_frame: AudioFrame):
-        print(f"ExternalAudioProcessor _do_result_frame: audio_frame voice_prob {audio_frame.voice_prob}, rms {audio_frame.rms}, pitch {audio_frame.pitch}, far_field_flag {audio_frame.far_field_flag}")
+        #print(f"ExternalAudioProcessor _do_result_frame: audio_frame voice_prob {audio_frame.voice_prob}, rms {audio_frame.rms}, pitch {audio_frame.pitch}, far_field_flag {audio_frame.far_field_flag}")
+        #pass
         ret  = 0
         data = None
         if self._vad_instance is not None:
             ret, data = self._vad_instance.process(audio_frame)
-            print(f"ExternalAudioProcessor _do_result_frame: vad result ret {ret}, data length {len(data)}")
+            #print(f"ExternalAudioProcessor _do_result_frame: vad result ret {ret}, data length {len(data)}")
         #do callback now
         if self._observer is not None:
             self._observer.on_processed_audio_frame(self, audio_frame, ret, data)

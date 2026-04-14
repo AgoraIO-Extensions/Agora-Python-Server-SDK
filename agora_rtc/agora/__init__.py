@@ -142,6 +142,10 @@ def _check_download_and_extract_sdk():
     mac_sdk="https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.32.154_26308_FULL_20251210_1756_994156_20251021_1427-3a.zip"
 
 
+    #date:20260413 for new apm algorithm test
+    linux_sdk="https://download.agora.io/sdk/release/agora_rtc_sdk_x86_64-linux-gnu-Agora_Native_SDK_for_Linux_x64_zhourui_27758_SERVER_20260413_2228_1072329_20251021_1427-3a.zip"
+    mac_sdk="https://download.agora.io/sdk/release/agora_sdk_mac_Agora_Native_SDK_for_Mac_zhourui_27299_FULL_20260402_1852_1059349_20251021_1427-3a.zip"
+
     
           
     linux_libfile_path = os.path.join(sdk_library_dir, "libagora_rtc_sdk.so")

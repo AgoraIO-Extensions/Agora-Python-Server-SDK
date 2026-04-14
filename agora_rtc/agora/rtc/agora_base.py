@@ -312,7 +312,43 @@ class AiAecConfig:
 @dataclass(kw_only=True)
 class BghvsCConfig:
 	enabled: bool = True
-	vad_thr: float = 0.8
+	frmSz: int = 160
+	smplFrq: int = 16000
+	inBuildVadOpen: int = 1
+	mainPoolFN: int = 1000
+	farPoolFN: int = 6000
+	mainTimeOutFN: int = 30000
+	farTimeOutFN: int = 60000
+	sosPersistentLen: int = 160
+	postPaddingLenOfEOS: int = 480
+	unVoiceLenOfTriggerEOS: int = 480
+	bvcSOSLen: int = 160
+	bvcPostEOSLen: int = 480
+	bvcEOSLen: int = 480
+	vobvcDelay: int = 12
+	bvcVoMthOpen: int = 1
+	bvcSpecMtOpen: int = 0
+	logLv: int = 0
+	voiceProbThr: float = 0.5
+	vadVolumeThr: int = 60
+	bvcBabbleVolumeThr: int = 60
+	powScale: float = 0.2
+	powRatio: float = 0.1
+	bvcSppGain: float = 0
+	bvcEnvTailDownFN: int = 0
+	bvcEnvMaxSpeed: int = 5
+	envTrackMode: int = 1
+	bvcDownRatio: float = 0.95
+	bvcDownDB: float = -20
+	bvcFarEnvThr: float = 0.000
+	bvcMainEnvRatio: float = 0.8
+	bvcFarEnvRatio: float = 0.8
+	bvcMainVadThr: float = 0.5
+	bvcFarVadThr: float = 0.4
+	bvcEnvResultSmoothRatio: float = 0.97
+	bvcEnvResultSmoothRatio1: float = 0.98
+	bvcMainSpkSmoothRatio: float = 0.99
+	quickSelectInterval: int = 1
 
 @dataclass(kw_only=True)
 class AgcConfig:
@@ -335,7 +371,43 @@ class APMConfig:
             },
             "bghvs": {
                 "enabled": self.bghvs_c_config.enabled,
-                "vadThr": self.bghvs_c_config.vad_thr
+                "frmSz": self.bghvs_c_config.frmSz,
+                "smplFrq": self.bghvs_c_config.smplFrq,
+                "inBuildVadOpen": self.bghvs_c_config.inBuildVadOpen,
+                "mainPoolFN": self.bghvs_c_config.mainPoolFN,
+                "farPoolFN": self.bghvs_c_config.farPoolFN,
+                "mainTimeOutFN": self.bghvs_c_config.mainTimeOutFN,
+                "farTimeOutFN": self.bghvs_c_config.farTimeOutFN,
+                "sosPersistentLen": self.bghvs_c_config.sosPersistentLen,
+                "postPaddingLenOfEOS": self.bghvs_c_config.postPaddingLenOfEOS,
+                "unVoiceLenOfTriggerEOS": self.bghvs_c_config.unVoiceLenOfTriggerEOS,
+                "bvcSOSLen": self.bghvs_c_config.bvcSOSLen,
+                "bvcPostEOSLen": self.bghvs_c_config.bvcPostEOSLen,
+                "bvcEOSLen": self.bghvs_c_config.bvcEOSLen,
+                "vobvcDelay": self.bghvs_c_config.vobvcDelay,
+                "bvcVoMthOpen": self.bghvs_c_config.bvcVoMthOpen,
+                "bvcSpecMtOpen": self.bghvs_c_config.bvcSpecMtOpen,
+                "logLv": self.bghvs_c_config.logLv,
+                "voiceProbThr": self.bghvs_c_config.voiceProbThr,
+                "vadVolumeThr": self.bghvs_c_config.vadVolumeThr,
+                "bvcBabbleVolumeThr": self.bghvs_c_config.bvcBabbleVolumeThr,
+                "powScale": self.bghvs_c_config.powScale,
+                "powRatio": self.bghvs_c_config.powRatio,
+                "bvcSppGain": self.bghvs_c_config.bvcSppGain,
+                "bvcEnvTailDownFN": self.bghvs_c_config.bvcEnvTailDownFN,
+                "bvcEnvMaxSpeed": self.bghvs_c_config.bvcEnvMaxSpeed,
+                "envTrackMode": self.bghvs_c_config.envTrackMode,
+                "bvcDownRatio": self.bghvs_c_config.bvcDownRatio,
+                "bvcDownDB": self.bghvs_c_config.bvcDownDB,
+                "bvcFarEnvThr": self.bghvs_c_config.bvcFarEnvThr,
+                "bvcMainEnvRatio": self.bghvs_c_config.bvcMainEnvRatio,
+                "bvcFarEnvRatio": self.bghvs_c_config.bvcFarEnvRatio,
+                "bvcMainVadThr": self.bghvs_c_config.bvcMainVadThr,
+                "bvcFarVadThr": self.bghvs_c_config.bvcFarVadThr,
+                "bvcEnvResultSmoothRatio": self.bghvs_c_config.bvcEnvResultSmoothRatio,
+                "bvcEnvResultSmoothRatio1": self.bghvs_c_config.bvcEnvResultSmoothRatio1,
+                "bvcMainSpkSmoothRatio": self.bghvs_c_config.bvcMainSpkSmoothRatio,
+                "quickSelectInterval": self.bghvs_c_config.quickSelectInterval,
             },
             "agc": {
                 "enabled": self.agc_config.enabled

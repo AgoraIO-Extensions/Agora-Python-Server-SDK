@@ -1,5 +1,8 @@
 # coding=utf-8
 
+import os
+import sys
+from plistlib import FMT_BINARY
 import time
 import datetime
 import ctypes
@@ -37,8 +40,12 @@ from agora.rtc.utils.audio_consumer import AudioConsumer
 
 import logging
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    stream=sys.stdout,
+)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 # connection observer
 
 def local_get_log_path_with_filename():
@@ -61,6 +68,7 @@ g_runing = True
 class ExampleAudioSinkObserver(IAudioSinkObserver):
     def on_processed_audio_frame(self,processor: 'ExternalAudioProcessor',frame: AudioFrame,vad_result_state:int,vad_result_data:bytearray):
         print(f"ExampleAudioSinkObserver on_processed_audio_frame: voice_prob {frame.voice_prob}, rms {frame.rms}, pitch {frame.pitch}, far_field_flag {frame.far_field_flag}, vad_result_state {vad_result_state}, vad_result_data length {len(vad_result_data)}")
+        pass
 
 #@profile
 def main():
@@ -85,7 +93,8 @@ def main():
     
 
 
-    logger.info("appid:", appid, "channel_id:", channel_id)
+    logger.info("appid: %s, channel_id: %s, sample_rate: %d, channels: %d", appid, channel_id, sample_rate, channels)
+    logger.info("pcm_file_path: %s", pcm_file_path)
    
     config = AgoraServiceConfig()
     config.appid = appid
@@ -119,24 +128,33 @@ def main():
         agc_config=AgcConfig(enabled=False),
         enable_dump=True,
     )
+    amp_config.bghvs_c_config.bvcEnvMaxSpeed = 2
     my_observer = ExampleAudioSinkObserver()
     external_audio_processor = ExternalAudioProcessor(agora_service)
-    external_audio_processor.initialize(amp_config, 48000, 2, AudioVadConfigV2(), my_observer)
+    ret = external_audio_processor.initialize(amp_config, 48000, 2, AudioVadConfigV2(), my_observer)
+    if ret < 0:
+        print(f"Failed to initialize external audio processor, error: {ret}")
     global g_runing
 
    
 
     #open a file and read pcm data
     file = open(pcm_file_path, "rb")
-    bytearray_data = bytearray(480)
+    buffer_size = 480*2*20
+    bytearray_data = bytearray(buffer_size)
+
+    return 
    
 
     while g_runing:
         read_len = file.readinto(bytearray_data)
         if read_len <= 0:
             break
-        external_audio_processor.push_audio_pcm_data(bytearray_data[:read_len], sample_rate, channels)
-        time.sleep(0.05)
+        ret = external_audio_processor.push_audio_pcm_data(bytearray_data[:read_len], sample_rate, channels)
+        if ret < 0:
+            print(f"Failed to push audio pcm data, error: {ret}")
+            break
+        time.sleep(0.001)
     file.close()
      # release resource
     logger.info("release resource now")
