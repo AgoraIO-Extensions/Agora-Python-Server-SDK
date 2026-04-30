@@ -18,21 +18,28 @@ from .. import sdk_library_dir, sdk_rtc_dir, sdk_rtm_dir
 
 lib_dir = sdk_library_dir
 
+
+def _load_library_if_exists(lib_dir, lib_name):
+    lib_path = os.path.join(lib_dir, lib_name)
+    if os.path.exists(lib_path):
+        ctypes.CDLL(lib_path)
+
+
 try:
     if sys.platform == 'darwin':
         lib_agora_rtc_path = os.path.join(lib_dir, 'libAgoraRtcKit.dylib')
         agora_lib = ctypes.CDLL(lib_agora_rtc_path)
         ctypes.CDLL(os.path.join(lib_dir, 'libAgoraAiNoiseSuppressionExtension.dylib'))
 
-    elif sys.platform == 'linux':
+    else:
         lib_agora_rtc_path = os.path.join(lib_dir, 'libagora_rtc_sdk.so')
-        ctypes.CDLL(os.path.join(lib_dir, 'libagora-fdkaac.so'))
+        _load_library_if_exists(lib_dir, 'libagora-fdkaac.so')
         #ctypes.CDLL(os.path.join(lib_dir, 'libagora_ai_noise_suppression_extension.so'))
-        ctypes.CDLL(os.path.join(lib_dir, 'libagora-ffmpeg.so'))
-        ctypes.CDLL(os.path.join(lib_dir, 'libagora-soundtouch.so'))
+        _load_library_if_exists(lib_dir, 'libagora-ffmpeg.so')
+        _load_library_if_exists(lib_dir, 'libagora-soundtouch.so')
         agora_lib = ctypes.CDLL(lib_agora_rtc_path)
         # should load it or the ains can not work
-        ctypes.CDLL(os.path.join(lib_dir, 'libagora_ai_noise_suppression_extension.so'))
+        _load_library_if_exists(lib_dir, 'libagora_ai_noise_suppression_extension.so')
 except OSError as e:
     logger.error(f"Error loading the library: {e}")
     logger.error(f"Attempted to load from: {lib_agora_rtc_path}")
