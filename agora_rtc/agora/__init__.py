@@ -174,7 +174,8 @@ def _check_download_and_extract_sdk():
         #url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.31-20250307_175457-603878.zip"
         #url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.32-20250425_150503-675674.zip"
         #url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.32-20251009_145437-921455.zip"
-        url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.32-20251009_145437-921455_20251023_1538.zip"
+        #url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.32-20251009_145437-921455_20251023_1538.zip"
+        url = "https://download.agora.io/sdk/release/agora_rtc_sdk_aarch64-linux-gnu-v4.4.32.163_27411_SERVER_20260211_103529-1009669.zip"
         rtc_md5 = "5c002f25d2b381e353082da4f835b4f2"
 
     '''
