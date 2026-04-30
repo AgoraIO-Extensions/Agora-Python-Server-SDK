@@ -187,7 +187,7 @@ class PcmConsumeStats:
     def is_push_to_rtc_completed(self) -> bool:
         now = int(time.time()*1000)
         diff = now - self.startTime
-        print(f"is_push_to_rtc_completed: {diff}, {self.duration}")
+        #print(f"is_push_to_rtc_completed: {diff}, {self.duration}")
         if diff > self.duration + int(180):
             return True
         return False

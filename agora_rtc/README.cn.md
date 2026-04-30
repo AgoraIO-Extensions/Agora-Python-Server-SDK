@@ -82,6 +82,11 @@ conclusion: the diff is not stable, but seems to less than 200ms.
 
 # 更新日志
 
+## 2026.04.30 Release Version 2.4.4
+
+- **修复**: 去掉了一个打印信息
+- **更新**: 更新 arm rtc sdk
+
 ## 2026.01.15 发布 2.4.3 版本
 
 - **修复bug**：在调用 `interrupt_audio` 时，重置 `pcm_consumer_.reset()` 的状态，这样调用后，`is_push_rtc_completed` 会返回 `true`。
@@ -449,4 +454,3 @@ vad2: 北京有哪些好玩的地方？
 vad： 下午好，北京有哪些好玩的地方？
 
 如果对延迟敏感，可以调低该值，或者咨询研发，在降低该值的情况下，应该如何在应用层做处理，在保障延迟的情况下，还能确保语意的连续性，不会产生AI被敏感的打断的感觉。
-

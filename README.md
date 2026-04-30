@@ -50,6 +50,11 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 
 # Change log
 
+## 2026.04.30 Release Version 2.4.4
+
+- **Bugfix**: Remove a print info
+- **Update**: Update arm rtc sdk
+
 ## 2026.01.15 Release Version 2.4.3
 
 - **Bugfix**: Fixed a bug to reset `pcm_consumer_` when calling `interrupt_audio`.
