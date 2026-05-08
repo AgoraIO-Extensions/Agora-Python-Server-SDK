@@ -199,3 +199,18 @@ run.sh
 
 tmp_*.py
 agora_cache.db
+
+# Local dev artifacts (VAD dumps, SDK logs, scratch outputs)
+agora_rtc_log/
+agora_rtc/examples/agora_rtc_log
+agora_rtc/examples/dump.zip
+agora_rtc/examples/plan_merge_yuv.md
+agora_rtc/examples/vad/
+agora_rtc/vad/
+/vad/
+/log/
+out.svg
+out_extra_conv.h264
+/your_file.py
+*.py.ok
+agora_rtc/examples/example_test_pyaudiocap.py alias
