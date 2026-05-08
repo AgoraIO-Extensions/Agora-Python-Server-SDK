@@ -82,8 +82,10 @@ conclusion: the diff is not stable, but seems to less than 200ms.
 
 # 更新日志
 
-## 2026.04.30 Release Version 2.4.4
+## 2026.05.08 Release Version 2.4.5
+- **更新**: 更新了 arm rtc sdk， 修复了在 arm64 架构下，没有导出符号表的问题。目前在arm架构下，基础功能是可以使用的，但vad等算法不能使用。
 
+## 2026.04.30 Release Version 2.4.4
 - **修复**: 去掉了一个打印信息
 - **更新**: 更新 arm rtc sdk
 
