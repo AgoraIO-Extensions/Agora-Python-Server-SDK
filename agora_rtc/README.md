@@ -49,6 +49,8 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 ```
 
 # Change log
+## 2026.05.08 Release Version 2.4.5
+- **Update**: Update arm rtc sdk, which can run basic function on arm64 platform, the vad function is not supported yet.
 
 ## 2026.04.30 Release Version 2.4.4
 
