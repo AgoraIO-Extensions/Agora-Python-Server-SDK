@@ -95,6 +95,10 @@ class CustomInstallCommand(install):
         #date:20260413 for new apm algorithm test
         #url="https://download.agora.io/sdk/release/agora_rtc_sdk_x86_64-linux-gnu-Agora_Native_SDK_for_Linux_x64_zhourui_27758_SERVER_20260413_2228_1072329_20251021_1427-3a.zip"
         #mac_sdk="https://download.agora.io/sdk/release/agora_sdk_mac_Agora_Native_SDK_for_Mac_zhourui_27299_FULL_20260402_1852_1059349_20251021_1427-3a.zip"
+
+        #date: 20260601 update rtc sdk to 174, to fix a bug which 2 app join with same uid
+        url="https://download.agora.io/sdk/release/agora_rtc_sdk_x86_64-linux-gnu-v4.4.32.174_28020_SERVER_20260601_1240_1144448_20251021_1427-3a.zip"
+        mac_sdk="https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.32.174_27844_FULL_20260601_1303_1144450_20251021_1427-3a.zip"
         
         if sys.platform == 'darwin':
             url = mac_sdk
@@ -102,7 +106,8 @@ class CustomInstallCommand(install):
        
         if arch == "aarch64" and sys.platform == 'linux':
             #url = "https://download.agora.io/sdk/release/agora_rtc_sdk_aarch64-linux-gnu-v4.4.32.163_27411_SERVER_20260211_103529-1009669.zip"
-            url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.32.170-20260506_202000-1105399.zip"
+            #url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.32.170-20260506_202000-1105399.zip"
+            url = "https://download.agora.io/sdk/release/Agora-RTC-aarch64-linux-gnu-v4.4.32.174-20260601_142442-1144588.zip"
         
         
               
@@ -129,7 +134,7 @@ class CustomInstallCommand(install):
 
 setup(
     name='agora_python_server_sdk',
-    version='2.4.5',
+    version='2.4.6',
     description='A Python SDK for Agora Server',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
