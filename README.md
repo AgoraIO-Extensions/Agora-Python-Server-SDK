@@ -50,6 +50,26 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 
 # Change log
 
+
+## 2026.06.24 Release Version 2.4.7
+
+- **New Features**:
+  - Added `RTCConnection.get_sid()` and `RTCConnection.set_simulcast_stream()` interfaces for retrieving SID and configuring Simulcast stream capabilities.
+  - In `EncryptionConfig`, added the `datastream_encryption_enabled` option to support data stream encryption.
+
+- **Improvements and Enhancements**:
+  - Improved the Simulcast Stream configuration process to further simplify the usage of `LocalVideoTrack.enable_simulcast_stream()`.
+  - Adjusted audio encoding timestamp behavior: when `capture_time_ms` is not set, the current time will be used by default.
+  - Optimized RTC/RTM binary message processing to enhance raw data passthrough capability.
+  - Enhanced lifecycle management of RTM ctypes callback objects to improve overall stability.
+
+- **Examples and Documentation**:
+  - Updated RTM/RTC example code, adding detailed examples for Simulcast and binary message transmission.
+  - Updated macOS SDK version records.
+
+## 2026.06.01 Release Version 2.4.6
+- **Update**: Updated the RTC SDK to version 174, resolving the issue where two same UIDs could join the same channel.
+
 ## 2026.05.08 Release Version 2.4.5
 - **Update**: Update arm rtc sdk, which can run basic function on arm64 platform, the vad function is not supported yet.
 

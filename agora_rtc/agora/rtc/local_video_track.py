@@ -53,8 +53,8 @@ class LocalVideoTrack:
         ret = agora_local_video_track_set_video_encoder_config(self.track_handle, ctypes.byref(VideoEncoderConfigurationInner.create(config)))
         return ret
 
-    def enable_simulcast_stream(self, enabled, config):
-        ret = agora_local_video_track_enable_simulcast_stream(self.track_handle, enabled, ctypes.byref(config))
+    def enable_simulcast_stream(self, enabled, config: SimulcastStreamConfig):
+        ret = agora_local_video_track_enable_simulcast_stream(self.track_handle, enabled, ctypes.byref(SimulcastStreamConfigInner.create(config)))
         return ret
 
     # def update_simulcast_stream(self, enabled, config):

@@ -182,12 +182,13 @@ class MessageEventInner(ctypes.Structure):
         ("customType", ctypes.c_char_p)
     ]
     def get(self) -> MessageEvent:
+        message = ctypes.string_at(self.message, self.messageLength) if self.message else b""
         return MessageEvent(
             channel_type=self.channelType,
             message_type=self.messageType,
             channel_name=self.channelName.decode('utf-8') if self.channelName else "",
             channel_topic=self.channelTopic.decode('utf-8') if self.channelTopic else "",
-            message=self.message.decode('utf-8') if self.message else "",
+            message=message,
             message_length=self.messageLength,
             publisher=self.publisher.decode('utf-8') if self.publisher else "",
             custom_type=self.customType.decode('utf-8') if self.customType else "",

@@ -36,8 +36,8 @@ class MyEventHandler(IRtmEventHandler):
         print(f"on_publish_result: {request_id}, {error_code}")
     def on_message_event(self, event: MessageEvent):
         print(f"on_message_event: {event.channel_name}, {event.message}, {event.message_type}, {event.message_length}, {event.publisher}, {event.custom_type}")
-        self.rtm_client.send_channel_message(event.channel_name, event.message)
-        self.rtm_client.send_user_message(event.publisher, event.message)
+        #self.rtm_client.send_channel_message(event.channel_name, event.message)
+        #self.rtm_client.send_user_message(event.publisher, event.message)
     def set_rtm_client(self, rtm_client: RTMClient):
         self.rtm_client = rtm_client
     
@@ -114,6 +114,8 @@ def main():
     
     while g_runing:
         time.sleep(0.05)
+        #send message to channel
+        rtm_client.send_channel_message(channel_id, b"test message")
 
     rtm_client.logout()
     print(f"登出结果: {request_id}")

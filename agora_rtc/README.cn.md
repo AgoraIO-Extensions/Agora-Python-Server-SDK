@@ -82,6 +82,25 @@ conclusion: the diff is not stable, but seems to less than 200ms.
 
 # 更新日志
 
+## 2026.06.24 Release Version 2.4.7
+
+- **新增功能**:
+  - 新增 `RTCConnection.get_sid()` 和 `RTCConnection.set_simulcast_stream()` 接口，用于获取 SID 与配置 Simulcast 流能力。
+  - `EncryptionConfig` 新增 `datastream_encryption_enabled` 配置项，支持数据流加密。
+
+- **优化与改进**:
+  - 优化 Simulcast Stream 的配置流程，进一步简化 `LocalVideoTrack.enable_simulcast_stream()` 的调用方式。
+  - 调整音频编码的时间戳行为：当未设置 `capture_time_ms` 时，默认自动采用当前时间。
+  - 优化 RTC/RTM 二进制消息处理流程，增强原始数据透传能力。
+  - 增强 RTM ctypes 回调对象的生命周期管理，提升整体稳定性。
+
+- **示例与文档**:
+  - 更新 RTM/RTC 示例代码，补充 Simulcast 及二进制消息发送的详细示例。
+  - 更新 macOS SDK 版本记录。
+
+## 2026.06.01 Release Version 2.4.6
+- **更新**: 更新了 rtc sdk到174，解决2个相同的uid加入到频道的问题
+
 ## 2026.05.08 Release Version 2.4.5
 - **更新**: 更新了 arm rtc sdk， 修复了在 arm64 架构下，没有导出符号表的问题。目前在arm架构下，基础功能是可以使用的，但vad等算法不能使用。
 
