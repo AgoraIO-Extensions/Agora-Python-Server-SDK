@@ -41,6 +41,13 @@ class RTCProcessIMPL(RTCBaseProcess):
 
 
     async def send(self, sample_options: ExampleOptions, connection: RTCConnection):
+        #simulcast stream
+        connection.set_simulcast_stream(True,   
+            SimulcastStreamConfig(
+                dimensions=VideoDimensions(width=384, height=216),
+                bitrate=360,
+                framerate=10)
+        )
         pcm_task = asyncio.create_task(push_pcm_data_from_file(sample_options.sample_rate, sample_options.num_of_channels, connection, sample_options.audio_file, self._exit))
         yuv_task = asyncio.create_task(push_yuv_data_from_file(sample_options.width, sample_options.height, sample_options.fps, connection, sample_options.video_file, self._exit))
         await pcm_task

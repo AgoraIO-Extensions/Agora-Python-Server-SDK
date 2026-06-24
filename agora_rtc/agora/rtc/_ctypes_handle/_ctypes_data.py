@@ -1276,7 +1276,8 @@ class EncryptionConfigInner(ctypes.Structure):
         return EncryptionConfigInner(
             config.encryption_mode,
             encryption_key,
-            encryption_kdf_salt
+            encryption_kdf_salt,
+            config.datastream_encryption_enabled
         )
 
 

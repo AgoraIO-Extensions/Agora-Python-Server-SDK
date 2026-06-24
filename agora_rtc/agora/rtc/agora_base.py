@@ -566,7 +566,7 @@ class EncodedAudioFrameInfo:
     samples_per_channel: int = 1024
     send_even_if_empty: int = 1
     number_of_channels: int = 1
-    capture_time_ms: int = 0
+    capture_time_ms: int = -1 #-1 means not set, when push_audio_encoded_data, if capture_time_ms is not set, will use the current time
 
 
 @dataclass(kw_only=True)
@@ -701,6 +701,7 @@ class EncryptionConfig:
     encryption_mode: int
     encryption_key: str
     encryption_kdf_salt: bytearray = None
+    datastream_encryption_enabled: bool = False
 @dataclass(kw_only=True)
 class CapabilityItem:
     id: int

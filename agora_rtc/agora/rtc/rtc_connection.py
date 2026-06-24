@@ -87,6 +87,11 @@ agora_local_audio_track_set_total_extra_send_ms = agora_lib.agora_local_audio_tr
 agora_local_audio_track_set_total_extra_send_ms.restype = AGORA_API_C_INT
 agora_local_audio_track_set_total_extra_send_ms.argtypes = [AGORA_HANDLE, ctypes.c_uint64]
 
+#get sid
+agora_rtc_conn_get_sid = agora_lib.agora_rtc_conn_get_sid
+agora_rtc_conn_get_sid.restype = ctypes.c_char_p
+agora_rtc_conn_get_sid.argtypes = [AGORA_HANDLE]
+
 #global variable
 _is_deliver_mute_data_has_set: bool = False
 
@@ -208,11 +213,13 @@ class RTCConnection:
     # send data stream message to connection
     def send_stream_message(self, data) -> int:
         length = len(data)
-        c_data = ctypes.c_char_p(data)
+        #c_data = ctypes.c_char_p(data)
+        arr = (ctypes.c_char * length).from_buffer(data)   # zero copy
+        ptr = ctypes.cast(arr, ctypes.POINTER(ctypes.c_char_p))
         ret = agora_rtc_conn_send_stream_message(
             self.conn_handle,
             self._data_stream_id,
-            c_data,
+            ptr,
             length
         )
         return ret
@@ -630,5 +637,18 @@ class RTCConnection:
             return -1001
         ret = self.local_user._send_intra_request(remote_uid)
         return ret
+        pass
+    def set_simulcast_stream(self, enabled: bool, config: SimulcastStreamConfig)->int:
+        ret = -1000
+        if self._video_track:
+            ret = self._video_track.enable_simulcast_stream(enabled, config)
+        return ret
+        pass    
+    def get_sid(self)->str:
+        ret = -1000
+        if self.conn_handle is None:
+            return ""
+        sid = agora_rtc_conn_get_sid(self.conn_handle)
+        return sid.decode() if sid else ""
         pass
     
