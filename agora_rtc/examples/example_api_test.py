@@ -349,7 +349,8 @@ def test_encryption_config():
     config = EncryptionConfig(
         encryption_mode=1,
         encryption_key="my_key",
-        encryption_kdf_salt=bytes([1, 2, 3, 4])
+        encryption_kdf_salt=bytes([1, 2, 3, 4]),
+        datastream_encryption_enabled=False
     )
     inner = EncryptionConfigInner.create(config)
     print(f"Salt values: {list(inner.encryption_kdf_salt)}")
@@ -358,7 +359,8 @@ def test_encryption_config():
     config = EncryptionConfig(
         encryption_mode=1,
         encryption_key="my_key",
-        encryption_kdf_salt=None
+        encryption_kdf_salt=None,
+        datastream_encryption_enabled=True
     )
     inner = EncryptionConfigInner.create(config)
     print(f"Empty salt: {inner.encryption_kdf_salt}")
@@ -367,7 +369,8 @@ def test_encryption_config():
     config = EncryptionConfig(
         encryption_mode=1,
         encryption_key="my_key",
-        encryption_kdf_salt=bytes([1] * 40)
+        encryption_kdf_salt=bytes([1] * 40),
+        datastream_encryption_enabled=False
     )
     inner = EncryptionConfigInner.create(config)
     print(f"Truncated salt: {list(inner.encryption_kdf_salt)}")
@@ -379,14 +382,16 @@ def test_encryption_config():
     config = EncryptionConfig(
         encryption_mode=1, 
         encryption_key=encryption_key,
-        encryption_kdf_salt=None
+        encryption_kdf_salt=None,
+        datastream_encryption_enabled=False
     )
     inner = EncryptionConfigInner.create(config)
     print(f"Truncated salt: {list(inner.encryption_kdf_salt)}")
     config = EncryptionConfig(
         encryption_mode=7, 
         encryption_key="oLB41X/IGpxgUMzsYpE+IOpNLOyIbpr8C7qe+mb7QRHkmrELtVsWw6Xr6rQ0XAK03fsBXJJVCkXeL2X7J492qXjR89Q=",
-        encryption_kdf_salt=bytearray(salt.encode('utf-8'))
+        encryption_kdf_salt=bytearray(salt.encode('utf-8')),
+        datastream_encryption_enabled=False
     )
     inner = EncryptionConfigInner.create(config)
     print(f"User case salt: {list(inner.encryption_kdf_salt)}")

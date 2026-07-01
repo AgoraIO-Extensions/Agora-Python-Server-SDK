@@ -1246,14 +1246,16 @@ class EncryptionConfigInner(ctypes.Structure):
     _fields_ = [
         ("encryption_mode", ctypes.c_int),
         ("encryption_key", ctypes.c_char_p),
-        ("encryption_kdf_salt", ctypes.c_uint8 * 32)
+        ("encryption_kdf_salt", ctypes.c_uint8 * 32),
+        ("datastream_encryption_enabled", ctypes.c_bool),
     ]
 
     def get(self):
         return EncryptionConfig(
             encryption_mode=self.encryption_mode,
             encryption_key=self.encryption_key.decode() if self.encryption_key else "",
-            encryption_kdf_salt=bytearray(bytes(self.encryption_kdf_salt))
+            encryption_kdf_salt=bytearray(bytes(self.encryption_kdf_salt)),
+            datastream_encryption_enabled=self.datastream_encryption_enabled
         )   
 
     @staticmethod

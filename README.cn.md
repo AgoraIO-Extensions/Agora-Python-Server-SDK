@@ -82,6 +82,19 @@ conclusion: the diff is not stable, but seems to less than 200ms.
 
 # 更新日志
 
+## 2026.06.24 Release Version 2.4.8
+
+- **修复**:
+  - 修复encryptionconfigure的一个实现错误。
+- **新增功能**:
+  - 新增 `ut test case`
+  - 用法
+   cd agora_rtc
+  pip install pytest
+  PYTHONPATH=. pytest tests/ -v
+  or pytest tests/ -v
+
+
 
 ## 2026.06.24 Release Version 2.4.7
 
