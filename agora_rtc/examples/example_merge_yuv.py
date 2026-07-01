@@ -1,6 +1,6 @@
 # coding=utf-8
 #
-# author: Yan Zhennan
+# author: Wei
 # date: 2026-04-14
 #
 # Offline tool: merge multiple same-size I420 YUV frames into a fixed layout
