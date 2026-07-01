@@ -50,6 +50,18 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 
 # Release Note
 
+## 2026.06.24 Release Version 2.4.8
+
+- **Bugfixes**:
+  - Fixed an implementation error in `encryptionconfigure`.
+- **New Features**:
+  - Added `ut test case`
+  - Usage:
+    cd agora_rtc
+    pip install pytest
+    PYTHONPATH=. pytest tests/ -v
+    or pytest tests/ -v
+
 ## 2026.06.24 Release Version 2.4.7
 
 - **New Features**:
