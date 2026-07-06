@@ -211,11 +211,20 @@ class RTCConnection:
         return ret
     
     # send data stream message to connection
+    # data can be str or bytes/bytearray object,is diff to send_sream_message which is a str object
     def send_stream_message(self, data) -> int:
+        if data is None:
+            return -1001
         length = len(data)
-        #c_data = ctypes.c_char_p(data)
-        arr = (ctypes.c_char * length).from_buffer(data)   # zero copy
-        ptr = ctypes.cast(arr, ctypes.POINTER(ctypes.c_char_p))
+        if length == 0:
+            return 0
+        if isinstance(data, str):
+            data = data.encode('utf-8')
+        elif isinstance(data, (bytes, bytearray)):
+            data = bytes(data)
+        else:
+            return -1002
+        ptr = ctypes.c_char_p(data)
         ret = agora_rtc_conn_send_stream_message(
             self.conn_handle,
             self._data_stream_id,

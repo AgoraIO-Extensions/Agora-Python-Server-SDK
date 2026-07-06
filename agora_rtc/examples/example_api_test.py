@@ -708,8 +708,16 @@ def main():
                 connection.push_audio_pcm_data(audio_buffer, sample_rate, channels)
                 print("push audio pcm data")
         time.sleep(0.05)
-        #connection.send_stream_message("stream test")
-        #connection.send_audio_meta_data("audio meta data test")
+        ret = connection.send_stream_message(b"stream test")
+        print(f"send stream message ret = {ret}")
+        ret = connection.send_stream_message("stream test")
+        print(f"send stream message ret = {ret}")
+        ret = connection.send_stream_message(bytearray(b"stream test"))
+        print(f"send stream message ret = {ret}")
+        ret = connection.send_stream_message("")
+        print(f"send stream message ret = {ret}")
+        ret = connection.send_audio_meta_data("audio meta data test")
+        print(f"send audio meta data ret = {ret}")
 
      # release resource
     print("release resource now")

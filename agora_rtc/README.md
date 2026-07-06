@@ -50,6 +50,12 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 
 # Release Note
 
+## 2026.06.24 Release Version 2.4.9
+
+- **Bugfixes**:
+  - Fixed a bug in `send_stream_message`.
+  - Fixed a bug with the non-standard usage of `ctypes.POINTER`.
+
 ## 2026.06.24 Release Version 2.4.8
 
 - **Bugfixes**:
