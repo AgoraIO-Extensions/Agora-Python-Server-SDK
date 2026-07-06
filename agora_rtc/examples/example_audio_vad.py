@@ -226,6 +226,16 @@ def main():
             if ret == True:
                connection.push_audio_pcm_data(slice_data, 16000, 1)
             time.sleep(0.05)
+            ret = connection.send_stream_message(b"stream test")
+            print(f"send stream message ret = {ret}")
+            ret = connection.send_stream_message("stream test")
+            print(f"send stream message ret = {ret}")
+            ret = connection.send_stream_message(bytearray(b"stream test"))
+            print(f"send stream message ret = {ret}")
+            ret = connection.send_stream_message("")
+            print(f"send stream message ret = {ret}")
+            ret = connection.send_audio_meta_data("audio meta data test")
+            print(f"send audio meta data ret = {ret}")
 
 
      # release resource

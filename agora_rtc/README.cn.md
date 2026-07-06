@@ -82,6 +82,12 @@ conclusion: the diff is not stable, but seems to less than 200ms.
 
 # 更新日志
 
+## 2026.06.24 Release Version 2.4.9
+
+- **修复**:
+  - 修复send_stream_message的bug
+  - 修复不完全标准的ctytpes.POINTER的bug
+
 ## 2026.06.24 Release Version 2.4.8
 
 - **修复**:
