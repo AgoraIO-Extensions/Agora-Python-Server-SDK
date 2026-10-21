@@ -82,6 +82,11 @@ conclusion: the diff is not stable, but seems to less than 200ms.
 
 # 更新日志
 
+## 2026.10.21 Release Version 2.4.10
+- **改进**:
+  - 修改 `SimulcastStreamConfig`中bitrate的单位，设置为kbps
+  - 修改 `VideoEncoderConfiguration` 中bitrate的单位，设置为kbps
+
 ## 2026.06.24 Release Version 2.4.9
 
 - **修复**:

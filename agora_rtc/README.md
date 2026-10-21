@@ -50,6 +50,11 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 
 # Release Note
 
+## 2026.10.21 Release Version 2.4.10
+- **Update**:
+  - Update `SimulcastStreamConfig` unit of bitrate to kbps
+  - Update `VideoEncoderConfiguration` unit of bitrate to kbps
+
 ## 2026.06.24 Release Version 2.4.9
 
 - **Bugfixes**:
