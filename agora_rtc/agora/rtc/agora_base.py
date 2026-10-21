@@ -607,7 +607,9 @@ class VideoEncoderConfiguration:
     dimensions: VideoDimensions
     codec_type: VideoCodecType = VideoCodecType.VIDEO_CODEC_H264
     frame_rate: int = 15
+    #bitrate: kbps
     bitrate: int = 0
+    #min_bitrate: kbps
     min_bitrate: int = -1
     orientation_mode: int = 0
     degradation_preference: int = 0
@@ -649,6 +651,7 @@ class ExternalVideoFrame:
 @dataclass(kw_only=True)
 class SimulcastStreamConfig:
     dimensions: VideoDimensions
+    #bitrate: kbps
     bitrate: int
     framerate: int
 
