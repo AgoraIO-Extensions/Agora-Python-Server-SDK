@@ -499,6 +499,11 @@ class RTCConnection:
         ret = -1000
         #ensure video track is yuv type
         if self._video_track and self._video_sender:
+            #change bitrate from bps to kbps
+            if config.bitrate > 0: 
+                config.bitrate = config.bitrate * 1000
+            if config.min_bitrate > 0:
+                config.min_bitrate = config.min_bitrate * 1000
             ret = self._video_track.set_video_encoder_configuration(config)
         return ret
     def is_push_to_rtc_completed(self) -> bool:
@@ -650,6 +655,8 @@ class RTCConnection:
     def set_simulcast_stream(self, enabled: bool, config: SimulcastStreamConfig)->int:
         ret = -1000
         if self._video_track:
+            if config.bitrate > 0:
+                config.bitrate = config.bitrate * 1000
             ret = self._video_track.enable_simulcast_stream(enabled, config)
         return ret
         pass    
