@@ -50,6 +50,10 @@ python agora_rtc/examples/example_audio_pcm_send.py --appId=xxx --channelId=xxx 
 
 # Change log
 
+## 2026.11.24 Release Version 2.4.11
+- **Improvements‌**:
+  - `update rtc` rtc` Modified update rtc to fix the issue where the encoder would crash under certain extremely rare circumstances. 
+  
 ## 2026.10.21 Release Version 2.4.10
 - **Update**:
   - Update `SimulcastStreamConfig` unit of bitrate to kbps

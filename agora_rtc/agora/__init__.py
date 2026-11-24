@@ -150,6 +150,9 @@ def _check_download_and_extract_sdk():
     linux_sdk="https://download.agora.io/sdk/release/agora_rtc_sdk_x86_64-linux-gnu-v4.4.32.174_28020_SERVER_20260601_1240_1144448_20251021_1427-3a.zip"
     mac_sdk="https://download.agora.io/sdk/release/agora_sdk_mac_v4.4.32.174_27844_FULL_20260601_1303_1144450_20251021_1427-3a.zip"
 
+    #date: 20261124 update rtc sdk to 4433 , to fix a bug in some case the video decoder will crash
+    url="https://download.agora.io/sdk/release/agora_rtc_sdk.v4.4.33.3_29118_SERVER_20261124_1102_ubuntu14_04_5_1403129_external-20251021_1427-3a.zip"
+     
     
           
     linux_libfile_path = os.path.join(sdk_library_dir, "libagora_rtc_sdk.so")
